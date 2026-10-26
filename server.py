@@ -556,5 +556,7 @@ if __name__ == "__main__":
     address = f"http://{host}:{port}"
     print(f"Clipic MVP running at {address}")
     print("Project drafts are stored in projects.json beside this file.")
-    threading.Timer(0.8, webbrowser.open, args=(address,)).start()
+    # Only open browser in local development
+    if os.environ.get("RENDER") != "true" and os.environ.get("RAILWAY_ENVIRONMENT") is None:
+        threading.Timer(0.8, webbrowser.open, args=(address,)).start()
     ThreadingHTTPServer((host, port), Handler).serve_forever()
