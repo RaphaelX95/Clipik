@@ -1,0 +1,12 @@
+[
+  {
+    "docnum": "1005",
+    "user_id": "demo-user",
+    "tokens": 5,
+    "amount": "13.50",
+    "confirmation": "manual",
+    "customer_id": "demo-user",
+    "status": "paid",
+    "created_at": "2026-10-26T05:53:02.196319+00:00"
+  }
+]
