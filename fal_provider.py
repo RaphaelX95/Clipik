@@ -171,7 +171,7 @@ def build_prompt(
     *, product: str, audience: str, language: str, script: str, style: str,
     segment_index: int, segment_count: int, creator: str = "דמות AI",
 ) -> str:
-    """בניית פרומפט UGC מפורט לקטע וידאו אחד, כפוף למוצר והקonyx."""
+    """בניית פרומפט UGC מפורט לקטע וידאו אחד, כפוף למוצר ולסגנון."""
     if not script.strip():
         raise ValueError("צריך לכתוב תסריט לפני יצירת הסרטון")
     if segment_index < 0 or segment_index >= segment_count:
