@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תבניות סרטונים - קליפיק</title>
+<style>
+:root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:30px 20px}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.head h1{margin:0;font-size:26px}
+.back{background:var(--green);color:#fff;border:0;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 14px #0000000a;transition:.15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px #00000012}
+.card h3{margin:0 0 6px;font-size:18px}
+.card p{margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.6}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tag{background:#f1f8f2;border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-size:11px;color:var(--ink)}
+.btn{width:100%;padding:11px;border:0;border-radius:12px;background:var(--lime);color:var(--ink);font-weight:bold;cursor:pointer}
+.back-link{display:inline-block;margin-bottom:18px;color:var(--green);text-decoration:none;font-weight:bold}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div><h1>תבניות סרטונים</h1></div>
+      <button class="back" onclick="window.location.href='/'">יצירת סרטון</button>
+    </div>
+    <p style="color:var(--muted);margin-top:-8px;margin-bottom:18px">בחרו תבנית מוכנה והתחילו לייצר סרטון תוך שניות.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>🎬 הדגמת מוצר יומיומית</h3>
+        <p>סרטון UGC טבעי שמציג את המוצר בשימוש יום-יומי, כמו לידים אמיתיים.</p>
+        <div class="meta"><span class="tag">UGC טבעי</span><span class="tag">15 שניות</span><span class="tag">6 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('UGC טבעי','הדגמת מוצר יומיומית')">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>📦 פתיחת חבילה מרגשת</h3>
+        <p>רגע האמת — חושפים את המוצר לראשונה, מלווה בתוספת אפקטים חמים.</p>
+        <div class="meta"><span class="tag">פתיחת חבילה</span><span class="tag">15 שניות</span><span class="tag">6 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('פתיחת חבילה','פתיחת חבילה מרגשת')">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>🎙️ קריינות ותקריבים</h3>
+        <p>תצוגה מקצועית עם קריין ותקריבים קרובים של המוצר — בלי דמות מול המצלמה.</p>
+        <div class="meta"><span class="tag">קריינות ותקריבים</span><span class="tag">20 שניות</span><span class="tag">8 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('קריינות ותקריבים','קריינות ותקריבים')">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>📚 מדריך קצר</h3>
+        <p>3-4 שלבים פשוטיםEEKים אחד אחרי השני, כמו סרטון הדרכה מהיר.</p>
+        <div class="meta"><span class="tag">מדריך קצר</span><span class="tag">30 שניות</span><span class="tag">12 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('מדריך קצר','מדריך קצר')">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>✨ שיתוף ברשתות</h3>
+        <p>סרטון קצר ואופטימי שנועד לשיתוף בטיקטוק ורילס — פורמט 9:16.</p>
+        <div class="meta"><span class="tag">UGC טבעי</span><span class="tag">15 שניות</span><span class="tag">6 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('UGC טבעי','שיתוף ברשתות')">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>🛍️ מבצע מיוחד</h3>
+        <p>סרטון קליטה למבצעים — מציג את ההנחה בחדות, עם קריאה לפעולה ברורה.</p>
+        <div class="meta"><span class="tag">הדגמת מוצר</span><span class="tag">10 שניות</span><span class="tag">4 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('הדגמת מוצר','מבצע מיוחד')">בחרו תבנית</button>
+      </div>
+    </div>
+  </div>
+<script>
+function useTemplate(style, name){
+  sessionStorage.setItem('clipik_template_style', style);
+  sessionStorage.setItem('clipik_template_name', name);
+  window.location.href = '/';
+}
+</script>
+</body>
+</html>
