@@ -42,6 +42,9 @@ _ICOUNT_SID_EXIRES = 0
 _GENERATION_CACHE: dict[str, float] = {}
 _GENERATION_CACHE_TTL = 300  # 5 minutes
 
+# Demo video for free trial users (pre-generated, no cost)
+_DEMO_VIDEO_URL = "https://v3b.fal.media/files/b/0aafe5c3/fAPg5-ZZJpXUy1q3uEUju_output.mp4"
+
 
 def read_projects():
     try:
@@ -85,6 +88,24 @@ def _update_user_tokens(user_id: str, tokens: int) -> dict:
             _save_users(data)
             return user
     return {}
+
+
+def _has_free_trial_available(user_id: str) -> bool:
+    user = _get_user(user_id)
+    if not user:
+        return False
+    # Free trial available if user hasn't used it yet and has exactly 6 tokens
+    # (the amount given in the free trial package)
+    return user.get('free_trial_used') is False and int(user.get('tokens', 0)) == 6
+
+
+def _mark_free_trial_used(user_id: str) -> None:
+    data = _load_users()
+    for user in data.get('users', []):
+        if user.get('id') == user_id:
+            user['free_trial_used'] = True
+            _save_users(data)
+            return
 
 
 def _icount_session() -> str:
@@ -214,6 +235,46 @@ class Handler(BaseHTTPRequestHandler):
             content_type, image_bytes = _fal_provider.validate_image_data_url(image_data_url)
         except ValueError as exc:
             return self.send_json(400, {"error": str(exc)})
+
+        user_id = payload.get('user_id', 'demo-user')
+        
+        # Check if user can use free trial (demo video instead of real generation)
+        if _has_free_trial_available(user_id):
+            _mark_free_trial_used(user_id)
+            tokens_required = _fal_provider.estimate_tokens(int(payload.get("duration", 15)))
+            user = _get_user(user_id)
+            new_tokens = 0
+            if user:
+                new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
+                _update_user_tokens(user_id, new_tokens)
+            
+            project = {
+                "id": uuid.uuid4().hex[:10],
+                "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "product": str(payload.get("product", "מוצר לדוגמה"))[:120],
+                "product_url": str(payload.get("product_url", ""))[:500],
+                "audience": str(payload.get("audience", ""))[:300],
+                "language": str(payload.get("language", "עברית"))[:40],
+                "platform": str(payload.get("platform", "אנכי · 9:16"))[:40],
+                "duration": str(payload.get("duration", "15"))[:20],
+                "script": str(payload.get("script", ""))[:5000],
+                "style": str(payload.get("style", "UGC טבעי"))[:80],
+                "creator": str(payload.get("creator", "דמות AI"))[:80],
+                "status": "completed",
+                "video_url": _DEMO_VIDEO_URL,
+                "demo": True,
+            }
+            items = read_projects()
+            items.insert(0, project)
+            write_projects(items[:100])
+            return self.send_json(201, {
+                "project": project,
+                "video_url": _DEMO_VIDEO_URL,
+                "tokens_remaining": new_tokens if user else 0,
+                "tokens_spent": tokens_required,
+                "demo": True,
+                "message": "סרטון הדגמה מוכן! רוצים סרטון אמיתי? קנו טוקנים",
+            })
 
         prompt = payload.get("prompt") or _fal_provider.build_prompt(
             product=payload.get("product", "מוצר לדוגמה"),
@@ -429,6 +490,8 @@ class Handler(BaseHTTPRequestHandler):
             user = _get_user(user_id)
             if user:
                 new_total = int(user.get("tokens", 0)) + tokens
+                user['free_trial_used'] = False
+                _save_users(_load_users())
                 _update_user_tokens(user_id, new_total)
                 return self.send_json(200, {"ok": True, "tokens_added": tokens, "tokens_total": new_total, "message": "סרטון ראשון חינם! הטוקנים הופעלו."})
             return self.send_json(404, {"error": "User not found"})
