@@ -551,7 +551,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    host = os.environ.get("CLIPIC_HOST", "127.0.0.1")
+    host = os.environ.get("CLIPIC_HOST", os.environ.get("HOST", "0.0.0.0"))
     port = int(os.environ.get("PORT", "8765"))
     address = f"http://{host}:{port}"
     print(f"Clipic MVP running at {address}")
