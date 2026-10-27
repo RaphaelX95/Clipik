@@ -96,7 +96,7 @@ uv run python server.py
 - [ ] sitemap.xml נגיש
 - [ ] Google Search Console אימות
 - [ ]=iCount redirect URLs עובדים
-- [ ] סרטון ראשון חינם עובד
+- [ ] סרטון ראשון במבצע 9.99 ש״ח עובד
 
 ## תמיכה
 פנו ל-אימייל או WhatsApp לתמיכה טכנית.

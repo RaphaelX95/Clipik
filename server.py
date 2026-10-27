@@ -499,7 +499,7 @@ class Handler(BaseHTTPRequestHandler):
                 user['free_trial_used'] = False
                 _save_users(_load_users())
                 _update_user_tokens(user_id, new_total)
-                return self.send_json(200, {"ok": True, "tokens_added": tokens, "tokens_total": new_total, "message": "סרטון ראשון חינם! הטוקנים הופעלו."})
+                return self.send_json(200, {"ok": True, "tokens_added": tokens, "tokens_total": new_total, "message": "סרטון ראשון במבצע 9.99 ש״ח! הטוקנים הופעלו."})
             return self.send_json(404, {"error": "User not found"})
 
         description = f"טוקנים - {tokens} טוקנים (חבילת {package_id})"
