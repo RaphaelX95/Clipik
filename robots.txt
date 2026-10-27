@@ -7,4 +7,4 @@ Disallow: /users.json
 Disallow: /pending_payments.json
 Disallow: /transactions.json
 
-Sitemap: http://127.0.0.1:8767/sitemap.xml
+Sitemap: https://clipik.pro/sitemap.xml

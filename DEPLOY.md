@@ -3,7 +3,7 @@
 ## שלבי הפריסה
 
 ### 1. קניית דומיין
-- קנו דומיין (למשל: `klipik.co.il`) מ-registrar כמו:
+- קנו דומיין (למשל: `clipik.pro`) מ-registrar כמו:
   - GoDaddy
   - Namecheap
   - Cloudflare Registrar
@@ -43,14 +43,14 @@ ICOUNT_CID=...
 ICOUNT_USER=...
 ICOUNT_PASS=...
 ICOUNT_PAGE_ID=14
-BASE_URL=https://klipik.co.il
+BASE_URL=https://clipik.pro
 PORT=8765
 ```
 
 ### 5. עדכון URLs בפריסה
 הריצו סקריפט העדכון לפני העלאה:
 ```bash
-python deploy.py https://klipik.co.il
+python deploy.py https://clipik.pro
 ```
 
 ### 6. הפעלת השרת
@@ -67,12 +67,12 @@ uv run python server.py
 
 ### 8. Google Search Console
 1. גשו ל [Google Search Console](https://search.google.com/search-console)
-2. הוסיפו דומיין: `klipik.co.il`
+2. הוסיפו דומיין: `clipik.pro`
 3. אוירו ownership:
    - **קובץ HTML:** הורידו קובץ אימות והעלו אותו לתיקיית האתר
    - **DNS TXT:** הוסיפו רשומה בדDNS
    - **Meta tag:** הוסיפו tag ל-index.html
-4. שלחו sitemap.xml: `https://klipik.co.il/sitemap.xml`
+4. שלחו sitemap.xml: `https://clipik.pro/sitemap.xml`
 
 ### 9. תמונות עם alt text
 הוסיפו תמונות למוצרים עם `alt` text מפורט:
