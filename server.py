@@ -386,7 +386,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self.send_json(400, {"error": str(exc)})
             return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
-        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo.html"):
+        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo.html"):
             self.send_error(404, "Not found")
             return
         if path == "/tips.html":
@@ -403,6 +403,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "logo.html").read_bytes()
         if path == "/product-page.html":
             body = (ROOT / "product-page.html").read_bytes()
+        if path == "/analytics.html":
+            body = (ROOT / "analytics.html").read_bytes()
         if path == "/payment_success.html":
             body = (ROOT / "payment_success.html").read_bytes()
         elif path == "/payment_failure.html":
@@ -440,6 +442,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle_script_generate()
         if path == "/api/product-page":
             return self._handle_product_page()
+        if path == "/api/analytics/summary":
+            return self._handle_analytics_summary()
+        if path == "/api/analytics/event":
+            return self._handle_analytics_event()
         if path == "/api/icount/create-payment":
             return self._handle_icount_payment()
         if path == "/api/icount/ipn":
@@ -508,6 +514,52 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.address_string(), fmt % args))
+
+
+    def _handle_analytics_summary(self):
+        # Demo summary - in production read from analytics store
+        demo = {
+            'total_views': 1247,
+            'total_videos': 18,
+            'total_downloads': 32,
+            'total_clicks': 486,
+            'weekly': [
+                {'day':'א','views':120,'videos':2},
+                {'day':'ב','views':98,'videos':1},
+                {'day':'ג','views':156,'videos':3},
+                {'day':'ד','views':134,'videos':2},
+                {'day':'ה','views':210,'videos':4},
+                {'day':'ו','views':89,'videos':1},
+                {'day':'ש','views':440,'videos':5}
+            ],
+            'recent_videos': [
+                {'name':'סרטון מוצר A','date':'27/10/2026','status':'הושלם','views':124},
+                {'name':'סרטון מוצר B','date':'26/10/2026','status':'הושלם','views':89},
+                {'name':'סרטון מוצר C','date':'25/10/2026','status':'מעובד','views':45}
+            ],
+            'recent_products': [
+                {'name':'מוצר אלפא','price':'₪199','date':'27/10/2026','downloads':12},
+                {'name':'מוצר בטא','price':'₪149','date':'26/10/2026','downloads':8},
+                {'name':'מוצר גאמה','price':'₪249','date':'25/10/2026','downloads':7}
+            ]
+        }
+        return self.send_json(200, demo)
+
+    def _handle_analytics_event(self):
+        try:
+            length = int(self.headers.get('Content-Length', '0'))
+            if length <= 0 or length > MAX_BODY:
+                return self.send_json(413, {'error': 'Request too large'})
+            payload = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            return self.send_json(400, {'error': 'Invalid JSON'})
+
+        event_type = str(payload.get('type', 'unknown')).strip()
+        data = payload.get('data', {})
+        # In production: persist to analytics store / database
+        print(f'ANALYTICS: {event_type} | {data}')
+        return self.send_json(200, {'ok': True})
+
 
     def _handle_icount_payment(self):
         try:
