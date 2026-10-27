@@ -335,6 +335,48 @@ class Handler(BaseHTTPRequestHandler):
         write_projects(items[:100])
         return self.send_json(201, {"project": project, "video_url": video_url, "tokens_remaining": new_tokens if user else 0, "tokens_spent": tokens_required})
 
+    def do_HEAD(self):
+        path = urlparse(self.path).path
+        if path not in ('/', '/index.html', '/packages.html', '/tips.html', '/templates.html', '/create.html', '/product-page.html', '/analytics.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html'):
+            self.send_error(404, 'Not found')
+            return
+        body = b''
+        if path == '/' or path == '/index.html':
+            body = (ROOT / 'index.html').read_bytes()
+        elif path == '/packages.html':
+            body = (ROOT / 'packages.html').read_bytes()
+        elif path == '/tips.html':
+            body = (ROOT / 'tips.html').read_bytes()
+        elif path == '/templates.html':
+            body = (ROOT / 'templates.html').read_bytes()
+        elif path == '/create.html':
+            body = (ROOT / 'create.html').read_bytes()
+        elif path == '/product-page.html':
+            body = (ROOT / 'product-page.html').read_bytes()
+        elif path == '/analytics.html':
+            body = (ROOT / 'analytics.html').read_bytes()
+        elif path == '/logo-source.jpg':
+            body = (ROOT / 'logo-source.jpg').read_bytes()
+        elif path == '/logo.svg':
+            body = (ROOT / 'logo.svg').read_bytes()
+        elif path == '/logo.html':
+            body = (ROOT / 'logo.html').read_bytes()
+        elif path == '/payment_success.html':
+            body = (ROOT / 'payment_success.html').read_bytes()
+        elif path == '/payment_failure.html':
+            body = (ROOT / 'payment_failure.html').read_bytes()
+        elif path == '/payment_cancel.html':
+            body = (ROOT / 'payment_cancel.html').read_bytes()
+        elif path == '/sitemap.xml':
+            body = (ROOT / 'sitemap.xml').read_bytes()
+        elif path == '/robots.txt':
+            body = (ROOT / 'robots.txt').read_bytes()
+        elif path == '/google7cfae0c73b4d1768.html':
+            body = (ROOT / 'google7cfae0c73b4d1768.html').read_bytes()
+        self.send_response(200)
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/api/health":
