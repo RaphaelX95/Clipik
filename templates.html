@@ -71,10 +71,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
   </div>
 <script>
 function useTemplate(style, name, duration){
-  sessionStorage.setItem('clipik_template_style', style);
-  sessionStorage.setItem('clipik_template_name', name);
-  if(duration) sessionStorage.setItem('clipik_template_duration', duration);
-  window.location.href = '/';
+  const hint = {
+    'הדגמת מוצר יומיומית': 'השתמשו בתאורה טבעית, צלמו מהצד ולא מהקדם, והראו את המוצר בשימוש אמיתי.',
+    'פתיחת חבילה מרגשת': 'התחילו עם זום קרוב על האריזה, ואז חשיפו את המוצר לאט. הוסיפו אפקטים קלים.',
+    'קריינות ותקריבים': 'תמונת רקע נקייה, תקריבים חדים, וטקסט קצר שיופיע ככתוביות.',
+    'מדריך קצר': 'חלקו את השימוש ל-3-4 שלבים פשוטים, עם כתוביות לכל שלב.',
+    'שיתוף ברשתות': 'פחות טקסט, יותר ויזואל. פתיחה מוליכה וסיום עם קריאה לפעולה.',
+    'מבצע מיוחד': 'הדגישו את ההנחה, הוסיפו תאריך, וסיימו עם "קנו עכשיו" ברור.'
+  };
+  const url = '/create.html?name=' + encodeURIComponent(name) + '&style=' + encodeURIComponent(style) + '&duration=' + encodeURIComponent(duration || 15) + '&hint=' + encodeURIComponent(hint[name] || '');
+  window.location.href = url;
 }
 </script>
 </body>
