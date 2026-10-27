@@ -167,6 +167,119 @@ def fit_image_to_platform(image_bytes: bytes, platform: str) -> tuple[str, bytes
     return "image/png", result.stdout
 
 
+STYLE_MAP = {
+    "UGC טבעי": {"concept": "product_review", "icon": "🎬", "he_name": "ביקורת מוצר"},
+    "הדגמת מוצר": {"concept": "product_review", "icon": "📦", "he_name": "הדגמת מוצר"},
+    "פתיחת חבילה": {"concept": "occasion", "icon": "🎁", "he_name": "אירוע/פתיחת חבילה"},
+    "קריינות ותקריבים": {"concept": "explainer", "icon": "🎙️", "he_name": "הסבר מקצועי"},
+    "מדריך קצר": {"concept": "explainer", "icon": "📚", "he_name": "מדריך How-to"},
+    "בעיה ופתרון": {"concept": "problem_solution", "icon": "💡", "he_name": "בעיה ופתרון"},
+    "ביקורת ראשונה": {"concept": "i_review", "icon": "⭐", "he_name": "ביקורת אישית"},
+    "מבצע/מבצע חדש": {"concept": "offer", "icon": "🔥", "he_name": "מבצע מיוחד"},
+}
+
+CONCEPTS = {
+    "problem_solution": {
+        "name": "בעיה ופתרון",
+        "icon": "💡",
+        "template": "כל יום {problem}. עד שנמצאו את {solution}. {product} עושה את זה בשבילך.",
+    },
+    "product_review": {
+        "name": "ביקורת מוצר",
+        "icon": "📦",
+        "template": "{product} - זה בדיוק מה שחפשת. {audience} אוהבים את {benefit}.",
+    },
+    "i_review": {
+        "name": "ביקורת אישית",
+        "icon": "⭐",
+        "template": "נסיתי את {product} למשך שבוע. {audience} - זה בשבילכם. {verdict}.",
+    },
+    "explainer": {
+        "name": "הסבר מקצועי",
+        "icon": "📚",
+        "template": "רובנו לא יודעים {common_mistake}. {product} מסביר איך {correct_way}.",
+    },
+    "offer": {
+        "name": "מבצע מיוחד",
+        "icon": "🔥",
+        "template": "לשבועיים בלבד! {product} ב-{discount}% הנחה! {audience} - זו ההזדמנות שלכם.",
+    },
+    "occasion": {
+        "name": "אירוע/סיפור",
+        "icon": "🎁",
+        "template": "כשעה לפני {occasion}, {product} נתן את {solution}. {audience} מספרים.",
+    },
+}
+
+
+def generate_script_from_brief(
+    product: str,
+    audience: str,
+    style: str = "UGC טבעי",
+    language: str = "he",
+    duration_seconds: int = 15,
+    custom_notes: str = "",
+) -> dict:
+    concept_info = STYLE_MAP.get(style, STYLE_MAP["UGC טבעי"])
+    concept = concept_info["concept"]
+    product_short = product.split('\n')[0][:60].strip()
+    audience_short = audience[:50].strip() if audience else 'קונים גנריים'
+    script_parts = []
+    if concept == 'problem_solution':
+        script_parts = [
+            f'כל יום {audience_short} מתמודדים עם {product_short} לא מתאים.',
+            f'עד שמצאנו את {product_short} - הפתרון שעובד.',
+            f'הצטרפו אלינו וגלו למה זה משנה את זה.',
+        ]
+    elif concept == 'product_review':
+        script_parts = [
+            f'מה שחשוב לדעת על {product_short}.',
+            f'עבור {audience_short} - זה בדיוק מה שחפשת.',
+            f'התקשרו עכשיו וגלו את ההבדל.',
+        ]
+    elif concept == 'i_review':
+        script_parts = [
+            f'נסיתי את {product_short} במשך החודש האחרון.',
+            f'ל{audience_short} - אתן לכם את הרושם האמיתי.',
+            f'אם אתם מחפשים איכות - זה קודם.',
+        ]
+    elif concept == 'explainer':
+        script_parts = [
+            f'רובנו עושים טעות עם {product_short}.',
+            f'הנה הדרך הנכונה לבחור ולהשתמש.',
+            f'שמרו על הטיפ הזה - זה חוסך לכם זמן וכסף.',
+        ]
+    elif concept == 'offer':
+        script_parts = [
+            f'מבצע מיוחד! {product_short} - {audience_short} מתחברים עכשיו.',
+            f'הנחה משתלמת רק לשבועיים.',
+            f'רוצים לשמוע עוד? התקשרו עכשיו.',
+        ]
+    elif concept == 'occasion':
+        script_parts = [
+            f'כשעה לפני {audience_short} {product_short} נתן פתרון מיידי.',
+            f'הם descobriru שלא יבחרו דבר אחר.',
+            f'ואתה? מוכן לחוות את זה?',
+        ]
+    script = ' '.join(script_parts)
+    words = script.split()
+    target_words = int(duration_seconds * 2.5)
+    if len(words) > target_words:
+        script = ' '.join(words[:target_words])
+    elif len(words) < target_words * 0.7:
+        script += f' הזמינו עכשיו ב-{product_short} - מבצע מיוחד!'
+    return {
+        'script': script.strip(),
+        'concept': concept,
+        'concept_name': concept_info['he_name'],
+        'icon': concept_info['icon'],
+        'style': style,
+        'language': language,
+        'estimated_duration': len(script.split()) / 2.5,
+        'scenes': len(script_parts),
+    }
+
+
 def build_prompt(
     *, product: str, audience: str, language: str, script: str, style: str,
     segment_index: int, segment_count: int, creator: str = "דמות AI",
@@ -185,13 +298,21 @@ def build_prompt(
         if creator == "קריינות"
         else "הצג יוצר AI עקבי אחד שמדבר למצלמה בצורה טבעית UGC."
     )
+    concept_hint = {
+        "problem_solution": "הצג קודם בעיה משותפת, אחר כך את המוצר כפתרון",
+        "product_review": "הצג את המוצר מאשר לאחור, תאור את היתרונות",
+        "i_review": "דבר בגוף ראשון כקונים שחוו את המוצר",
+        "explainer": "דבר כמומחה שמסביר טיפ שימושי",
+        "offer": "הצג את ההצעה בבירור, תאור את הערך",
+        "occasion": "סTell一个小故事 קצרה עם המוצר",
+    }.get(style.split()[0] if style else "UGC", "הצג את המוצר בצורה מושכת")
     return (
         "צור סרטון קצר 9:16 אנכי לפרסומת מוצר UGC, תחושת מצלמה טבעית ביד. "
         "השתמש בתמונת המוצר שסופחה כהפנייה חזותית. אל תשנה צורת המוצר, "
         "צבע, תווית, אריזה או פרטים גלויים אחרים. אל תמציא תכונות מוצר או טענות. "
         "אל תוסיף כתוביות, לוגואים או טקסט כתוב; אלה מתווספים בעריכת הוידאו. "
         f"מוצר: {product[:120]}. קהל: {audience[:300] or 'קונים גנריים'}. "
-        f"סגנון: {style[:80]}. {part} "
+        f"סגנון: {style[:80]}. {concept_hint}. {part} "
         f"{delivery} ב-{language}, אמור את התסריט שסופק כדיאלוג מדבר או קריינות: "
         f"{spoken_script[:5000]}"
     )
