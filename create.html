@@ -76,6 +76,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <div id="captionCount" style="text-align:left;font-size:11px;color:var(--muted);margin-top:4px">0 / 50 תווים</div>
       </div>
       <div class="field">
+        <label for="musicSelect">מוזיקת רקע</label>
+        <select id="musicSelect" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
+          <option value="ללא מוזיקה">ללא מוזיקה</option>
+          <option value="אופטימי וקל">אופטימי וקל</option>
+          <option value="מודרני וטכנולוגי">מודרני וטכנולוגי</option>
+          <option value="רגוע ומרגיע">רגוע ומרגיע</option>
+          <option value="מרוצה ואנרגטי">מרוצה ואנרגטי</option>
+          <option value="לועזי וקלאסי">לועזי וקלאסי</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
         <textarea id="instructions" maxlength="750" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
         <div class="hint" id="templateHint"></div>
@@ -192,6 +203,7 @@ async function createVideo(){
   form.append('script', instructions);
   form.append('creator', document.getElementById('avatarSelect').value);
   form.append('captions', document.getElementById('captions').value.trim());
+  form.append('music', document.getElementById('musicSelect').value);
   if(fileInput.files[0]) form.append('image', fileInput.files[0]);
 
   try{
