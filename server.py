@@ -260,6 +260,7 @@ class Handler(BaseHTTPRequestHandler):
                 "script": str(payload.get("script", ""))[:750],
                 "captions": str(payload.get("captions", ""))[:50],
                 "music": str(payload.get("music", "ללא מוזיקה"))[:40],
+                "ar_effects": str(payload.get("ar_effects", "[]"))[:200],
                 "style": str(payload.get("style", "UGC טבעי"))[:80],
                 "creator": str(payload.get("creator", "דמות AI"))[:80],
                 "status": "completed",
@@ -287,6 +288,7 @@ class Handler(BaseHTTPRequestHandler):
             segment_index=0,
             segment_count=1,
             creator=payload.get("creator", "דמות AI"),
+            ar_effects=json.loads(payload.get("ar_effects", "[]") or "[]"),
         )
         duration = int(payload.get("duration", 15))
 
@@ -314,6 +316,7 @@ class Handler(BaseHTTPRequestHandler):
             "script": str(payload.get("script", ""))[:750],
             "captions": str(payload.get("captions", ""))[:50],
             "music": str(payload.get("music", "ללא מוזיקה"))[:40],
+            "ar_effects": str(payload.get("ar_effects", "[]"))[:200],
             "style": str(payload.get("style", "UGC טבעי"))[:80],
             "creator": str(payload.get("creator", "דמות AI"))[:80],
             "status": "completed",
@@ -455,6 +458,7 @@ class Handler(BaseHTTPRequestHandler):
             "script": str(payload.get("script", ""))[:750],
             "captions": str(payload.get("captions", ""))[:50],
             "music": str(payload.get("music", "ללא מוזיקה"))[:40],
+            "ar_effects": str(payload.get("ar_effects", "[]"))[:200],
             "style": str(payload.get("style", "UGC טבעי"))[:80],
             "creator": str(payload.get("creator", "דמות AI"))[:80],
             "status": "draft",

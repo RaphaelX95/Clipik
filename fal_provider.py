@@ -283,6 +283,7 @@ def generate_script_from_brief(
 def build_prompt(
     *, product: str, audience: str, language: str, script: str, style: str,
     segment_index: int, segment_count: int, creator: str = "דמות AI",
+    ar_effects: list[str] | None = None,
 ) -> str:
     """בניית פרומפט UGC מפורט לקטע וידאו אחד, כפוף למוצר ולסגנון."""
     if not script.strip():
@@ -306,6 +307,22 @@ def build_prompt(
         "offer": "הצג את ההצעה בבירור, תאור את הערך",
         "occasion": "סTell一个小故事 קצרה עם המוצר",
     }.get(style.split()[0] if style else "UGC", "הצג את המוצר בצורה מושכת")
+    
+    # AR effects instruction
+    ar_instruction = ""
+    if ar_effects:
+        effect_map = {
+            "sparkles": "נצוצות זוהר סביב המוצר",
+            "hearts": "לבבות צפים סביב המוצר",
+            "glow": "אפקט זוהר סביב המוצר",
+            "stars": "כוכבים קופצים סביב המוצר",
+            "particles": "קונפטי ופártיקles סביב המוצר",
+            "border": "מסגרת יפהפייה סביב הסרטון",
+        }
+        effects_desc = [effect_map.get(e, e) for e in ar_effects if e in effect_map]
+        if effects_desc:
+            ar_instruction = " הוסף אפקטים ויזואליים: " + ", ".join(effects_desc) + "."
+    
     return (
         "צור סרטון קצר 9:16 אנכי לפרסומת מוצר UGC, תחושת מצלמה טבעית ביד. "
         "השתמש בתמונת המוצר שסופחה כהפנייה חזותית. אל תשנה צורת המוצר, "
@@ -314,7 +331,7 @@ def build_prompt(
         f"מוצר: {product[:120]}. קהל: {audience[:300] or 'קונים גנריים'}. "
         f"סגנון: {style[:80]}. {concept_hint}. {part} "
         f"{delivery} ב-{language}, אמור את התסריט שסופק כדיאלוג מדבר או קריינות: "
-        f"{spoken_script[:750]}"
+        f"{spoken_script[:750]}{ar_instruction}"
     )
 
 

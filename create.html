@@ -33,6 +33,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
   .back { padding: 10px 14px; font-size: 13px; }
 }
 
+/* AR Effects */
+.ar-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+.ar-sparkles{background:radial-gradient(circle at 20% 30%, rgba(255,215,0,0.3) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(255,215,0,0.3) 0%, transparent 50%)}
+.ar-hearts{background:radial-gradient(circle at 30% 40%, rgba(255,0,0,0.2) 0%, transparent 40%),radial-gradient(circle at 70% 60%, rgba(255,0,0,0.2) 0%, transparent 40%)}
+.ar-glow{box-shadow:inset 0 0 60px rgba(37,211,102,0.4)}
+.ar-stars{background:radial-gradient(circle at 25% 25%, rgba(255,255,255,0.4) 0%, transparent 30%),radial-gradient(circle at 75% 75%, rgba(255,255,255,0.4) 0%, transparent 30%)}
+.ar-particles{background:radial-gradient(circle at 40% 50%, rgba(255,0,255,0.3) 0%, transparent 40%),radial-gradient(circle at 60% 50%, rgba(0,255,255,0.3) 0%, transparent 40%)}
+.ar-border{outline:4px solid #25D366;outline-offset:-8px;border-radius:16px}
 </style>
 </head>
 <body>
@@ -85,6 +93,29 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
           <option value="מרוצה ואנרגטי">מרוצה ואנרגטי</option>
           <option value="לועזי וקלאסי">לועזי וקלאסי</option>
         </select>
+      </div>
+      <div class="field">
+        <label>אפקטים AR <small style="color:var(--muted)">(אופציונלי)</small></label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="sparkles"> ✨ נצוצות
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="hearts"> ❤️ לבבות
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="glow"> 💫 זוהר
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="stars"> ⭐ כוכבים
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="particles"> 🎊 קונפטי
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="ar_effects" value="border"> 🎀 מסגרת
+          </label>
+        </div>
       </div>
       <div class="field">
         <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
@@ -204,6 +235,11 @@ async function createVideo(){
   form.append('creator', document.getElementById('avatarSelect').value);
   form.append('captions', document.getElementById('captions').value.trim());
   form.append('music', document.getElementById('musicSelect').value);
+  
+  // Collect AR effects
+  const arEffects = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
+  form.append('ar_effects', JSON.stringify(arEffects));
+  
   if(fileInput.files[0]) form.append('image', fileInput.files[0]);
 
   try{
@@ -211,6 +247,25 @@ async function createVideo(){
     const d = await r.json();
     if(!r.ok) throw new Error(d.error || 'שגיאה ביצירה');
     status.innerHTML = '✓ הסרטון נוצר בהצלחה! <a href="' + (d.video_url || '#') + '" target="_blank">צפו בסרטון</a>';
+    
+    // Apply AR effects to video
+    const arEffects = JSON.parse(payload.get('ar_effects') || '[]');
+    if(arEffects.length > 0 && d.video_url){
+      const videoContainer = document.createElement('div');
+      videoContainer.style.cssText = 'position:relative;display:inline-block;margin-top:12px;border-radius:12px;overflow:hidden';
+      videoContainer.innerHTML = '<video src="' + d.video_url + '" controls autoplay loop style="display:block;max-width:100%;border-radius:12px"></video>';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'ar-overlay';
+      arEffects.forEach(effect => {
+        const div = document.createElement('div');
+        div.className = 'ar-' + effect;
+        overlay.appendChild(div);
+      });
+      
+      videoContainer.appendChild(overlay);
+      status.appendChild(videoContainer);
+    }
     btn.disabled = false;
   }catch(err){
     status.textContent = 'שגיאה: ' + err.message;
