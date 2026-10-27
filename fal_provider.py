@@ -316,8 +316,12 @@ def build_prompt(
             "hearts": "לבבות צפים סביב המוצר",
             "glow": "אפקט זוהר סביב המוצר",
             "stars": "כוכבים קופצים סביב המוצר",
-            "particles": "קונפטי ופártיקles סביב המוצר",
+            "particles": "קונפטי ופרטיקles סביב המוצר",
             "border": "מסגרת יפהפייה סביב הסרטון",
+            "rainbow": "קשת בענן סביב המוצר",
+            "snow": "שלג אור במרקע",
+            "fire": "להבות עדינות ליד המוצר",
+            "bokeh": "אפקט בוקח רך ומרגיע",
         }
         effects_desc = [effect_map.get(e, e) for e in ar_effects if e in effect_map]
         if effects_desc:
