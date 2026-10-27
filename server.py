@@ -386,7 +386,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self.send_json(400, {"error": str(exc)})
             return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
-        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo.html"):
+        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html"):
             self.send_error(404, "Not found")
             return
         if path == "/tips.html":
@@ -399,6 +399,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "google7cfae0c73b4d1768.html").read_bytes()
         if path == "/logo.svg":
             body = (ROOT / "logo.svg").read_bytes()
+        if path == "/logo-source.jpg":
+            body = (ROOT / "logo-source.jpg").read_bytes()
         if path == "/logo.html":
             body = (ROOT / "logo.html").read_bytes()
         if path == "/product-page.html":
@@ -425,6 +427,14 @@ class Handler(BaseHTTPRequestHandler):
             content_type = "application/xml; charset=utf-8"
         elif path == "/robots.txt":
             content_type = "text/plain; charset=utf-8"
+        elif path.endswith(".jpg") or path.endswith(".jpeg"):
+            content_type = "image/jpeg"
+        elif path.endswith(".png"):
+            content_type = "image/png"
+        elif path.endswith(".svg"):
+            content_type = "image/svg+xml"
+        elif path.endswith(".ico"):
+            content_type = "image/x-icon"
         else:
             content_type = "text/html; charset=utf-8"
         
