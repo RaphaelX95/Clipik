@@ -386,7 +386,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self.send_json(400, {"error": str(exc)})
             return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
-        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html"):
+        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo.html"):
             self.send_error(404, "Not found")
             return
         if path == "/tips.html":
@@ -397,6 +397,10 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "create.html").read_bytes()
         if path == "/google7cfae0c73b4d1768.html":
             body = (ROOT / "google7cfae0c73b4d1768.html").read_bytes()
+        if path == "/logo.svg":
+            body = (ROOT / "logo.svg").read_bytes()
+        if path == "/logo.html":
+            body = (ROOT / "logo.html").read_bytes()
         if path == "/payment_success.html":
             body = (ROOT / "payment_success.html").read_bytes()
         elif path == "/payment_failure.html":
