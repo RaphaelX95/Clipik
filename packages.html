@@ -29,6 +29,19 @@
   .breakdown li { margin: 6px 0; }
   .btn { width: 100%; padding: 12px; border: 0; border-radius: 12px; background: var(--lime); color: var(--ink); font-weight: bold; cursor: pointer; margin-top: 8px; }
   .note { text-align: center; color: var(--muted); font-size: 11px; margin-top: 18px; }
+
+@media (max-width: 768px) {
+  .wrap { padding: 20px 14px; }
+  .head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .head h1 { font-size: 22px; }
+  .grid { grid-template-columns: 1fr; gap: 14px; }
+  .card { padding: 16px; }
+  .price { font-size: 24px; }
+  .breakdown { font-size: 11px; }
+  .buy-btn { width: 100%; padding: 12px; font-size: 14px; min-height: 44px; }
+  .note { font-size: 11px; }
+}
+
 </style>
 </head>
 <body>
