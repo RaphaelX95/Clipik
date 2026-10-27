@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>אנליטיקס - קליפיק</title>
-<style>
+<link rel="stylesheet" href="/styles.css">
 :root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
@@ -32,14 +32,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
 .table tr:hover td{background:#f6faf6}
 .footer{text-align:center;padding:18px;color:var(--muted);font-size:12px}
 @media(max-width:768px){.stats{grid-template-columns:1fr}.head{flex-direction:column;align-items:flex-start}}
-</style>
+
 </head>
 <body><script>
 (function(){
   const params = new URLSearchParams(location.search);
   const token = params.get('token');
   if(!token || token !== 'YO4DfXieWO5axgFYUleauA'){
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Arial,sans-serif;background:#e8f5e9;color:#1b3a1f;text-align:center;padding:20px"><div><h1>🔒 גישה מוגבלת</h1><p>הדף הזה נגיש למנהלי האתר בלבד.</p></div></div>';
+    document.body.innerHTML = '<div><div><h1>🔒 גישה מוגבלת</h1><p>הדף הזה נגיש למנהלי האתר בלבד.</p></div></div>';
     throw new Error('Unauthorized');
   }
 })();
@@ -136,7 +136,7 @@ function loadAnalytics(){
   const chart = document.getElementById('weeklyChart');
   chart.innerHTML = demo.weekly.map(d => {
     const pct = Math.round((d.views / maxViews) * 100);
-    return `<div class="bar-row"><div class="name">${d.day}</div><div class="track"><div class="fill" style="width:${pct}%"></div></div><div class="num">${d.views}</div></div>`
+    return `<div class="bar-row"><div class="name">${d.day}</div><div class="track"><div class="fill"></div></div><div class="num">${d.views}</div></div>`
   }).join('');
 
   const tbody1 = document.getElementById('recentVideos');

@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יצירת סרטון - קליפיק</title>
-<style>
-:root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
+<link rel="stylesheet" href="/styles.css">;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
 .wrap{max-width:860px;margin:auto;padding:28px 18px}
@@ -46,13 +45,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
 .ar-fire{background:radial-gradient(circle at 30% 70%, rgba(255,100,0,0.35) 0%, transparent 40%),radial-gradient(circle at 70% 80%, rgba(255,140,0,0.25) 0%, transparent 35%)}
 .ar-bokeh{background:radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25) 0%, transparent 30%),radial-gradient(circle at 75% 25%, rgba(255,255,255,0.2) 0%, transparent 28%),radial-gradient(circle at 50% 70%, rgba(255,255,255,0.2) 0%, transparent 32%)}
 
-<style>
-.ar-preview{position:relative;width:100%;aspect-ratio:9/16;max-height:360px;background:#f5f7f1;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:10px}
+<style>.ar-preview{position:relative;width:100%;aspect-ratio:9/16;max-height:360px;background:#f5f7f1;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:10px}
 .ar-preview video{width:100%;height:100%;object-fit:cover;display:block}
 .ar-preview .ar-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
 @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
 .ar-preview .float{animation:float 2.4s ease-in-out infinite}
-</style>
+
 </style>
 </head>
 <body>
@@ -72,17 +70,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <input id="productName" type="text" placeholder="למשל: סטארטאפ טקטוני, מכנסי גברים, שתיית קלים">
       </div>
       <div class="field">
-        <label for="productUrl">קישור למוצר <small style="color:var(--muted)">(אופציונלי)</small></label>
+        <label for="productUrl">קישור למוצר <small>(אופציונלי)</small></label>
         <input id="productUrl" type="url" placeholder="https://yourstore.com/products/...">
       </div>
       <div class="field">
-        <label for="productImage">תמונת מוצר <small style="color:var(--muted)">(PNG/JPG)</small></label>
+        <label for="productImage">תמונת מוצר <small>(PNG/JPG)</small></label>
         <input id="productImage" type="file" accept="image/png,image/jpeg">
-        <div id="previewThumb" style="margin-top:8px;display:none"><img id="thumbImg" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></div>
+        <div id="previewThumb"><img id="thumbImg"></div>
       </div>
       <div class="field">
         <label for="avatarSelect">דמות מדברת</label>
-        <select id="avatarSelect" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
+        <select id="avatarSelect">
           <option value="דמות AI">דמות AI כללית</option>
           <option value="קריינות">קריין חיצוני (ללא דמות)</option>
           <option value="אדם/ה">אדם/ה מקומי</option>
@@ -91,13 +89,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         </select>
       </div>
       <div class="field">
-        <label for="captions">כתוביות בסוף הסרטון <small style="color:var(--muted)">(אופציונלי, עד 50 תווים)</small></label>
-        <input id="captions" type="text" maxlength="50" placeholder="למשל: קליפיק - צרו סרטונים בעברית" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
-        <div id="captionCount" style="text-align:left;font-size:11px;color:var(--muted);margin-top:4px">0 / 50 תווים</div>
+        <label for="captions">כתוביות בסוף הסרטון <small>(אופציונלי, עד 50 תווים)</small></label>
+        <input id="captions" type="text" maxlength="50" placeholder="למשל: קליפיק - צרו סרטונים בעברית">
+        <div id="captionCount">0 / 50 תווים</div>
       </div>
       <div class="field">
         <label for="musicSelect">מוזיקת רקע</label>
-        <select id="musicSelect" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
+        <select id="musicSelect">
           <option value="ללא מוזיקה">ללא מוזיקה</option>
           <option value="אופטימי וקל">אופטימי וקל</option>
           <option value="מודרני וטכנולוגי">מודרני וטכנולוגי</option>
@@ -107,50 +105,50 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         </select>
       </div>
       <div class="field">
-        <label>אפקטים AR <small style="color:var(--muted)">(אופציונלי)</small></label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+        <label>אפקטים AR <small>(אופציונלי)</small></label>
+        <div>
+          <label>
             <input type="checkbox" name="ar_effects" value="sparkles"> ✨ נצוצות
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="hearts"> ❤️ לבבות
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="glow"> 💫 זוהר
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="stars"> ⭐ כוכבים
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="particles"> 🎊 קונפטי
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="border"> 🎀 מסגרת
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="rainbow"> 🌈 קשת בענן
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="snow"> ❄️ שלג
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="fire"> 🔥 להבות
           </label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f5f7f1;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px">
+          <label>
             <input type="checkbox" name="ar_effects" value="bokeh"> 🌟 בוקח
           </label>
         </div>
       </div>
       <div class="field">
-        <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
+        <label for="instructions">הנחיות למחולל <small>(עד 750 תווים)</small></label>
         <textarea id="instructions" maxlength="750" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
         <div class="hint" id="templateHint"></div>
-        <div id="charCount" style="text-align:left;font-size:11px;color:var(--muted);margin-top:4px">0 / 750 תווים</div>
+        <div id="charCount">0 / 750 תווים</div>
       </div>
-      <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-bottom:10px" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
+      <button class="btn" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
       <button class="btn primary" id="createBtn" onclick="createVideo()">✳ צרו תצוגת סרטון</button>
-      <div id="arPreview" class="ar-preview" style="display:none"></div>
-      <p id="status" style="margin-top:10px;color:var(--muted);font-size:12px"></p>
+      <div id="arPreview" class="ar-preview"></div>
+      <p id="status"></p>
     </div>
   </div>
 
@@ -304,7 +302,7 @@ if(arCheckboxes.length){
     if(arEffects.length > 0 && d.video_url){
       const videoContainer = document.createElement('div');
       videoContainer.style.cssText = 'position:relative;display:inline-block;margin-top:12px;border-radius:12px;overflow:hidden';
-      videoContainer.innerHTML = '<video src="' + d.video_url + '" controls autoplay loop style="display:block;max-width:100%;border-radius:12px"></video>';
+      videoContainer.innerHTML = '<video src="' + d.video_url + '" controls autoplay loop></video>';
       
       const overlay = document.createElement('div');
       overlay.className = 'ar-overlay';

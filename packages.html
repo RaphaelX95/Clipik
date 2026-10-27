@@ -11,7 +11,7 @@
 <meta property="og:description" content="חבילות טוקנים ליצירת סרטוני AI. סרטון ראשון במבצע 9.99 ש״ח!">
 <meta property="og:type" content="website">
 <meta property="og:url" content="/packages.html">
-<style>
+<link rel="stylesheet" href="/styles.css">
   :root { --bg:#e8f5e9; --white:#fff; --ink:#1b3a1f; --muted:#4a6b4f; --line:#c8e6c9; --lime:#25D366; --green:#075e54; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: Arial, "Noto Sans Hebrew", sans-serif; }
@@ -42,26 +42,26 @@
   .note { font-size: 11px; }
 }
 
-</style>
+
 </head>
 <body>
   <div class="wrap">
     <div class="head">
       <div>
-        <div style="font-size:12px;color:var(--muted)">תוכניות</div>
+        <div>תוכניות</div>
         <h1>חבילות טוקנים</h1>
       </div>
       <button class="back" onclick="window.location.href='/'">חזרה</button>
     </div>
-    <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div>
   <div>
-    <div style="font-size:11px;color:var(--muted);font-weight:bold">סרטון ראשון במבצע</div>
-      <div style="font-size:22px;font-weight:800;color:#25D366">9.99 ש"ח</div>
-      <div style="font-size:12px;color:var(--muted)">6 טוקנים · עד 15 שניות</div>
+    <div>סרטון ראשון במבצע</div>
+      <div>9.99 ש"ח</div>
+      <div>6 טוקנים · עד 15 שניות</div>
     </div>
-    <button class="buy-btn" data-package="trial" data-amount="9.99" style="width:auto;padding:10px 18px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer">קנו עכשיו</button>
+    <button class="buy-btn" data-package="trial" data-amount="9.99">קנו עכשיו</button>
 </div>
-<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+<div class="grid">
       <div class="card">
         <h3>3 סרטונים</h3>
         <p class="price">₪16.20</p>
@@ -74,7 +74,7 @@
             <li>~1 סרטון 15 שניות (6 טוקנים)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="3" data-amount="16.20" style="width:auto;padding:10px 18px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer">קנו עכשיו</button>
+        <button class="buy-btn" data-package="3" data-amount="16.20">קנו עכשיו</button>
       </div>
       <div class="card">
         <h3>5 סרטונים</h3>
@@ -88,7 +88,7 @@
             <li>~1 סרטון 15 שניות (6 טוקנים) + 2 סרטוני 5 שניות (4 טוקנים)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="5" data-amount="27.00" style="width:auto;padding:10px 18px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer">קנו עכשיו</button>
+        <button class="buy-btn" data-package="5" data-amount="27.00">קנו עכשיו</button>
       </div>
       <div class="card">
         <h3>10 סרטונים</h3>
@@ -102,7 +102,7 @@
             <li>~3 סרטוני 15 שניות (6 טוקנים) + 1 סרטון 5 שניות (2 טוקנים)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="10" data-amount="54.00" style="width:auto;padding:10px 18px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer">קנו עכשיו</button>
+        <button class="buy-btn" data-package="10" data-amount="54.00">קנו עכשיו</button>
       </div>
     </div>
     <div class="grid">
@@ -121,7 +121,7 @@
             <li>~4 סרטוני 30 שניות (12 טוקנים כל אחד)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="50" data-amount="135" style="width:100%;padding:12px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer;margin-top:8px">קנו עכשיו</button>
+        <button class="buy-btn" data-package="50" data-amount="135">קנו עכשיו</button>
       </div>
       <div class="card popular">
         <div class="badge">הכי פופולרי</div>
@@ -139,7 +139,7 @@
             <li>~10 סרטוני 30 שניות (12 טוקנים כל אחד)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="120" data-amount="324" style="width:100%;padding:12px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer;margin-top:8px">קנו עכשיו</button>
+        <button class="buy-btn" data-package="120" data-amount="324">קנו עכשיו</button>
       </div>
       <div class="card">
         <h3>פרימיום</h3>
@@ -156,7 +156,7 @@
             <li>~20 סרטוני 30 שניות (12 טוקנים כל אחד)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="250" data-amount="675" style="width:100%;padding:12px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer;margin-top:8px">קנו עכשיו</button>
+        <button class="buy-btn" data-package="250" data-amount="675">קנו עכשיו</button>
       </div>
       <div class="card">
         <h3>אולטרה</h3>
@@ -173,7 +173,7 @@
             <li>~41 סרטוני 30 שניות (12 טוקנים כל אחד)</li>
           </ul>
         </div>
-        <button class="buy-btn" data-package="500" data-amount="1350" style="width:100%;padding:12px;border:0;border-radius:12px;background:#25D366;color:var(--ink);font-weight:bold;cursor:pointer;margin-top:8px">קנו עכשיו</button>
+        <button class="buy-btn" data-package="500" data-amount="1350">קנו עכשיו</button>
       </div>
     </div>
     <p class="note">טוקנים נוצרים רק כאשר ללקוח יש יתרה. אין מנוי חודשי.</p>

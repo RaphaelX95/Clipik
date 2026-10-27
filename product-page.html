@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יצירת דף מוצר - קליפיק</title>
-<style>
+<link rel="stylesheet" href="/styles.css">
 :root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
@@ -38,7 +38,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
 .section-row button{background:#d32f2f;color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:12px}
 .char-count{text-align:left;font-size:11px;color:var(--muted);margin-top:4px}
 @media(max-width:768px){.wrap{padding:20px 14px}.grid{grid-template-columns:1fr}.head{flex-direction:column;gap:10px}.head h1{font-size:22px}}
-</style>
+
 </head>
 <body>
   <div class="wrap">
@@ -90,28 +90,28 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <div class="field">
           <label for="productImage">תמונת מוצר</label>
           <input id="productImage" type="file" accept="image/png,image/jpeg" onchange="previewImage(event)">
-          <div id="thumbPreview" style="margin-top:8px;display:none"><img id="thumbImg" style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></div>
+          <div id="thumbPreview"><img id="thumbImg"></div>
         </div>
 
-        <h3 style="margin-top:18px;margin-bottom:12px">🎯 יתרונות מרכזיים</h3>
+        <h3>🎯 יתרונות מרכזיים</h3>
         <div id="benefitsList"></div>
-        <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-top:8px" onclick="addBenefit()">+ הוסף יתרון</button>
+        <button class="btn" onclick="addBenefit()">+ הוסף יתרון</button>
 
-        <h3 style="margin-top:18px;margin-bottom:12px">❓ שאלות נפוצות</h3>
+        <h3>❓ שאלות נפוצות</h3>
         <div id="faqList"></div>
-        <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-top:8px" onclick="addFaq()">+ הוסף שאלה</button>
+        <button class="btn" onclick="addFaq()">+ הוסף שאלה</button>
 
-        <button class="btn primary" style="margin-top:18px;background:var(--green);color:#fff" onclick="generatePage()">✨ צרו דף מוצר</button>
-        <p id="status" style="margin-top:10px;color:var(--muted);font-size:12px"></p>
+        <button class="btn primary" onclick="generatePage()">✨ צרו דף מוצר</button>
+        <p id="status"></p>
       </div>
 
       <div class="preview" id="preview">
         <h2 id="prevTitle">שם המוצר</h2>
         <div class="price" id="prevPrice">₪0</div>
         <div class="desc" id="prevDesc">תיאור קצר של המוצר יופיע כאן...</div>
-        <div id="prevImage" style="margin:12px 0;display:none"><img id="prevImg" style="max-width:100%;border-radius:12px;max-height:300px;object-fit:cover"></div>
-        <div id="prevBenefits" style="margin:12px 0"></div>
-        <div id="prevFaq" style="margin-top:16px"></div>
+        <div id="prevImage"><img id="prevImg"></div>
+        <div id="prevBenefits"></div>
+        <div id="prevFaq"></div>
         <div class="meta">תצוגה מקדימה • עדכון אוטומטי</div>
       </div>
     </div>
@@ -176,12 +176,12 @@ function updatePreview(){
 
   // Benefits
   const benefits = Array.from(document.querySelectorAll('#benefitsList input')).map(i => i.value).filter(Boolean);
-  const benefitsHtml = benefits.length ? '<strong>יתרונות:</strong><ul style="margin:6px 0;padding-right:20px">' + benefits.map(b => `<li>${b}</li>`).join('') + '</ul>' : '';
+  const benefitsHtml = benefits.length ? '<strong>יתרונות:</strong><ul>' + benefits.map(b => `<li>${b}</li>`).join('') + '</ul>' : '';
   document.getElementById('prevBenefits').innerHTML = benefitsHtml;
 
   // FAQ
   const faqs = Array.from(document.querySelectorAll('#faqList input')).map(i => i.value).filter(Boolean);
-  const faqHtml = faqs.length ? '<strong>שאלות נפוצות:</strong><ul style="margin:6px 0;padding-right:20px">' + faqs.map(f => `<li>${f}</li>`).join('') + '</ul>' : '';
+  const faqHtml = faqs.length ? '<strong>שאלות נפוצות:</strong><ul>' + faqs.map(f => `<li>${f}</li>`).join('') + '</ul>' : '';
   document.getElementById('prevFaq').innerHTML = faqHtml;
 
   // Char counts
