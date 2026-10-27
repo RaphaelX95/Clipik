@@ -443,8 +443,14 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/product-page":
             return self._handle_product_page()
         if path == "/api/analytics/summary":
+            token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
+            if token != "YO4DfXieWO5axgFYUleauA":
+                return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_summary()
         if path == "/api/analytics/event":
+            token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
+            if token != "YO4DfXieWO5axgFYUleauA":
+                return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_event()
         if path == "/api/icount/create-payment":
             return self._handle_icount_payment()

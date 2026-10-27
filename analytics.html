@@ -34,7 +34,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
 @media(max-width:768px){.stats{grid-template-columns:1fr}.head{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
-<body>
+<body><script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+  if(!token || token !== 'YO4DfXieWO5axgFYUleauA'){
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Arial,sans-serif;background:#e8f5e9;color:#1b3a1f;text-align:center;padding:20px"><div><h1>🔒 גישה מוגבלת</h1><p>הדף הזה נגיש למנהלי האתר בלבד.</p></div></div>';
+    throw new Error('Unauthorized');
+  }
+})();
+</script>
+
   <div class="wrap">
     <div class="head">
       <div><h1>📊 אנליטיקס</h1></div>
