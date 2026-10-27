@@ -61,11 +61,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <div id="previewThumb" style="margin-top:8px;display:none"><img id="thumbImg" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></div>
       </div>
       <div class="field">
-        <label for="instructions">הנחיות למחולל</label>
-        <textarea id="instructions" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
+        <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
+        <textarea id="instructions" maxlength="750" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
         <div class="hint" id="templateHint"></div>
+        <div id="charCount" style="text-align:left;font-size:11px;color:var(--muted);margin-top:4px">0 / 750 תווים</div>
       </div>
-      <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-bottom:10px" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
       <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-bottom:10px" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
       <button class="btn primary" id="createBtn" onclick="createVideo()">✳ צרו תצוגת סרטון</button>
       <p id="status" style="margin-top:10px;color:var(--muted);font-size:12px"></p>
@@ -98,6 +98,25 @@ document.getElementById('productImage').onchange = function(e){
   };
   reader.readAsDataURL(file);
 };
+
+// Character counter for script textarea
+const instructionsEl = document.getElementById('instructions');
+const charCountEl = document.getElementById('charCount');
+if(instructionsEl && charCountEl){
+  const updateCount = () => {
+    const len = instructionsEl.value.length;
+    charCountEl.textContent = len + ' / 750 תווים';
+    if(len > 700){
+      charCountEl.style.color = '#d32f2f';
+    } else if(len > 600){
+      charCountEl.style.color = '#f57c00';
+    } else {
+      charCountEl.style.color = 'var(--muted)';
+    }
+  };
+  instructionsEl.addEventListener('input', updateCount);
+  updateCount();
+}
 
 async function generateScript(){
   const product = document.getElementById('productName').value.trim();

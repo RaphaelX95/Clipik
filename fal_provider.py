@@ -314,7 +314,7 @@ def build_prompt(
         f"מוצר: {product[:120]}. קהל: {audience[:300] or 'קונים גנריים'}. "
         f"סגנון: {style[:80]}. {concept_hint}. {part} "
         f"{delivery} ב-{language}, אמור את התסריט שסופק כדיאלוג מדבר או קריינות: "
-        f"{spoken_script[:5000]}"
+        f"{spoken_script[:750]}"
     )
 
 
