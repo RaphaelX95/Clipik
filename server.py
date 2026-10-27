@@ -352,7 +352,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlparse(self.path).path
-        if path not in ('/', '/index.html', '/packages.html', '/tips.html', '/templates.html', '/create.html', '/product-page.html', '/analytics.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html'):
+        if path not in ('/', '/index.html', '/packages.html', '/tips.html', '/templates.html', '/create.html', '/product-page.html', '/analytics.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -370,6 +370,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'product-page.html').read_bytes()
         elif path == '/analytics.html':
             body = (ROOT / 'analytics.html').read_bytes()
+        elif path == '/styles.css':
+            body = (ROOT / 'styles.css').read_bytes()
         elif path == '/logo-source.jpg':
             body = (ROOT / 'logo-source.jpg').read_bytes()
         elif path == '/logo.svg':
@@ -447,7 +449,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self.send_json(400, {"error": str(exc)})
             return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
-        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html"):
+        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/styles.css"):
             self.send_error(404, "Not found")
             return
         if path == "/tips.html":
@@ -480,9 +482,11 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "robots.txt").read_bytes()
         elif path == "/":
             body = (ROOT / "index.html").read_bytes()
-        elif path == "/packages.html":
+        if path == "/packages.html":
             body = (ROOT / "packages.html").read_bytes()
-        
+        if path == "/styles.css":
+            body = (ROOT / "styles.css").read_bytes()
+
         # Set correct content type for non-HTML files
         if path == "/sitemap.xml":
             content_type = "application/xml; charset=utf-8"
@@ -496,6 +500,8 @@ class Handler(BaseHTTPRequestHandler):
             content_type = "image/svg+xml"
         elif path.endswith(".ico"):
             content_type = "image/x-icon"
+        elif path.endswith(".css"):
+            content_type = "text/css; charset=utf-8"
         else:
             content_type = "text/html; charset=utf-8"
         
