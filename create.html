@@ -65,6 +65,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <textarea id="instructions" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
         <div class="hint" id="templateHint"></div>
       </div>
+      <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-bottom:10px" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
+      <button class="btn" style="background:#fff;color:var(--green);border:2px solid var(--green);margin-bottom:10px" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
       <button class="btn primary" id="createBtn" onclick="createVideo()">✳ צרו תצוגת סרטון</button>
       <p id="status" style="margin-top:10px;color:var(--muted);font-size:12px"></p>
     </div>
@@ -96,6 +98,32 @@ document.getElementById('productImage').onchange = function(e){
   };
   reader.readAsDataURL(file);
 };
+
+async function generateScript(){
+  const product = document.getElementById('productName').value.trim();
+  if(!product){
+    alert('נא להזין שם מוצר/נושא כדי ליצור תסריט');
+    return;
+  }
+  const audience = document.getElementById('productUrl').value.trim();
+  const style = template.style;
+  const duration = template.duration;
+  const status = document.getElementById('status');
+  status.textContent = 'יוצר תסריט אוטומטי...';
+  try{
+    const r = await fetch('/api/script/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({product, audience, style, duration, language: 'he'})
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'שגיאה');
+    document.getElementById('instructions').value = d.script || '';
+    status.textContent = '✓ תסריט נוצר! '+ (d.concept_name || '') + ' · ' + Math.round(d.estimated_duration || duration) + ' שניות · ' + (d.scenes || 3) + ' סצנות';
+  }catch(err){
+    status.textContent = 'שגיאה: ' + err.message;
+  }
+}
 
 async function createVideo(){
   const name = document.getElementById('productName').value.trim() || 'מוצר לדוגמה';

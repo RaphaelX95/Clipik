@@ -69,14 +69,26 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
       <div class="card">
         <h3>✨ שיתוף ברשתות</h3>
         <p>סרטון קצר ואופטימי שנועד לשיתוף בטיקטוק ורילס — פורמט 9:16.</p>
-        <div class="meta"><span class="tag">UGC טבעי</span><span class="tag">15 שניות</span><span class="tag">6 טוקנים</span></div>
+        <div class="meta"><span class="tag">ביקורת מוצר</span><span class="tag">15 שניות</span><span class="tag">6 טוקנים</span></div>
         <button class="btn" onclick="useTemplate('UGC טבעי','שיתוף ברשתות',15)">בחרו תבנית</button>
       </div>
       <div class="card">
         <h3>🛍️ מבצע מיוחד</h3>
         <p>סרטון קליטה למבצעים — מציג את ההנחה בחדות, עם קריאה לפעולה ברורה.</p>
-        <div class="meta"><span class="tag">הדגמת מוצר</span><span class="tag">10 שניות</span><span class="tag">4 טוקנים</span></div>
-        <button class="btn" onclick="useTemplate('הדגמת מוצר','מבצע מיוחד',10)">בחרו תבנית</button>
+        <div class="meta"><span class="tag">מבצע מיוחד</span><span class="tag">10 שניות</span><span class="tag">4 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('מבצע/מבצע חדש','מבצע מיוחד',10)">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>💡 בעיה ופתרון</h3>
+        <p>מציגים בעיה שגורמת לציון פיה, ואז מגלים כיצד המוצר פותר אותה.</p>
+        <div class="meta"><span class="tag">בעיה ופתרון</span><span class="tag">20 שניות</span><span class="tag">8 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('בעיה ופתרון','בעיה ופתרון',20)">בחרו תבנית</button>
+      </div>
+      <div class="card">
+        <h3>⭐ ביקורת ראשונה</h3>
+        <p>דמות אחת סופרת את החוויה שלה עם המוצר — אמינה, קרובה, ומרגשת.</p>
+        <div class="meta"><span class="tag">ביקורת אישית</span><span class="tag">20 שניות</span><span class="tag">8 טוקנים</span></div>
+        <button class="btn" onclick="useTemplate('ביקורת ראשונה','ביקורת ראשונה',20)">בחרו תבנית</button>
       </div>
     </div>
   </div>
@@ -88,7 +100,9 @@ function useTemplate(style, name, duration){
     'קריינות ותקריבים': 'תמונת רקע נקייה, תקריבים חדים, וטקסט קצר שיופיע ככתוביות.',
     'מדריך קצר': 'חלקו את השימוש ל-3-4 שלבים פשוטים, עם כתוביות לכל שלב.',
     'שיתוף ברשתות': 'פחות טקסט, יותר ויזואל. פתיחה מוליכה וסיום עם קריאה לפעולה.',
-    'מבצע מיוחד': 'הדגישו את ההנחה, הוסיפו תאריך, וסיימו עם "קנו עכשיו" ברור.'
+    'מבצע מיוחד': 'הדגישו את ההנחה, הוסיפו תאריך, וסיימו עם "קנו עכשיו" ברור.',
+    'בעיה ופתרון': 'תחילה הציגו בעיה שצריכה פתרון, אחר כך הראו את המוצר כפתרון.',
+    'ביקורת ראשונה': 'דברו בגוף ראשון כקונים שחוו את המוצר - honest review.',
   };
   const url = '/create.html?name=' + encodeURIComponent(name) + '&style=' + encodeURIComponent(style) + '&duration=' + encodeURIComponent(duration || 15) + '&hint=' + encodeURIComponent(hint[name] || '');
   window.location.href = url;

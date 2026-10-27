@@ -423,6 +423,8 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/api/generations":
             return self._handle_generation()
+        if path == "/api/script/generate":
+            return self._handle_script_generate()
         if path == "/api/icount/create-payment":
             return self._handle_icount_payment()
         if path == "/api/icount/ipn":
@@ -433,10 +435,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", "0"))
             if length <= 0 or length > MAX_BODY:
-                return self.send_json(413, {"error": "Request must be under 1 MB"})
+                return self.send_json(413, {"error": "Request too large"})
             payload = json.loads(self.rfile.read(length))
-            if not isinstance(payload, dict):
-                return self.send_json(400, {"error": "Expected a project object"})
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
         project = {
@@ -458,9 +458,38 @@ class Handler(BaseHTTPRequestHandler):
         write_projects(items[:100])
         return self.send_json(201, {"project": project})
 
+    def _handle_script_generate(self):
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > MAX_BODY:
+                return self.send_json(413, {"error": "Request too large"})
+            payload = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            return self.send_json(400, {"error": "Invalid JSON"})
+
+        product = str(payload.get("product", "")).strip()
+        audience = str(payload.get("audience", "")).strip()
+        style = str(payload.get("style", "UGC טבעי")).strip()
+        language = str(payload.get("language", "he")).strip()
+        duration = int(payload.get("duration", 15))
+
+        if not product:
+            return self.send_json(400, {"error": "product is required"})
+
+        try:
+            result = _fal_provider.generate_script_from_brief(
+                product=product,
+                audience=audience,
+                style=style,
+                language=language,
+                duration_seconds=duration,
+            )
+            return self.send_json(200, result)
+        except Exception as exc:
+            return self.send_json(500, {"error": str(exc)})
+
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.address_string(), fmt % args))
-
 
     def _handle_icount_payment(self):
         try:
