@@ -250,60 +250,62 @@ async function createVideo(){
   status.textContent = 'יוצר סרטון...';
   btn.disabled = true;
 
-  const form = new FormData();
-  form.append('product', name);
-  form.append('style', template.style);
-  form.append('duration', template.duration);
-  form.append('script', instructions);
-  form.append('creator', document.getElementById('avatarSelect').value);
-  form.append('captions', document.getElementById('captions').value.trim());
-  form.append('music', document.getElementById('musicSelect').value);
-  
-  // Collect AR effects
   const arEffects = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
-  form.append('ar_effects', JSON.stringify(arEffects));
-  
-  if(fileInput.files[0]) form.append('image', fileInput.files[0]);
 
-  try{
-    const r = await fetch('/api/generations', {method:'POST', body: form});
+  const buildPayload = (imageDataUrl) => ({
+    image_data_url: imageDataUrl,
+    product: name,
+    style: template.style,
+    duration: template.duration,
+    script: instructions,
+    creator: document.getElementById('avatarSelect').value,
+    captions: document.getElementById('captions').value.trim(),
+    music: document.getElementById('musicSelect').value,
+    ar_effects: JSON.stringify(arEffects),
+    audience: document.getElementById('productUrl').value.trim(),
+    language: 'he',
+    platform: 'אנכי · 9:16'
+  });
+
+  const submit = async (payload) => {
+    const r = await fetch('/api/generations', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
     const d = await r.json();
     if(!r.ok) throw new Error(d.error || 'שגיאה ביצירה');
     status.innerHTML = '✓ הסרטון נוצר בהצלחה! <a href="' + (d.video_url || '#') + '" target="_blank">צפו בסרטון</a>';
-    
-    // Live AR preview
-const arCheckboxes = document.querySelectorAll('input[name="ar_effects"]');
-const preview = document.getElementById('arPreview');
-function updateArPreview(){
-  if(!preview) return;
-  preview.innerHTML = '';
-  const active = Array.from(arCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
-  if(active.length === 0){
-    preview.style.display = 'none';
-    return;
-  }
-  preview.style.display = 'block';
-  const overlay = document.createElement('div');
-  overlay.className = 'ar-overlay';
-  active.forEach(effect => {
-    const d = document.createElement('div');
-    d.className = 'ar-' + effect + ' float';
-    overlay.appendChild(d);
-  });
-  preview.appendChild(overlay);
-}
-if(arCheckboxes.length){
-  arCheckboxes.forEach(cb => cb.addEventListener('change', updateArPreview));
-  updateArPreview();
-}
 
-// Apply AR effects to video
-    const arEffects = JSON.parse(payload.get('ar_effects') || '[]');
+    const preview = document.getElementById('arPreview');
+    function updateArPreview(){
+      if(!preview) return;
+      preview.innerHTML = '';
+      const active = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
+      if(active.length === 0){
+        preview.style.display = 'none';
+        return;
+      }
+      preview.style.display = 'block';
+      const overlay = document.createElement('div');
+      overlay.className = 'ar-overlay';
+      active.forEach(effect => {
+        const div = document.createElement('div');
+        div.className = 'ar-' + effect + ' float';
+        overlay.appendChild(div);
+      });
+      preview.appendChild(overlay);
+    }
+    const arCheckboxes = document.querySelectorAll('input[name="ar_effects"]');
+    if(arCheckboxes.length){
+      arCheckboxes.forEach(cb => cb.addEventListener('change', updateArPreview));
+      updateArPreview();
+    }
+
     if(arEffects.length > 0 && d.video_url){
       const videoContainer = document.createElement('div');
       videoContainer.style.cssText = 'position:relative;display:inline-block;margin-top:12px;border-radius:12px;overflow:hidden';
       videoContainer.innerHTML = '<video src="' + d.video_url + '" controls autoplay loop></video>';
-      
       const overlay = document.createElement('div');
       overlay.className = 'ar-overlay';
       arEffects.forEach(effect => {
@@ -311,11 +313,27 @@ if(arCheckboxes.length){
         div.className = 'ar-' + effect;
         overlay.appendChild(div);
       });
-      
       videoContainer.appendChild(overlay);
       status.appendChild(videoContainer);
     }
     btn.disabled = false;
+  };
+
+  try{
+    if(fileInput.files[0]){
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        try{
+          await submit(buildPayload(ev.target.result));
+        }catch(err){
+          status.textContent = 'שגיאה: ' + err.message;
+          btn.disabled = false;
+        }
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }else{
+      await submit(buildPayload(''));
+    }
   }catch(err){
     status.textContent = 'שגיאה: ' + err.message;
     btn.disabled = false;

@@ -266,18 +266,18 @@ class Handler(BaseHTTPRequestHandler):
             project = {
                 "id": uuid.uuid4().hex[:10],
                 "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "product": str(payload.get("product", "מוצר לדוגמה"))[:120],
-                "product_url": str(payload.get("product_url", ""))[:500],
-                "audience": str(payload.get("audience", ""))[:300],
-                "language": str(payload.get("language", "עברית"))[:40],
-                "platform": str(payload.get("platform", "אנכי · 9:16"))[:40],
-                "duration": str(payload.get("duration", "15"))[:20],
-                "script": str(payload.get("script", ""))[:750],
-                "captions": str(payload.get("captions", ""))[:50],
-                "music": str(payload.get("music", "ללא מוזיקה"))[:40],
-                "ar_effects": str(payload.get("ar_effects", "[]"))[:200],
-                "style": str(payload.get("style", "UGC טבעי"))[:80],
-                "creator": str(payload.get("creator", "דמות AI"))[:80],
+                "product": self._sanitize(payload.get("product", "מוצר לדוגמה"), 120),
+                "product_url": self._sanitize(payload.get("product_url", ""), 500),
+                "audience": self._sanitize(payload.get("audience", ""), 300),
+                "language": self._sanitize(payload.get("language", "עברית"), 40),
+                "platform": self._sanitize(payload.get("platform", "אנכי · 9:16"), 40),
+                "duration": self._sanitize(payload.get("duration", "15"), 20),
+                "script": self._sanitize(payload.get("script", ""), 750),
+                "captions": self._sanitize(payload.get("captions", ""), 50),
+                "music": self._sanitize(payload.get("music", "ללא מוזיקה"), 40),
+                "ar_effects": self._sanitize(payload.get("ar_effects", "[]"), 200),
+                "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
+                "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
                 "status": "completed",
                 "video_url": _DEMO_VIDEO_URL,
                 "demo": True,
@@ -392,6 +392,7 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'google7cfae0c73b4d1768.html').read_bytes()
         self.send_response(200)
         self.send_header('Content-Length', str(len(body)))
+        self._send_security_headers()
         self.end_headers()
 
     def do_GET(self):
@@ -516,6 +517,8 @@ class Handler(BaseHTTPRequestHandler):
         if not _check_rate_limit(ip):
             self.send_json(429, {"error": "Too many requests"})
             return
+        if not self._verify_csrf():
+            return self.send_json(403, {"error": "CSRF check failed"})
         path = urlparse(self.path).path
         if path == "/api/generations":
             return self._handle_generation()
@@ -550,18 +553,18 @@ class Handler(BaseHTTPRequestHandler):
         project = {
             "id": uuid.uuid4().hex[:10],
             "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "product": str(payload.get("product", "מוצר לדוגמה"))[:120],
-            "product_url": str(payload.get("product_url", ""))[:500],
-            "audience": str(payload.get("audience", ""))[:300],
-            "language": str(payload.get("language", "עברית"))[:40],
-            "platform": str(payload.get("platform", "אנכי · 9:16"))[:40],
-            "duration": str(payload.get("duration", "15"))[:20],
-            "script": str(payload.get("script", ""))[:750],
-            "captions": str(payload.get("captions", ""))[:50],
-            "music": str(payload.get("music", "ללא מוזיקה"))[:40],
-            "ar_effects": str(payload.get("ar_effects", "[]"))[:200],
-            "style": str(payload.get("style", "UGC טבעי"))[:80],
-            "creator": str(payload.get("creator", "דמות AI"))[:80],
+            "product": self._sanitize(payload.get("product", "מוצר לדוגמה"), 120),
+            "product_url": self._sanitize(payload.get("product_url", ""), 500),
+            "audience": self._sanitize(payload.get("audience", ""), 300),
+            "language": self._sanitize(payload.get("language", "עברית"), 40),
+            "platform": self._sanitize(payload.get("platform", "אנכי · 9:16"), 40),
+            "duration": self._sanitize(payload.get("duration", "15"), 20),
+            "script": self._sanitize(payload.get("script", ""), 750),
+            "captions": self._sanitize(payload.get("captions", ""), 50),
+            "music": self._sanitize(payload.get("music", "ללא מוזיקה"), 40),
+            "ar_effects": self._sanitize(payload.get("ar_effects", "[]"), 200),
+            "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
+            "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
             "status": "draft",
         }
         items = read_projects()
@@ -578,10 +581,10 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
 
-        product = str(payload.get("product", "")).strip()
-        audience = str(payload.get("audience", "")).strip()
-        style = str(payload.get("style", "UGC טבעי")).strip()
-        language = str(payload.get("language", "he")).strip()
+        product = self._sanitize(payload.get("product", ""), 120)
+        audience = self._sanitize(payload.get("audience", ""), 300)
+        style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
+        language = self._sanitize(payload.get("language", "he"), 40)
         duration = int(payload.get("duration", 15))
 
         if not product:
@@ -641,7 +644,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {'error': 'Invalid JSON'})
 
-        event_type = str(payload.get('type', 'unknown')).strip()
+        event_type = self._sanitize(payload.get('type', 'unknown'), 40)
         data = payload.get('data', {})
         # In production: persist to analytics store / database
         print(f'ANALYTICS: {event_type} | {data}')
@@ -657,10 +660,10 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
 
-        package_id = payload.get("package_id", "")
+        package_id = self._sanitize(payload.get("package_id", ""), 20)
         amount = float(payload.get("amount", 0))
-        user_id = payload.get("user_id", "demo-user")
-        user_email = payload.get("email", "")
+        user_id = self._sanitize(payload.get("user_id", "demo-user"), 40)
+        user_email = self._sanitize(payload.get("email", ""), 120)
 
         # Package token mapping
         package_tokens = {
@@ -804,6 +807,26 @@ class Handler(BaseHTTPRequestHandler):
 
         return self.send_json(200, {"status": "ok", "tokens_added": matched.get("tokens") if matched else 0})
 
+
+    def _send_security_headers(self):
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('X-Frame-Options', 'DENY')
+        self.send_header('X-XSS-Protection', '1; mode=block')
+        self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
+        self.send_header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+
+    @staticmethod
+    def _sanitize(value, max_length=200):
+        if value is None:
+            return ''
+        text = str(value)
+        allowed = [chr(10), chr(13), chr(9)]
+        text = ''.join(ch for ch in text if ch.isprintable() or ch in allowed)
+        return text.strip()[:max_length]
+
+    def _verify_csrf(self):
+        ctype = self.headers.get('Content-Type', '')
+        return 'application/json' in ctype
 
 if __name__ == "__main__":
     host = os.environ.get("CLIPIC_HOST", os.environ.get("HOST", "0.0.0.0"))
