@@ -66,9 +66,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
           <option value="דמות AI">דמות AI כללית</option>
           <option value="קריינות">קריין חיצוני (ללא דמות)</option>
           <option value="אדם/ה">אדם/ה מקומי</option>
-          <option value="צעיר/ה">צעיר/הYG</option>
+          <option value="צעיר/ה">צעיר/ה YG</option>
           <option value="מבוגר/ה">מבוגר/ה מנוסה</option>
         </select>
+      </div>
+      <div class="field">
+        <label for="captions">כתוביות בסוף הסרטון <small style="color:var(--muted)">(אופציונלי, עד 50 תווים)</small></label>
+        <input id="captions" type="text" maxlength="50" placeholder="למשל: קליפיק - צרו סרטונים בעברית" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
+        <div id="captionCount" style="text-align:left;font-size:11px;color:var(--muted);margin-top:4px">0 / 50 תווים</div>
       </div>
       <div class="field">
         <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
@@ -128,6 +133,23 @@ if(instructionsEl && charCountEl){
   updateCount();
 }
 
+// Caption counter
+const captionEl = document.getElementById('captions');
+const captionCountEl = document.getElementById('captionCount');
+if(captionEl && captionCountEl){
+  const updateCaptionCount = () => {
+    const len = captionEl.value.length;
+    captionCountEl.textContent = len + ' / 50 תווים';
+    if(len > 45){
+      captionCountEl.style.color = '#d32f2f';
+    } else {
+      captionCountEl.style.color = 'var(--muted)';
+    }
+  };
+  captionEl.addEventListener('input', updateCaptionCount);
+  updateCaptionCount();
+}
+
 async function generateScript(){
   const product = document.getElementById('productName').value.trim();
   if(!product){
@@ -169,6 +191,7 @@ async function createVideo(){
   form.append('duration', template.duration);
   form.append('script', instructions);
   form.append('creator', document.getElementById('avatarSelect').value);
+  form.append('captions', document.getElementById('captions').value.trim());
   if(fileInput.files[0]) form.append('image', fileInput.files[0]);
 
   try{
