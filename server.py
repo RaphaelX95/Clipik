@@ -174,6 +174,21 @@ def _icount_create_payment_link(amount: float, description: str, client_name: st
         return {"error": str(exc)}
 
 
+
+# Simple rate limiting
+from collections import defaultdict
+import time
+_request_counts = defaultdict(list)
+def _check_rate_limit(ip):
+    now = time.time()
+    window = 60
+    max_requests = 10
+    _request_counts[ip] = [t for t in _request_counts[ip] if now - t < window]
+    if len(_request_counts[ip]) >= max_requests:
+        return False
+    _request_counts[ip].append(now)
+    return True
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "ClipicMVP/0.1"
 
@@ -378,6 +393,10 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        ip = self.client_address[0] if hasattr(self, "client_address") else "unknown"
+        if not _check_rate_limit(ip):
+            self.send_json(429, {"error": "Too many requests"})
+            return
         path = urlparse(self.path).path
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
@@ -487,6 +506,10 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self):
+        ip = self.client_address[0] if hasattr(self, "client_address") else "unknown"
+        if not _check_rate_limit(ip):
+            self.send_json(429, {"error": "Too many requests"})
+            return
         path = urlparse(self.path).path
         if path == "/api/generations":
             return self._handle_generation()
