@@ -61,6 +61,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans
         <div id="previewThumb" style="margin-top:8px;display:none"><img id="thumbImg" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></div>
       </div>
       <div class="field">
+        <label for="avatarSelect">דמות מדברת</label>
+        <select id="avatarSelect" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)">
+          <option value="דמות AI">דמות AI כללית</option>
+          <option value="קריינות">קריין חיצוני (ללא דמות)</option>
+          <option value="אדם/ה">אדם/ה מקומי</option>
+          <option value="צעיר/ה">צעיר/הYG</option>
+          <option value="מבוגר/ה">מבוגר/ה מנוסה</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="instructions">הנחיות למחולל <small style="color:var(--muted)">(עד 750 תווים)</small></label>
         <textarea id="instructions" maxlength="750" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
         <div class="hint" id="templateHint"></div>
@@ -158,6 +168,7 @@ async function createVideo(){
   form.append('style', template.style);
   form.append('duration', template.duration);
   form.append('script', instructions);
+  form.append('creator', document.getElementById('avatarSelect').value);
   if(fileInput.files[0]) form.append('image', fileInput.files[0]);
 
   try{
