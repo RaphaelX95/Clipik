@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יצירת סרטון - קליפיק</title>
+<style>
+:root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
+.wrap{max-width:860px;margin:auto;padding:28px 18px}
+.tpl-banner{background:linear-gradient(135deg,#075e54,#25D366);color:#fff;border-radius:16px;padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tpl-banner h2{margin:0;font-size:18px}
+.tpl-banner p{margin:4px 0 0;opacity:.95;font-size:13px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 4px 14px #0000000a;margin-bottom:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:bold;margin-bottom:6px;font-size:13px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+.field textarea{min-height:90px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border:0;border-radius:12px;background:var(--lime);color:var(--ink);font-weight:bold;cursor:pointer}
+.btn.primary{background:var(--green);color:#fff}
+.back{display:inline-block;margin-bottom:14px;color:var(--green);text-decoration:none;font-weight:bold}
+.hint{background:#f5f7f1;border:1px solid #e5e9dc;border-radius:10px;padding:12px;font-size:12px;color:#3f453a;line-height:1.6;margin-top:8px}
+.hint strong{display:block;margin-bottom:4px;color:#2a3026}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/templates.html">← חזור לתבניות</a>
+    <div class="tpl-banner" id="tplBanner">
+      <div>
+        <h2 id="tplTitle">תבנית</h2>
+        <p id="tplDesc">הגדירו את פרטי הסרטון לפי התבנית שבחרתם.</p>
+      </div>
+      <button class="btn" onclick="document.getElementById('createForm').scrollIntoView({behavior:'smooth'})">התחילו עכשיו</button>
+    </div>
+
+    <div class="card" id="createForm">
+      <div class="field">
+        <label for="productName">שם המוצר / נושא</label>
+        <input id="productName" type="text" placeholder="למשל: סטארטאפ טקטוני, מכנסי גברים, שתיית קלים">
+      </div>
+      <div class="field">
+        <label for="productUrl">קישור למוצר <small style="color:var(--muted)">(אופציונלי)</small></label>
+        <input id="productUrl" type="url" placeholder="https://yourstore.com/products/...">
+      </div>
+      <div class="field">
+        <label for="productImage">תמונת מוצר <small style="color:var(--muted)">(PNG/JPG)</small></label>
+        <input id="productImage" type="file" accept="image/png,image/jpeg">
+        <div id="previewThumb" style="margin-top:8px;display:none"><img id="thumbImg" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></div>
+      </div>
+      <div class="field">
+        <label for="instructions">הנחיות למחולל</label>
+        <textarea id="instructions" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
+        <div class="hint" id="templateHint"></div>
+      </div>
+      <button class="btn primary" id="createBtn" onclick="createVideo()">✳ צרו תצוגת סרטון</button>
+      <p id="status" style="margin-top:10px;color:var(--muted);font-size:12px"></p>
+    </div>
+  </div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const template = {
+  name: params.get('name') || 'סרטון מותאם',
+  style: params.get('style') || 'UGC טבעי',
+  duration: params.get('duration') || '15',
+  hint: params.get('hint') || ''
+};
+
+document.getElementById('tplTitle').textContent = 'תבנית: ' + template.name;
+document.getElementById('tplDesc').textContent = 'סגנון: ' + template.style + ' · ' + template.duration + ' שניות';
+if(template.hint){
+  const el = document.getElementById('templateHint');
+  el.innerHTML = '<strong>💡 טיפ לפי התבנית</strong>' + template.hint;
+}
+
+document.getElementById('productImage').onchange = function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('thumbImg').src = ev.target.result;
+    document.getElementById('previewThumb').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+};
+
+async function createVideo(){
+  const name = document.getElementById('productName').value.trim() || 'מוצר לדוגמה';
+  const instructions = document.getElementById('instructions').value.trim();
+  const fileInput = document.getElementById('productImage');
+  const status = document.getElementById('status');
+  const btn = document.getElementById('createBtn');
+  status.textContent = 'יוצר סרטון...';
+  btn.disabled = true;
+
+  const form = new FormData();
+  form.append('product', name);
+  form.append('style', template.style);
+  form.append('duration', template.duration);
+  form.append('script', instructions);
+  if(fileInput.files[0]) form.append('image', fileInput.files[0]);
+
+  try{
+    const r = await fetch('/api/generations', {method:'POST', body: form});
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'שגיאה ביצירה');
+    status.innerHTML = '✓ הסרטון נוצר בהצלחה! <a href="' + (d.video_url || '#') + '" target="_blank">צפו בסרטון</a>';
+    btn.disabled = false;
+  }catch(err){
+    status.textContent = 'שגיאה: ' + err.message;
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
