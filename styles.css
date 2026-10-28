@@ -13,7 +13,7 @@
   --accent:#ff5a1f;
   --accent-2:#e2470f;
   --accent-soft:#fff0e8;
-  --teal:#0d9488;
+  --teal:#14161a;
   --radius:14px;
   --radius-sm:10px;
   --shadow:0 1px 2px rgba(20,22,26,0.05),0 6px 20px rgba(20,22,26,0.05);
@@ -61,7 +61,7 @@ a:hover{color:var(--accent-2);text-decoration:underline}
   padding:7px 12px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);font-size:13px;font-weight:700;
 }
 .avatar{
-  width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#0d9488);color:#fff;
+  width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;
   display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;
 }
 .btn{
@@ -69,7 +69,7 @@ a:hover{color:var(--accent-2);text-decoration:underline}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn-primary{
-  background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,0.35);
+  background:var(--accent);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,0.35);
 }
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(124,58,237,0.45)}
 .btn-secondary{background:var(--surface-2);color:var(--ink)}
@@ -85,7 +85,7 @@ a:hover{color:var(--accent-2);text-decoration:underline}
 .hero h1{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:-.6px;line-height:1.1}
 .hero p{color:var(--muted);font-size:18px;margin-top:12px;max-width:640px;margin-inline:auto}
 .gradient-text{
-  background:linear-gradient(135deg,#7c3aed,#0d9488);
+  background:var(--accent);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 
@@ -154,7 +154,7 @@ a:hover{color:var(--accent-2);text-decoration:underline}
 .price span{font-size:14px;color:var(--muted);font-weight:500}
 .popular-badge{
   position:absolute;top:-10px;left:50%;transform:translateX(-50%);
-  background:linear-gradient(135deg,#7c3aed,#0d9488);color:#fff;
+  background:var(--accent);color:#fff;
   padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;
 }
 
@@ -204,7 +204,7 @@ dialog::backdrop{background:rgba(15,23,42,0.45)}
 /* Utilities */
 .badge{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800}
 .progress{height:8px;background:var(--surface-2);border-radius:999px;overflow:hidden}
-.progress > span{display:block;height:100%;background:linear-gradient(135deg,#7c3aed,#0d9488);width:0%;transition:width .4s}
+.progress > span{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s}
 .hidden{display:none !important}
 .text-center{text-align:center}
 .mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}
@@ -417,7 +417,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #7c3aed, #0d9488);
+  background: var(--accent);
   opacity: 0;
   transition: opacity 0.25s;
 }
@@ -453,7 +453,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   opacity: 1;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  background: var(--accent);
   color: #fff;
   box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
 }
@@ -538,7 +538,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   transform: translateY(-2px);
 }
 .chip.active {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  background: var(--accent);
   color: #fff;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
@@ -574,7 +574,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
 
 /* Accessibility improvements */
 :focus-visible {
-  outline: 3px solid #7c3aed;
+  outline: 3px solid #ff5a1f;
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -849,3 +849,17 @@ aside.side{display:none !important}
 /* בוררי מקטעים: מתפצלים בשורות כשיש הרבה אפשרויות (שפה, פורמט, אורך) */
 .segmented{display:flex;flex-wrap:wrap;gap:4px}
 .segmented .seg{flex:1 1 auto;min-width:72px}
+
+/* שלב המוצר: קישור או תמונה */
+.or-divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:18px 0}
+.or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.upload-btn{width:100%;flex-direction:column;gap:2px;padding:14px;border-style:dashed}
+.upload-btn small{font-weight:500;color:var(--muted);font-size:12px}
+.product-hint{color:var(--muted);font-size:13px;margin-top:14px;text-align:center}
+.product{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2)}
+.product .thumbs{display:flex;gap:6px}
+.product .thumb,.product .thumb-img{width:44px;height:44px;border-radius:8px;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line)}
+.product .meta{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.product .meta small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.product .ok{color:#15803d;font-weight:700;font-size:13px}
+#toScripts:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
