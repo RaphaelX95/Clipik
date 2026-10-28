@@ -885,7 +885,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_event()
         if path == "/api/icount/create-payment":
-            return self._handle_icount_payment()
+            return self._safe_call(self._handle_icount_payment)
         if path == "/api/icount/ipn":
             return self._handle_icount_ipn()
         if path != "/api/projects":
