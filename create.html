@@ -378,5 +378,23 @@ document.querySelectorAll('.seg-wrap').forEach(function(group){
   });
 });
 </script>
+<script>
+// בחירה מוקדמת מתבנית: /create.html?style=...&duration=...
+(function () {
+  try {
+    var p = new URLSearchParams(location.search);
+    var s = p.get('style');
+    var d = p.get('duration');
+    if (s) {
+      var chip = document.querySelector('#styleChips [data-style="' + s.replace(/"/g, '') + '"]');
+      if (chip) chip.click();
+    }
+    if (d && /^(5|10|15|20|30)$/.test(d)) {
+      var seg = document.querySelector('.seg-wrap[data-for="duration"] [data-value="' + d + '"]');
+      if (seg) seg.click();
+    }
+  } catch (e) { /* אם הפרמטרים לא תקינים, המסך נשאר בברירת המחדל */ }
+})();
+</script>
 </body>
 </html>

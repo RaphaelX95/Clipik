@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>תבניות סרטונים - קליפיק | UGC, דמו מוצרים, מדריכים</title>
-  <meta name="description" content="תבניות סרטוני UGC מוכנות: הדגמת מוצר, פתיחת חבילה, ביקורת, מדריך קצר ומבצע. בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות.">
+  <title>תבניות סרטונים - קליפיק</title>
+  <meta name="description" content="חמש תבניות סרטון מוכנות: UGC טבעי, הדגמת מוצר, פתיחת חבילה, קריינות ותקריבים ומדריך קצר. בחרו תבנית והמשיכו ליצירת הסרטון.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -19,8 +19,8 @@
   </div>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
-    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
-    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
+    <a href="/templates.html" class="sidebar-link active"><span class="sidebar-icon">📋</span>תבניות</a>
     <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
@@ -31,79 +31,66 @@
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
 </aside>
-  
 
-  <main class="main-content" class="container" style="padding-top:48px;padding-bottom:80px">
-    <div style="text-align:center;margin-bottom:40px">
-      <h1 class="h1" class="section-title" style="font-size:30px">📑 תבניות סרטונים מוכנות</h1>
-      <p class="section-sub" style="font-size:16px">בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות</p>
-    </div>
+<main class="main-content">
+  <div class="container" style="max-width:1040px;padding-top:32px;padding-bottom:64px">
+    <header style="margin-bottom:28px">
+      <h1 class="h1" style="font-size:30px">תבניות סרטון</h1>
+      <p class="section-sub" style="font-size:16px">כל תבנית קובעת סגנון ואורך מומלץ. בוחרים, ממשיכים למסך היצירה, ומזינים את המוצר.</p>
+    </header>
 
     <div class="grid grid-3" id="templateGrid"></div>
-  </main>
 
-  <footer class="footer">
-    <div class="container">
-      <p>© 2026 Clipik. כל הזכויות שמורות. · <a href="/create.html">צור סרטון מותאם</a></p>
+    <p style="color:var(--muted);font-size:13px;margin-top:24px">הטוקנים מחושבים לסרטון אחד. הכמות והמחיר במחירון. אפשר לשנות כל הגדרה במסך היצירה.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<footer class="footer">
+  <div class="container">
+    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <a href="/pricing.html">מחירון</a>
+      <a href="/examples.html">טיפים</a>
+      <a href="/faq.html">שאלות נפוצות</a>
+      <a href="/contact.html">צור קשר</a>
     </div>
-  </footer>
+    <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
+  </div>
+</footer>
 
-  <div class="toast" id="toast"></div>
-  <script>
-    const templates = [
-      { id: 'ugc-daily', icon: '🎬', title: 'הדגמת מוצר יומיומית', desc: 'סרטון UGC טבעי שמציג את המוצר בשימוש יום-יומי, כמו לידים אמיתיים.', tags: ['UGC טבעי', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
-      { id: 'unboxing', icon: '📦', title: 'פתיחת חבילה מרגשת', desc: 'רגע האמת — חושפים את המוצר לראשונה, מלווה בתוספת אפקטים חמים.', tags: ['פתיחת חבילה', '15 שניות', '6 טוקנים'], style: 'פתיחת חבילה', duration: 15 },
-      { id: 'voiceover', icon: '🎙️', title: 'קריינות ותקריבים', desc: 'תצוגה מקצועית עם קריין ותקריבים קרובים של המוצר — בלי דמות מול המצלמה.', tags: ['קריינות', '20 שניות', '8 טוקנים'], style: 'קריינות ותקריבים', duration: 20 },
-      { id: 'tutorial', icon: '📚', title: 'מדריך קצר', desc: '3-4 שלבים פשוטים אחד אחרי השני, כמו סרטון הדרכה מהיר.', tags: ['מדריך', '30 שניות', '12 טוקנים'], style: 'מדריך קצר', duration: 30 },
-      { id: 'social', icon: '✨', title: 'שיתוף ברשתות', desc: 'סרטון קצר ואופטימי שנועד לשיתוף בטיקטוק ורילס — פורמט 9:16.', tags: ['ביקורת', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
-      { id: 'promo', icon: '🛍️', title: 'מבצע מיוחד', desc: 'סרטון קליטה למבצעים — מציג את ההנחה בחדות, עם קריאה לפעולה ברורה.', tags: ['מבצע', '10 שניות', '4 טוקנים'], style: 'מבצע מיוחד', duration: 10 },
-      { id: 'problem-solve', icon: '💡', title: 'בעיה ופתרון', desc: 'תחילה הציגו בעיה שצריכה פתרון, אחר כך הראו את המוצר כפתרון.', tags: ['בעיה ופתרון', '20 שניות', '8 טוקנים'], style: 'בעיה ופתרון', duration: 20 },
-      { id: 'review', icon: '⭐', title: 'ביקורת ראשונה', desc: 'דברו בגוף ראשון כקונים שחוו את המוצר - honest review.', tags: ['ביקורת', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
-      { id: 'comparison', icon: '⚖️', title: 'השוואת מוצרים', desc: 'הצגו את המוצר מול מתחרה והדגישו היתרisons ברורים.', tags: ['השוואה', '25 שניות', '10 טוקנים'], style: 'קריינות ותקריבים', duration: 25 },
-    ];
+<script>
+  // חמש התבניות תואמות בדיוק לסגנונות ולאורכים שנתמכים במסך היצירה.
+  var templates = [
+    { style: 'UGC טבעי', title: 'UGC טבעי', icon: '🎬', duration: 15, desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.' },
+    { style: 'הדגמת מוצר', title: 'הדגמת מוצר', icon: '🔍', duration: 15, desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.' },
+    { style: 'פתיחת חבילה', title: 'פתיחת חבילה', icon: '📦', duration: 15, desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.' },
+    { style: 'קריינות ותקריבים', title: 'קריינות ותקריבים', icon: '🎙️', duration: 20, desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.' },
+    { style: 'מדריך קצר', title: 'מדריך קצר', icon: '📚', duration: 30, desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.' }
+  ];
 
-    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+  // טוקנים לסרטון אחד לפי אורך: 720p לפי הבסיס, 1080p פי 1.5
+  var baseTokens = { 5: 2, 10: 4, 15: 6, 20: 8, 25: 10, 30: 12 };
 
-    function useTemplate(tpl) {
-      sessionStorage.setItem('clipik_template_style', tpl.style);
-      sessionStorage.setItem('clipik_template_name', tpl.title);
-      sessionStorage.setItem('clipik_template_duration', String(tpl.duration));
-      window.location.href = '/create.html';
-    }
+  function tokensFor(duration, res) {
+    var base = baseTokens[duration];
+    return res === '1080p' ? Math.round(base * 1.5) : base;
+  }
 
-    function renderTemplates(filterStyle) {
-      const grid = $('#templateGrid');
-      const list = filterStyle ? templates.filter(t => t.style === filterStyle) : templates;
-      grid.innerHTML = list.map(t => `
-        <div class="card">
-          <div style="font-size:42px;margin-bottom:10px">${t.icon}</div>
-          <h3 class="h3" style="font-size:16px;font-weight:800;margin-bottom:6px">${t.title}</h3>
-          <p style="color:var(--muted);font-size:13px;margin-bottom:12px">${t.desc}</p>
-          <div class="chips" style="margin-bottom:14px">
-            ${t.tags.map(tag => `<span class="chip" style="cursor:default">${tag}</span>`).join('')}
-          </div>
-          <button class="btn btn-primary" style="width:100%" onclick="useTemplate(templates.find(x => x.id === '${t.id}'))">בחרו תבנית ←</button>
-        </div>
-      `).join('');
-    }
-
-    // Filter tabs
-    const filterStyles = ['הכל', 'UGC טבעי', 'הדגמת מוצר', 'קריינות ותקריבים', 'מדריך קצר'];
-    let currentFilter = 'הכל';
-    const filterBar = document.createElement('div');
-    filterBar.style.cssText = 'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px';
-    filterBar.innerHTML = filterStyles.map(s =>
-      `<button class="chip ${s === 'הכל' ? 'active' : ''}" data-filter="${s}">${s}</button>`
-    ).join('');
-    filterBar.onclick = e => {
-      const b = e.target.closest('[data-filter]');
-      if (!b) return;
-      currentFilter = b.dataset.filter;
-      filterBar.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
-      renderTemplates(currentFilter === 'הכל' ? null : currentFilter);
-    };
-    document.querySelector('main').insertBefore(filterBar, document.getElementById('templateGrid'));
-    renderTemplates();
-  </script>
+  var grid = document.getElementById('templateGrid');
+  grid.innerHTML = templates.map(function (t) {
+    var href = '/create.html?style=' + encodeURIComponent(t.style) + '&duration=' + t.duration;
+    return '<div class="card">' +
+      '<div style="font-size:40px;margin-bottom:10px">' + t.icon + '</div>' +
+      '<h3 class="h3" style="font-size:18px;margin-bottom:6px">' + t.title + '</h3>' +
+      '<p style="color:var(--muted);font-size:14px;margin-bottom:14px">' + t.desc + '</p>' +
+      '<div class="chips" style="margin-bottom:16px">' +
+        '<span class="chip" style="cursor:default">' + t.duration + ' שניות</span>' +
+        '<span class="chip" style="cursor:default">720p: ' + tokensFor(t.duration, '720p') + ' טוקנים</span>' +
+        '<span class="chip" style="cursor:default">1080p: ' + tokensFor(t.duration, '1080p') + ' טוקנים</span>' +
+      '</div>' +
+      '<a class="btn btn-primary" style="width:100%;text-align:center" href="' + href + '">בחרו תבנית</a>' +
+    '</div>';
+  }).join('');
+</script>
 </body>
 </html>
