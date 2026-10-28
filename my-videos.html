@@ -26,7 +26,6 @@
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
-    <a href="/contact.html" class="sidebar-link"><span class="sidebar-icon">📧</span>צור קשר</a>
     <a href="/login.html" class="sidebar-link"><span class="sidebar-icon">👤</span>התחברות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
@@ -137,14 +136,16 @@ function renderVideos() {
 
 function downloadVideo(index) {
   const v = videos[index];
-  const blob = new Blob([JSON.stringify(v, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
+  if (!v || !v.video_url) { toast('אין קובץ סרטון להורדה'); return; }
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `clipic-${v.id || 'video'}.json`;
+  a.href = v.video_url;
+  a.download = `clipik-${v.id || 'video'}.mp4`;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
-  toast('הקובץ הורד ✓');
+  a.remove();
+  toast('ההורדה התחילה');
 }
 
 function deleteVideo(index) {
@@ -221,7 +222,6 @@ loadVideos();
     <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
       <a href="/pricing.html">מחירון</a>
       <a href="/faq.html">שאלות נפוצות</a>
-      <a href="/contact.html">צור קשר</a>
       <a href="/examples.html">טיפים</a>
       <a href="/login.html">התחברות</a>
     </div>

@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """Tiny dependency-free local server for the Clipic MVP."""
 from __future__ import annotations
+import base64
+import hashlib
+import hmac
 import json
 import re
+import secrets
+import time
+from http.cookies import SimpleCookie
+from urllib.parse import urlencode
 from decimal import Decimal
 import os
 import threading
@@ -84,6 +91,55 @@ def _get_user(user_id: str) -> dict | None:
         if user.get('id') == user_id:
             return user
     return None
+
+_GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+_GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+_SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
+SESSION_COOKIE = "clipik_session"
+STATE_COOKIE = "clipik_oauth_state"
+
+
+def _sign(payload: dict) -> str:
+    raw = base64.urlsafe_b64encode(json.dumps(payload, separators=(",", ":")).encode()).decode().rstrip("=")
+    sig = hmac.new(_SESSION_SECRET.encode(), raw.encode(), hashlib.sha256).hexdigest()
+    return f"{raw}.{sig}"
+
+
+def _unsign(token: str) -> dict | None:
+    if not token or "." not in token or not _SESSION_SECRET:
+        return None
+    raw, sig = token.rsplit(".", 1)
+    good = hmac.new(_SESSION_SECRET.encode(), raw.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(sig, good):
+        return None
+    try:
+        data = json.loads(base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)))
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(data, dict) or float(data.get("exp", 0)) < time.time():
+        return None
+    return data
+
+
+def _ensure_user(user_id: str, email: str) -> None:
+    data = _load_users()
+    users = data.setdefault("users", [])
+    if any(u.get("id") == user_id for u in users):
+        return
+    users.append({
+        "id": user_id,
+        "email": email,
+        "tokens": 0,
+        "free_trial_used": False,
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    })
+    _save_users(data)
+
+
+def _has_enough_tokens(user_id: str, needed: int) -> bool:
+    user = _get_user(user_id)
+    return bool(user) and int(user.get("tokens", 0)) >= needed
+
 
 def _update_user_tokens(user_id: str, tokens: int) -> dict:
     data = _load_users()
@@ -280,7 +336,10 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self.send_json(400, {"error": str(exc)})
 
-        user_id = payload.get('user_id', 'demo-user')
+        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
+        tokens_needed = _uni.estimate_tokens(duration, resolution)
+        if not _has_enough_tokens(user_id, tokens_needed):
+            return self.send_json(402, {"error": "אין מספיק טוקנים. רכשו חבילה כדי ליצור סרטון."})
         
         # Check if user can use free trial (demo video instead of real generation)
         if _has_free_trial_available(user_id):
@@ -370,7 +429,7 @@ class Handler(BaseHTTPRequestHandler):
             "video_url": video_url,
         }
         # Deduct tokens after successful generation
-        user_id = payload.get('user_id', 'demo-user')
+        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
         tokens_required = _uni.estimate_tokens(duration, resolution)
         user = _get_user(user_id)
         if user:
@@ -389,6 +448,80 @@ class Handler(BaseHTTPRequestHandler):
         '/analytics.html': '/packages.html',
     }
 
+    def _cookie(self, name):
+        jar = SimpleCookie()
+        try:
+            jar.load(self.headers.get("Cookie", ""))
+        except Exception:
+            return ""
+        morsel = jar.get(name)
+        return morsel.value if morsel else ""
+
+    def _session(self):
+        return _unsign(self._cookie(SESSION_COOKIE))
+
+    def _session_user_id(self):
+        sess = self._session()
+        return f"google:{sess['sub']}" if sess and sess.get("sub") else None
+
+    def _secure_flag(self):
+        return "; Secure" if _BASE_URL.startswith("https://") else ""
+
+    def _redirect(self, location, set_cookies=()):
+        self.send_response(302)
+        self.send_header("Location", location)
+        for cookie in set_cookies:
+            self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def _google_start(self):
+        if not (_GOOGLE_CLIENT_ID and _GOOGLE_CLIENT_SECRET and _SESSION_SECRET):
+            return self._redirect("/login.html?error=google_not_configured")
+        state = secrets.token_urlsafe(24)
+        params = urlencode({
+            "client_id": _GOOGLE_CLIENT_ID,
+            "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
+            "response_type": "code",
+            "scope": "openid email profile",
+            "state": state,
+            "prompt": "select_account",
+        })
+        cookie = (f"{STATE_COOKIE}={_sign({'state': state, 'exp': time.time() + 600})}"
+                  f"; Path=/; Max-Age=600; HttpOnly; SameSite=Lax{self._secure_flag()}")
+        return self._redirect("https://accounts.google.com/o/oauth2/v2/auth?" + params, [cookie])
+
+    def _google_callback(self):
+        qs = parse_qs(urlparse(self.path).query)
+        code = (qs.get("code") or [""])[0]
+        state = (qs.get("state") or [""])[0]
+        saved = _unsign(self._cookie(STATE_COOKIE))
+        clear_state = f"{STATE_COOKIE}=; Path=/; Max-Age=0"
+        if not code or not state or not saved or saved.get("state") != state:
+            return self._redirect("/login.html?error=google_state", [clear_state])
+        try:
+            tok = _requests.post("https://oauth2.googleapis.com/token", data={
+                "code": code,
+                "client_id": _GOOGLE_CLIENT_ID,
+                "client_secret": _GOOGLE_CLIENT_SECRET,
+                "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
+                "grant_type": "authorization_code",
+            }, timeout=15)
+            tok.raise_for_status()
+            info = _requests.get("https://openidconnect.googleapis.com/v1/userinfo",
+                                 headers={"Authorization": f"Bearer {tok.json()['access_token']}"}, timeout=15)
+            info.raise_for_status()
+            profile = info.json()
+        except Exception:
+            return self._redirect("/login.html?error=google_failed", [clear_state])
+        sub = str(profile.get("sub", ""))
+        if not sub:
+            return self._redirect("/login.html?error=google_failed", [clear_state])
+        _ensure_user(f"google:{sub}", str(profile.get("email", "")))
+        session = _sign({"sub": sub, "exp": time.time() + 30 * 86400})
+        cookie = (f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}")
+        return self._redirect("/create.html", [clear_state, cookie])
+
     def do_HEAD(self):
         path = urlparse(self.path).path
         if path in REDIRECTS:
@@ -396,7 +529,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Location', REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/contact.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -416,8 +549,6 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'examples.html').read_bytes()
         elif path == '/faq.html':
             body = (ROOT / 'faq.html').read_bytes()
-        elif path == '/contact.html':
-            body = (ROOT / 'contact.html').read_bytes()
         elif path == '/login.html':
             body = (ROOT / 'login.html').read_bytes()
         elif path == '/packages.html':
@@ -459,13 +590,24 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
+        if path == "/api/auth/google/start":
+            return self._google_start()
+        if path == "/api/auth/google/callback":
+            return self._google_callback()
+        if path == "/api/auth/logout":
+            return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
+        if path == "/api/auth/me":
+            sess = self._session()
+            if not sess:
+                return self.send_json(401, {"error": "not logged in"})
+            return self.send_json(200, {"user_id": f"google:{sess['sub']}"})
         if path == "/api/fal/status":
             configured = bool(os.environ.get("UNIFICALLY_API_KEY"))
             return self.send_json(200, {"configured": configured, "model": _uni.MODEL_ID})
         if path == "/api/projects":
             return self.send_json(200, {"projects": read_projects()})
         if path == "/api/users/me":
-            user_id = self.headers.get('X-User-Id', 'demo-user')
+            user_id = self._session_user_id() or self.headers.get('X-User-Id', 'demo-user')
             user = _get_user(user_id)
             if not user:
                 return self.send_json(404, {"error": "User not found"})
@@ -519,7 +661,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/contact.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico"):
             self.send_error(404, "Not found")
             return
         body = b""
@@ -535,8 +677,6 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "examples.html").read_bytes()
         if path == "/faq.html":
             body = (ROOT / "faq.html").read_bytes()
-        if path == "/contact.html":
-            body = (ROOT / "contact.html").read_bytes()
         if path == "/login.html":
             body = (ROOT / "login.html").read_bytes()
         if path == "/create.html":
@@ -579,8 +719,6 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "examples.html").read_bytes()
         if path == "/faq.html":
             body = (ROOT / "faq.html").read_bytes()
-        if path == "/contact.html":
-            body = (ROOT / "contact.html").read_bytes()
         if path == "/login.html":
             body = (ROOT / "login.html").read_bytes()
         if path == "/styles.css":
@@ -804,7 +942,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(400, {"error": "Invalid JSON"})
 
         package_id = self._sanitize(payload.get("package_id", ""), 40)
-        user_id = self._sanitize(payload.get("user_id", "demo-user"), 40)
+        user_id = self._session_user_id() or self._sanitize(payload.get("user_id", "demo-user"), 40)
         user_email = self._sanitize(payload.get("email", ""), 120)
 
         # המחיר נקבע בשרת לפי מזהה החבילה. סכום שנשלח מהלקוח מתעלם.
