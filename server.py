@@ -95,11 +95,9 @@ def _get_user(user_id: str) -> dict | None:
             return user
     return None
 
-_GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-_GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 _SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
 SESSION_COOKIE = "clipik_session"
-STATE_COOKIE = "clipik_oauth_state"
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def _sign(payload: dict) -> str:
@@ -465,7 +463,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _session_user_id(self):
         sess = self._session()
-        return f"google:{sess['sub']}" if sess and sess.get("sub") else None
+        return sess["uid"] if sess and sess.get("uid") else None
 
     def _secure_flag(self):
         return "; Secure" if _BASE_URL.startswith("https://") else ""
@@ -478,52 +476,31 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
-    def _google_start(self):
-        if not (_GOOGLE_CLIENT_ID and _GOOGLE_CLIENT_SECRET and _SESSION_SECRET):
-            return self._redirect("/login.html?error=google_not_configured")
-        state = secrets.token_urlsafe(24)
-        params = urlencode({
-            "client_id": _GOOGLE_CLIENT_ID,
-            "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
-            "response_type": "code",
-            "scope": "openid email profile",
-            "state": state,
-            "prompt": "select_account",
-        })
-        cookie = (f"{STATE_COOKIE}={_sign({'state': state, 'exp': time.time() + 600})}"
-                  f"; Path=/; Max-Age=600; HttpOnly; SameSite=Lax{self._secure_flag()}")
-        return self._redirect("https://accounts.google.com/o/oauth2/v2/auth?" + params, [cookie])
-
-    def _google_callback(self):
-        qs = parse_qs(urlparse(self.path).query)
-        code = (qs.get("code") or [""])[0]
-        state = (qs.get("state") or [""])[0]
-        saved = _unsign(self._cookie(STATE_COOKIE))
-        clear_state = f"{STATE_COOKIE}=; Path=/; Max-Age=0"
-        if not code or not state or not saved or saved.get("state") != state:
-            return self._redirect("/login.html?error=google_state", [clear_state])
+    def _email_login(self):
+        """התחברות עם אימייל בלבד (בלי סיסמה). מייצר סשן חתום ל-30 יום."""
+        if not _SESSION_SECRET:
+            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
         try:
-            tok = _requests.post("https://oauth2.googleapis.com/token", data={
-                "code": code,
-                "client_id": _GOOGLE_CLIENT_ID,
-                "client_secret": _GOOGLE_CLIENT_SECRET,
-                "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
-                "grant_type": "authorization_code",
-            }, timeout=15)
-            tok.raise_for_status()
-            info = _requests.get("https://openidconnect.googleapis.com/v1/userinfo",
-                                 headers={"Authorization": f"Bearer {tok.json()['access_token']}"}, timeout=15)
-            info.raise_for_status()
-            profile = info.json()
-        except Exception:
-            return self._redirect("/login.html?error=google_failed", [clear_state])
-        sub = str(profile.get("sub", ""))
-        if not sub:
-            return self._redirect("/login.html?error=google_failed", [clear_state])
-        _ensure_user(f"google:{sub}", str(profile.get("email", "")))
-        session = _sign({"sub": sub, "exp": time.time() + 30 * 86400})
-        cookie = (f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}")
-        return self._redirect("/create.html", [clear_state, cookie])
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 10_000:
+                return self.send_json(400, {"error": "בקשה לא תקינה"})
+            payload = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            return self.send_json(400, {"error": "בקשה לא תקינה"})
+        email = str((payload or {}).get("email", "")).strip().lower()
+        if len(email) > 254 or not _EMAIL_RE.match(email):
+            return self.send_json(400, {"error": "נא להזין כתובת אימייל תקינה"})
+        uid = f"email:{email}"
+        _ensure_user(uid, email)
+        session = _sign({"uid": uid, "exp": time.time() + 30 * 86400})
+        cookie = f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}"
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Set-Cookie", cookie)
+        body = json.dumps({"user_id": uid, "email": email}).encode("utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_HEAD(self):
         path = urlparse(self.path).path
@@ -593,17 +570,13 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
-        if path == "/api/auth/google/start":
-            return self._google_start()
-        if path == "/api/auth/google/callback":
-            return self._google_callback()
         if path == "/api/auth/logout":
             return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
         if path == "/api/auth/me":
             sess = self._session()
             if not sess:
                 return self.send_json(401, {"error": "not logged in"})
-            uid = f"google:{sess['sub']}"
+            uid = sess.get("uid", "")
             row = _get_user(uid) or {}
             return self.send_json(200, {"user_id": uid, "email": row.get("email", ""), "tokens": row.get("tokens", 0)})
         if path == "/api/fal/status":
@@ -763,6 +736,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._verify_csrf():
             return self.send_json(403, {"error": "CSRF check failed"})
         path = urlparse(self.path).path
+        if path == "/api/auth/email":
+            return self._email_login()
         if path == "/api/generations":
             return self._handle_generation()
         if path == "/api/script/generate":
