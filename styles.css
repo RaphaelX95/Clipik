@@ -863,3 +863,27 @@ aside.side{display:none !important}
 .product .meta small{display:block;font-weight:500;color:var(--muted);font-size:12px}
 .product .ok{color:#15803d;font-weight:700;font-size:13px}
 #toScripts:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* שלב 2: בחירת פתיח בלבד */
+.script-options{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.script-option{border:1px solid var(--line);border-radius:12px;background:#fff;transition:border-color .18s,box-shadow .18s}
+.script-option:hover{border-color:#cdd1d9}
+.script-option.selected{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.script-accordion{width:100%;border:0;background:none;padding:14px 16px;cursor:pointer;font:inherit;text-align:start;color:var(--ink)}
+.script-title{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:700}
+.script-title small{color:var(--muted);font-size:12px}
+.script-panel{padding:0 16px 16px}
+.script-panel.hidden,.hidden{display:none !important}
+.script-example{color:var(--ink-2);font-size:15px;line-height:1.6;margin-bottom:10px}
+.script-example b,.script-delivery b{color:var(--muted);font-weight:600;font-size:12px;display:block;margin-bottom:2px}
+.script-delivery{color:var(--muted);font-size:13px;margin-bottom:10px}
+.script-text-label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.script-text{width:100%;min-height:96px;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;resize:vertical}
+.script-text:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+/* שלב 3: בחירת סגנון צילום */
+.style-picker{margin-bottom:18px}
+.style-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px}
+.style-grid .chip{width:100%;padding:12px 10px;border-radius:12px;text-align:center;font-size:14px}
+.style-grid .chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.style-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:720px){.style-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
