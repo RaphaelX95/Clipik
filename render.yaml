@@ -12,6 +12,8 @@ services:
         sync: false
       - key: DATA_DIR
         value: /opt/render/project/data
+      - key: BASE_URL
+        value: https://clipik.pro
     disk:
       name: data
       mountPath: /opt/render/project/data

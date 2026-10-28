@@ -888,3 +888,7 @@ aside.side{display:none !important}
 .style-grid .chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
 .style-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media (max-width:720px){.style-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== כפתור התחברות מודגש מתחת לכותרת בתפריט (עמוד הבית) ===== */
+.sidebar-login-cta{display:block;margin:4px 16px 18px;padding:13px 16px;border-radius:12px;background:linear-gradient(135deg,#ff5a1f,#ff8a3d);color:#fff !important;font-weight:800;font-size:16px;text-align:center;text-decoration:none;box-shadow:0 8px 20px rgba(255,90,31,.35);transition:transform .15s,box-shadow .15s}
+.sidebar-login-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(255,90,31,.45)}

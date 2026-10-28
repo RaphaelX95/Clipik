@@ -4,12 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>התחברות - קליפיק</title>
-<meta name="description" content="התחברו לקליפיק עם חשבון Google">
+<meta name="description" content="התחברו לקליפיק עם כתובת אימייל">
 <link rel="canonical" href="/login.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:image" content="https://clipik.pro/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://clipik.pro/og-image.png">
 </head>
 <body>
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
@@ -18,6 +27,7 @@
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק
   </div>
+  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
     <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
@@ -27,7 +37,6 @@
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
-    <a href="/login.html" class="sidebar-link active"><span class="sidebar-icon">👤</span>התחברות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
 </aside>
@@ -37,14 +46,22 @@
     <section class="login-card" aria-labelledby="login-title">
       <div id="guestView">
         <h1 id="login-title" class="login-title">התחברות</h1>
-        <p class="login-sub">נכנסים עם חשבון Google. בלי סיסמה ובלי הרשמה נפרדת.</p>
+        <p class="login-sub">מזינים אימייל ונכנסים. בלי סיסמה ובלי הרשמה נפרדת.</p>
 
         <p id="loginMsg" class="login-msg" role="alert" hidden></p>
 
-        <a class="google-btn" href="/api/auth/google/start">
-          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          <span>המשיכו עם Google</span>
-        </a>
+        <form id="emailForm" class="email-form" novalidate>
+          <label for="emailInput" class="email-label">כתובת אימייל</label>
+          <input id="emailInput" class="email-input" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
+          <button id="emailBtn" class="btn btn-primary btn-large" type="submit">שלחו לי קוד</button>
+        </form>
+        <form id="codeForm" class="email-form" novalidate hidden>
+          <p class="login-sub" style="margin:0"><span id="codeTo"></span> שלחנו קוד בן 6 ספרות.</p>
+          <label for="codeInput" class="email-label">קוד ההתחברות</label>
+          <input id="codeInput" class="email-input code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required>
+          <button id="codeBtn" class="btn btn-primary btn-large" type="submit">התחברו</button>
+          <button id="resendBtn" class="btn btn-secondary" type="button">שלחו קוד חדש</button>
+        </form>
       </div>
 
       <div id="memberView" hidden>
@@ -68,11 +85,15 @@
 .login-sub{color:var(--muted);font-size:15px;line-height:1.6;margin:0 0 22px}
 .login-sub strong{color:var(--ink)}
 .login-msg{background:#fdecea;color:#9b1c1c;border-radius:12px;padding:10px 14px;font-size:14px;margin:0 0 18px}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 16px;border:1px solid #dadce0;border-radius:12px;background:#fff;color:#3c4043;font:inherit;font-size:16px;font-weight:600;text-decoration:none;cursor:pointer;transition:background .15s,box-shadow .15s}
-.google-btn:hover{background:#f8f9fa;box-shadow:0 1px 3px rgba(60,64,67,.2)}
-.google-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .login-ok{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-soft);color:var(--accent-2);font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .login-actions{display:flex;flex-direction:column;gap:10px}
+.email-form{display:flex;flex-direction:column;gap:10px;text-align:right}
+.email-form[hidden]{display:none}
+.email-label{font-size:14px;font-weight:600;color:var(--ink)}
+.email-input{width:100%;padding:14px 16px;border:1px solid #d0d5dd;border-radius:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;background:#fff}
+.email-input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:transparent}
+.email-form .btn{width:100%}
+.code-input{text-align:center;letter-spacing:.4em;font-size:22px;font-weight:700}
 .login-actions .btn{width:100%;text-align:center}
 </style>
 <script>
@@ -80,9 +101,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 (function () {
   const msgs = {
-    google_not_configured: 'התחברות עם Google עדיין לא הוגדרה. נסו שוב מאוחר יותר.',
-    google_state: 'ההתחברות פגה. נסו שוב.',
-    google_failed: 'ההתחברות עם Google נכשלה. נסו שוב.'
+    email_failed: 'ההתחברות נכשלה. נסו שוב.'
   };
   const err = new URLSearchParams(location.search).get('error');
   if (err && msgs[err]) {
@@ -91,12 +110,79 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     el.hidden = false;
   }
 
+  const emailForm = document.getElementById('emailForm');
+  const codeForm = document.getElementById('codeForm');
+  const msg = document.getElementById('loginMsg');
+  let pendingEmail = '';
+
+  function showMsg(text) { msg.textContent = text; msg.hidden = false; }
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(r => r.json().then(d => ({ ok: r.ok, d: d })));
+  }
+
+  function requestCode(email) {
+    return postJson('/api/auth/email/request', { email: email }).then(res => {
+      if (!res.ok) throw new Error(res.d.error || 'שליחת הקוד נכשלה. נסו שוב.');
+      pendingEmail = email;
+      document.getElementById('codeTo').textContent = email;
+      emailForm.hidden = true;
+      codeForm.hidden = false;
+      document.getElementById('codeInput').focus();
+    });
+  }
+
+  emailForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const input = document.getElementById('emailInput');
+    const btn = document.getElementById('emailBtn');
+    const email = input.value.trim();
+    msg.hidden = true;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      showMsg('נא להזין כתובת אימייל תקינה');
+      input.focus();
+      return;
+    }
+    btn.disabled = true;
+    requestCode(email)
+      .catch(err => showMsg(err.message))
+      .finally(() => { btn.disabled = false; });
+  });
+
+  document.getElementById('resendBtn').addEventListener('click', function () {
+    msg.hidden = true;
+    requestCode(pendingEmail).catch(err => showMsg(err.message));
+  });
+
+  codeForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const code = document.getElementById('codeInput').value.replace(/\s/g, '');
+    const btn = document.getElementById('codeBtn');
+    msg.hidden = true;
+    if (!/^\d{6}$/.test(code)) {
+      showMsg('הקוד צריך להיות 6 ספרות');
+      return;
+    }
+    btn.disabled = true;
+    postJson('/api/auth/email/verify', { email: pendingEmail, code: code })
+      .then(res => {
+        if (!res.ok) throw new Error(res.d.error || 'ההתחברות נכשלה. נסו שוב.');
+        location.href = '/create.html';
+      })
+      .catch(err => showMsg(err.message))
+      .finally(() => { btn.disabled = false; });
+  });
+
   fetch('/api/auth/me', { credentials: 'same-origin' })
     .then(r => (r.ok ? r.json() : null))
     .then(d => {
       if (!d) return;
       document.getElementById('guestView').hidden = true;
-      document.getElementById('memberEmail').textContent = d.email || 'חשבון Google';
+      document.getElementById('memberEmail').textContent = d.email || 'חשבון';
       document.getElementById('memberView').hidden = false;
     })
     .catch(() => { /* אם השרת לא זמין, מציגים את מסך ההתחברות */ });

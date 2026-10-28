@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>חבילות טוקנים - קליפיק | מחירון סרטוני AI</title>
-<meta name="description" content="סרטון ראשון במבצע 9.99 ש״ח. חבילות 3/5/10 סרטונים, סטארטאפ, סטנדרט, פרימיום ואולטרה.">
+<meta name="description" content="חבילות טוקנים ליצירת סרטוני מוצר עם AI, לפי אורך הסרטון וכמות הסרטונים.">
 <meta name="keywords" content="חבילות טוקנים, מחירון, סרטוני מוצרים, UGC, AI, בינה מלאכותית, קליפיק, Shopify, טיקטוק, רילס">
 <link rel="canonical" href="/packages.html">
 <meta property="og:title" content="חבילות טוקנים - קליפיק">
-<meta property="og:description" content="חבילות טוקנים ליצירת סרטוני AI. סרטון ראשון במבצע 9.99 ש״ח!">
+<meta property="og:description" content="חבילות טוקנים ליצירת סרטוני מוצר עם AI.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="/packages.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
                 });
                 const d = await r.json();
                 if (d.ok) {
-                    alert('סרטון ראשון במבצע 9.99 ש״ח! ' + (d.tokens_added || 6) + ' טוקנים הופעלו.');
+                    alert((d.tokens_added || 6) + ' טוקנים הופעלו.');
                     btn.textContent = 'הופעל ✓';
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
@@ -102,6 +102,15 @@ function generateProductPage(){
 }
 
 </script>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:image" content="https://clipik.pro/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://clipik.pro/og-image.png">
 </head>
 <body>
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
@@ -110,6 +119,7 @@ function generateProductPage(){
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק
   </div>
+  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
     <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
@@ -119,7 +129,6 @@ function generateProductPage(){
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
-    <a href="/login.html" class="sidebar-link"><span class="sidebar-icon">👤</span>התחברות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
 </aside>
@@ -152,16 +161,7 @@ function generateProductPage(){
       <div class="page-header">
         <div>
           <h1 class="gradient-text">🎟️ חבילות טוקנים</h1>
-          <p class="page-subtitle">סרטון ראשון במבצע 9.99 ש"ח — 15 שניות!</p>
-        </div>
-      </div>
-
-      <div class="trial-banner ai-glow">
-        <div class="trial-content">
-          <div class="trial-badge">🎁 מבצע מיוחד</div>
-          <h2 class="gradient-text">סרטון ראשון ב-9.99 ש"ח</h2>
-          <p class="trial-desc">6 טוקנים · עד 15 שניות · ללא התחייבות</p>
-          <button class="btn btn-large btn-primary buy-btn" data-package="trial" data-amount="9.99">התחילו עכשיו</button>
+          <p class="page-subtitle">בוחרים חבילה לפי אורך הסרטון וכמות הסרטונים.</p>
         </div>
       </div>
 
