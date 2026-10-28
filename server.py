@@ -517,6 +517,19 @@ class Handler(BaseHTTPRequestHandler):
             return None
         return payload if isinstance(payload, dict) else None
 
+    def _safe_call(self, fn):
+        """מונע מצב שבו שגיאה בשרת (למשל בשמירה ל-Supabase) מחזירה תשובה ריקה לדפדפן."""
+        try:
+            return fn()
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
+            print(f"[auth] server error in {fn.__name__}: {exc!r}", flush=True)
+            try:
+                return self.send_json(503, {"error": "שגיאה זמנית בשרת. נסו שוב בעוד רגע."})
+            except Exception:
+                return None
+
     def _email_request_code(self):
         """שלב 1: שולחים קוד בן 6 ספרות לאימייל."""
         if not _SESSION_SECRET:
@@ -834,6 +847,8 @@ class Handler(BaseHTTPRequestHandler):
         # הוא מאומת בשרת מול iCount לפני זיכוי טוקנים.
         if path != "/api/icount/ipn" and not self._verify_csrf():
             return self.send_json(403, {"error": "CSRF check failed"})
+        if path in ("/api/auth/email/request", "/api/auth/email/verify"):
+            return self._safe_call(self._email_request_code if path.endswith("/request") else self._email_verify_code)
         if path == "/api/auth/email/request":
             return self._email_request_code()
         if path == "/api/auth/email/verify":
