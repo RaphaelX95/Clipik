@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="/styles.css"><script>
 document.querySelectorAll('.buy-btn').forEach(btn => {
     btn.onclick = async () => {
+        const originalText = btn.textContent;
         const packageId = btn.dataset.package;
         const amount = parseFloat(btn.dataset.amount || '0');
         btn.disabled = true;
@@ -56,14 +57,14 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
             email = prompt('הכניסו כתובת אימייל לקבל קבלה ולעדכן טוקנים:\n(האימייל יישמר עבור קניות עתידיות)');
             if (email === null) {
                 btn.disabled = false;
-                btn.textContent = 'קנו עכשיו';
+                btn.textContent = originalText;
                 return;
             }
             email = email.trim();
             if (!email || !email.includes('@')) {
                 alert('נא להכניס כתובת אימייל תקינה');
                 btn.disabled = false;
-                btn.textContent = 'קנו עכשיו';
+                btn.textContent = originalText;
                 return;
             }
             localStorage.setItem('clipic_email', email);
@@ -80,12 +81,12 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
             } else {
                 alert('שגיאה: ' + (d.error || 'לא הצלחנו ליצור תשלום'));
                 btn.disabled = false;
-                btn.textContent = 'קנו עכשיו';
+                btn.textContent = originalText;
             }
         } catch (e) {
             alert('שגיאה: ' + e.message);
             btn.disabled = false;
-            btn.textContent = 'קנו עכשיו';
+            btn.textContent = originalText;
         }
     };
 });
@@ -129,7 +130,6 @@ function generateProductPage(){
   <div class="page-tabs">
     <button class="page-tab active" onclick="switchTab('packages')">🎟️ חבילות טוקנים</button>
     <button class="page-tab" onclick="switchTab('product')">📦 יצירת דף מוצר</button>
-    <button class="page-tab" onclick="switchTab('analytics')">📊 אנליטיקס</button>
   </div>
 </div>
 <aside class="side">
@@ -395,40 +395,7 @@ function generateProductPage(){
     </aside>
   </div>
 </div>
-<div id="tab-analytics" class="page-section">
-  <div class="page-header">
-    <div>
-      <h1 class="gradient-text">📊 אנליטיקס</h1>
-      <p class="page-subtitle">מעקב אחר ביצועי הסרטונים והמרות</p>
-    </div>
-  </div>
-  <div class="analytics-grid">
-    <div class="analytics-card ai-glow">
-      <div class="analytics-icon">👁️</div>
-      <div class="analytics-value">1,234</div>
-      <div class="analytics-label">צפיות סה"כ</div>
-    </div>
-    <div class="analytics-card ai-glow">
-      <div class="analytics-icon">🎬</div>
-      <div class="analytics-value">45</div>
-      <div class="analytics-label">סרטונים שנוצרו</div>
-    </div>
-    <div class="analytics-card ai-glow">
-      <div class="analytics-icon">💰</div>
-      <div class="analytics-value">₪2,340</div>
-      <div class="analytics-label">הכנסה מהמרות</div>
-    </div>
-    <div class="analytics-card ai-glow">
-      <div class="analytics-icon">📈</div>
-      <div class="analytics-value">12.5%</div>
-      <div class="analytics-label">שיעור המרה</div>
-    </div>
-  </div>
-  <div class="recent-activity">
-    <h3 class="gradient-text">פעילות אחרונה</h3>
-    <div class="activity-list" id="activityList"></div>
-  </div>
-</div></main>
+</main>
   </div>
 <footer class="footer">
   <div class="container">
