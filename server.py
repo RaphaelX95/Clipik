@@ -451,10 +451,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         ip = self.client_address[0] if hasattr(self, "client_address") else "unknown"
-        if not _check_rate_limit(ip):
+        path = urlparse(self.path).path
+        # ההגבלה חלה על ה-API בלבד. דף אחד טוען עשרות קבצים (CSS, JS, תמונות, פונטים),
+        # ולכן הגבלה על כל בקשה שברה את העיצוב אצל משתמשים רגילים.
+        if path.startswith("/api/") and not _check_rate_limit(ip):
             self.send_json(429, {"error": "Too many requests"})
             return
-        path = urlparse(self.path).path
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
         if path == "/api/fal/status":

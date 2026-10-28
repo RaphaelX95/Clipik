@@ -21,11 +21,11 @@
   </div>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
-    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
+    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
     <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
     <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
-    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
+    <a href="/pricing.html" class="sidebar-link active"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">🌟</span>דוגמאות</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
     <a href="/contact.html" class="sidebar-link"><span class="sidebar-icon">📧</span>צור קשר</a>
@@ -33,271 +33,46 @@
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
 </aside>
-
-<div class="layout">
-<aside class="side">
-  <div class="brand">
-    <div class="brand-logo"><img src="/logo-source.jpg" alt="קליפיק" width="32" height="32"></div>
-    <div class="brand-name">קליפיק</div>
-  </div>
-  <nav class="nav">
-    <div class="nav-title">הסטודיו</div>
-    <button onclick="window.location.href='/'"><span class="ico">✨</span> יצירת סרטון</button>
-    <button onclick="window.location.href='/'"><span class="ico">📋</span> תבניות</button>
-    <button onclick="window.location.href='/pricing.html'"><span class="ico">🎟️</span> יצירת דף מוצר</button>
-    <button onclick="window.location.href='/my-videos.html'"><span class="ico">🎬</span> הסרטונים שלי</button>
-    <div class="nav-title">ניווט</div>
-    <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
-  </nav>
-</aside>
-<main class="main-content" class="main">
-  <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
-  <div class="page-header">
-    <div>
-      <h1 class="h1" class="gradient-text">💳 מחירון</h1>
-      <p class="page-subtitle">בחרו את החבילה המתאימה לכם — תמיד גמיש</p>
+<main class="main-content">
+  <div class="container pricing-page">
+    <header class="pricing-head">
+      <h1>מחירון</h1>
+      <p>משלמים רק על סרטונים שיוצאים. סרטון ראשון ב-₪9.99, ואחריו כל סרטון לפי הטבלה.</p>
+    </header>
+    <section class="price-table-wrap" aria-labelledby="table-title">
+      <h2 id="table-title" class="section-title">מחיר לסרטון</h2>
+      <table class="price-table">
+        <thead><tr><th scope="col">סרטון</th><th scope="col">טוקנים</th><th scope="col">מחיר</th></tr></thead>
+        <tbody>
+                    <tr><td>סרטון 720p באורך 15 שניות</td><td>6</td><td class="price">₪8.80</td></tr>
+          <tr><td>סרטון 1080p באורך 15 שניות</td><td>9</td><td class="price">₪13.20</td></tr>
+          <tr><td>סרטון 720p באורך 20 שניות</td><td>8</td><td class="price">₪11.74</td></tr>
+          <tr><td>סרטון 1080p באורך 20 שניות</td><td>12</td><td class="price">₪17.61</td></tr>
+          <tr><td>סרטון 720p באורך 30 שניות</td><td>12</td><td class="price">₪17.61</td></tr>
+          <tr><td>סרטון 1080p באורך 30 שניות <span class="promo-tag">מבצע 15%</span></td><td>18</td><td class="price">₪22.45</td></tr>
+        </tbody>
+      </table>
+      <p class="fine">טוקן אחד שווה כ-₪1.47. יתרת הטוקנים מתעדכנת אוטומטית אחרי כל רכישה.</p>
+    </section>
+    <div class="pricing-cta">
+      <a class="btn btn-primary btn-large" href="/packages.html">רכשו טוקנים</a>
+      <a class="btn btn-secondary btn-large" href="/faq.html">שאלות נפוצות</a>
     </div>
-    <div class="toggle" id="billingToggle">
-      <button class="active" onclick="setBilling('monthly', this)">חודשי</button>
-      <button onclick="setBilling('yearly', this)">שנתי</button>
-      <span class="save-badge">חסכו 20%</span>
-    </div>
-  </div>
-
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <div class="pricing-header">
-        <h3 class="h3">בסיסי</h3>
-        <div class="pricing-amount">
-          <span class="price" data-monthly="49" data-yearly="39">₪49</span>
-          <span class="period">/חודש</span>
-        </div>
-        <p class="pricing-desc">לפרויקטים קטנים וניסיונות ראשונים</p>
-      </div>
-      <ul class="pricing-features">
-        <li>✓ 15 טוקנים בחודש</li>
-        <li>✓ עד 10 סרטונים</li>
-        <li>✓ עד 15 שניות לסרטון</li>
-        <li>✓ תמיכה במייל</li>
-      </ul>
-      <button class="btn btn-secondary btn-large buy-btn" data-package="basic" data-monthly="49" data-yearly="39" onclick="buyPackage(this)">
-        התחילו עכשיו
-      </button>
-    </div>
-
-    <div class="pricing-card popular">
-      <div class="popular-badge">🔥 הכי פופולרי</div>
-      <div class="pricing-header">
-        <h3 class="h3">פרו</h3>
-        <div class="pricing-amount">
-          <span class="price" data-monthly="99" data-yearly="79">₪99</span>
-          <span class="period">/חודש</span>
-        </div>
-        <p class="pricing-desc">לעסקים קטנים וקמפיינים קבועים</p>
-      </div>
-      <ul class="pricing-features">
-        <li>✓ 50 טוקנים בחודש</li>
-        <li>✓ עד 30 סרטונים</li>
-        <li>✓ עד 30 שניות לסרטון</li>
-        <li>✓ גיוון בסגנונות</li>
-        <li>✓ תמיכה מועדפת</li>
-      </ul>
-      <button class="btn btn-primary btn-large buy-btn" data-package="pro" data-monthly="99" data-yearly="79" onclick="buyPackage(this)">
-        התחילו עכשיו
-      </button>
-    </div>
-
-    <div class="pricing-card">
-      <div class="pricing-header">
-        <h3 class="h3">עסקי</h3>
-        <div class="pricing-amount">
-          <span class="price" data-monthly="249" data-yearly="199">₪249</span>
-          <span class="period">/חודש</span>
-        </div>
-        <p class="pricing-desc">לצוותים ומותגים גדולים</p>
-      </div>
-      <ul class="pricing-features">
-        <li>✓ 200 טוקנים בחודש</li>
-        <li>✓ סרטונים בלי הגבלה</li>
-        <li>✓ עד 60 שניות לסרטון</li>
-        <li>✓ API access</li>
-        <li>✓ מנהל חשבון ייעודי</li>
-      </ul>
-      <button class="btn btn-secondary btn-large buy-btn" data-package="business" data-monthly="249" data-yearly="199" onclick="buyPackage(this)">
-        צרו קשר
-      </button>
-    </div>
-  </div>
-
-  <div class="faq-section">
-    <h2 class="h2" class="section-title gradient-text">❓ שאלות נפוצות על טוקנים</h2>
-    <details>
-      <summary>מהו טוקן?</summary>
-      <p>טוקן הוא יחידת crédit ליצירת סרטונים. טוקן אחד מאפשר ליצור סרטון קצר (עד 5 שניות). כל סרטון נוסף צורך בטוקנים נוספים בהתאם לאורכו.</p>
-    </details>
-    <details>
-      <summary>כמה טוקנים צריכים לסרטון?</summary>
-      <p>סרטון של 5 שניות צורך ב-2 טוקנים, 10 שניות ב-4 טוקנים, 15 שניות ב-6 טוקנים, ועד 30 שניות ב-12 טוקנים. ניתן לראות את העלות המדויקת לפני היצירה בסטודיו.</p>
-    </details>
-    <details>
-      <summary>האם הטוקנים מתפ�kers?</summary>
-      <p>כן! טוקנים שלא ניצלתם נשארים בחשבונכם עד 12 חודשים. אין הפסד — תוכלו ליצור סרטונים בכל עת שתרצו.</p>
-    </details>
-    <details>
-      <summary>מה קורה אם נגמרו הטוקנים?</summary>
-      <p>אם נגמרו הטוקנים, תוכלו לרכוש חבילה נוספת בכל עת. הסרטונים שלכם נשמרים ואתם יכולים להמשיך לעבוד עליהם לאחר הרכישה.</p>
-    </details>
-    <details>
-      <summary>האם יש החזר כספי?</summary>
-      <p>בהתאם לתנאי השימוש, ניתן לקבל החזר כספי עד 14 יום מרגע הרכישה, כל עוד לא נוצרו סרטונים באמצעות הטוקנים.</p>
-    </details>
-    <details>
-      <summary>כמה עולה סרטון אחד?</summary>
-      <p>סרטון ראשון במבצע 9.99 ש״ח (6 טוקנים). לאחר מכן, מחיר הטוקן מתחיל מ-₪1.47 לטוקן, כך שסרטון של 15 שניות (6 טוקנים) עולה כ-₪8.80. חבילות שנתיות מציעות הנחה משמעותית.</p>
-    </details>
   </div>
 </main>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-let billing = 'monthly';
-
-function esc(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-function setBilling(type, btn) {
-  billing = type;
-  document.querySelectorAll('#billingToggle button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  document.querySelectorAll('.buy-btn').forEach(btn => {
-    const monthly = btn.dataset.monthly || '0';
-    const yearly = btn.dataset.yearly || monthly;
-    const amount = type === 'monthly' ? monthly : yearly;
-    const priceEl = btn.closest('.pricing-card')?.querySelector('.price');
-    if (priceEl) {
-      priceEl.textContent = '₪' + amount;
-    }
-    if (btn.dataset.package !== 'business') {
-      btn.dataset.amount = amount;
-    }
-  });
-}
-
-async function buyPackage(btn) {
-  const packageId = btn.dataset.package;
-  const amount = parseFloat(btn.dataset.amount || '0');
-
-  btn.disabled = true;
-  const originalText = btn.textContent;
-  btn.textContent = 'מעביר...';
-
-  let email = '';
-  const storedEmail = localStorage.getItem('clipic_email');
-  if (storedEmail) {
-    email = storedEmail;
-  } else {
-    email = prompt('הכניסו כתובת אימייל לקבל קבלה ולעדכן טוקנים:\n(האימייל יישמר עבור קניות עתידיות)');
-    if (email === null) {
-      btn.disabled = false;
-      btn.textContent = originalText;
-      return;
-    }
-    email = email.trim();
-    if (!email || !email.includes('@')) {
-      alert('נא להכניס כתובת אימייל תקינה');
-      btn.disabled = false;
-      btn.textContent = originalText;
-      return;
-    }
-    localStorage.setItem('clipic_email', email);
-  }
-
-  try {
-    const r = await fetch('/api/icount/create-payment', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        package_id: packageId,
-        amount: amount,
-        user_id: 'demo-user',
-        email: email
-      })
-    });
-    const d = await r.json();
-    if (d.redirect_url) {
-      window.location.href = d.redirect_url;
-    } else {
-      alert('שגיאה: ' + (d.error || 'לא הצלחנו ליצור תשלום'));
-      btn.disabled = false;
-      btn.textContent = originalText;
-    }
-  } catch (e) {
-    alert('שגיאה: ' + e.message);
-    btn.disabled = false;
-    btn.textContent = originalText;
-  }
-}
-
-function toggleMenu() {
-  const side = document.querySelector('.side');
-  const btn = document.getElementById('menuBtn');
-  if (!side) return;
-  if (side.style.display === 'block') {
-    side.style.display = '';
-    btn.textContent = '☰ תפריט';
-  } else {
-    side.style.display = 'block';
-    side.style.position = 'fixed';
-    side.style.top = '0';
-    side.style.right = '0';
-    side.style.bottom = '0';
-    side.style.zIndex = '999';
-    side.style.width = '260px';
-    side.style.boxShadow = '-4px 0 20px #0003';
-    btn.textContent = '✕ סגירה';
-  }
-}
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 680) {
-    const side = document.querySelector('.side');
-    if (side) {
-      side.style.display = '';
-      side.style.position = '';
-      side.style.top = '';
-      side.style.right = '';
-      side.style.bottom = '';
-      side.style.zIndex = '';
-      side.style.width = '';
-      side.style.boxShadow = '';
-    }
-    const btn = document.getElementById('menuBtn');
-    if (btn) btn.textContent = '☰ תפריט';
-  }
-});
-</script>
-<footer class="footer">
-  <div class="container">
-    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
-      <a href="/pricing.html">מחירון</a>
-      <a href="/faq.html">שאלות נפוצות</a>
-      <a href="/contact.html">צור קשר</a>
-      <a href="/examples.html">דוגמאות</a>
-      <a href="/login.html">התחברות</a>
-    </div>
-    <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
-  </div>
-</footer>
+<style>
+.pricing-page{max-width:880px;padding:8px 0 40px}
+.pricing-head h1{font-family:var(--display);font-size:clamp(34px,5vw,48px);font-weight:600;line-height:1.1}
+.pricing-head p{color:var(--muted);margin-top:10px;font-size:17px;max-width:620px}
+.price-table-wrap{margin-top:32px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.price-table{width:100%;border-collapse:collapse;margin-top:8px}
+.price-table th,.price-table td{text-align:right;padding:14px 10px;border-top:1px solid var(--line);font-size:15px}
+.price-table thead th{border-top:0;color:var(--muted);font-weight:600;font-size:13px}
+.price-table .price{font-weight:700;font-variant-numeric:tabular-nums}
+.promo-tag{display:inline-block;margin-inline-start:8px;background:var(--accent-soft);color:var(--accent-2);padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.fine{color:var(--muted);font-size:13px;margin-top:14px}
+.pricing-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+@media (max-width:560px){.price-table th:nth-child(2),.price-table td:nth-child(2){display:none}}
+</style>
 </body>
 </html>
