@@ -48,6 +48,11 @@ _ICOUNT_CID = os.environ.get("ICOUNT_CID", "")
 _ICOUNT_USER = os.environ.get("ICOUNT_USER", "")
 _ICOUNT_PASS = os.environ.get("ICOUNT_PASS", "")
 _ICOUNT_PAGE_ID = os.environ.get("ICOUNT_PAGE_ID", "")
+_ANALYTICS_TOKEN = os.environ.get("ANALYTICS_TOKEN", "")
+
+
+def _analytics_ok(token: str) -> bool:
+    return bool(_ANALYTICS_TOKEN) and hmac.compare_digest(str(token), _ANALYTICS_TOKEN)
 _ICOUNT_BASE = "https://api.icount.co.il/api/v3.php"
 _ICOUNT_SID = None
 _ICOUNT_SID_EXIRES = 0
@@ -591,7 +596,6 @@ class Handler(BaseHTTPRequestHandler):
             body = b''
         self.send_response(200)
         self.send_header('Content-Length', str(len(body)))
-        self._send_security_headers()
         self.end_headers()
 
     def do_GET(self):
@@ -638,12 +642,12 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
         if path == "/payment/failure":
-            body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>תשלום נכשל</h1><p>לא הצלחנו לבצע את התשלום. נסו שוב או צרו קשר.</p><p><a href='/packages.html'>חזרה לחבילות</a></p></body></html>"
+            body = (ROOT / "payment_failure.html").read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body.encode("utf-8"))))
+            self.send_header("Content-Length", str(len(body)))
             self.end_headers()
-            self.wfile.write(body.encode("utf-8"))
+            self.wfile.write(body)
             return
         if path == "/payment/cancel":
             body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>התשלום בוטל</h1><p>החיוב לא בוצע. ניתן לנסות שוב בכל עת.</p><p><a href='/packages.html'>חזרה לחבילות</a></p></body></html>"
@@ -799,12 +803,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle_product_page()
         if path == "/api/analytics/summary":
             token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
-            if token != "YO4DfXieWO5axgFYUleauA":
+            if not _analytics_ok(token):
                 return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_summary()
         if path == "/api/analytics/event":
             token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
-            if token != "YO4DfXieWO5axgFYUleauA":
+            if not _analytics_ok(token):
                 return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_event()
         if path == "/api/icount/create-payment":
@@ -1073,6 +1077,10 @@ class Handler(BaseHTTPRequestHandler):
 
         return self.send_json(200, {"status": "ok", "tokens_added": tokens_to_add})
 
+
+    def end_headers(self):
+        self._send_security_headers()
+        super().end_headers()
 
     def _send_security_headers(self):
         self.send_header('X-Content-Type-Options', 'nosniff')
