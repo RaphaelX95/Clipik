@@ -98,6 +98,7 @@ _SITE_ICONS = {
     "/icon-192.png": ("icon-192.png", "image/png"),
     "/icon-512.png": ("icon-512.png", "image/png"),
     "/apple-touch-icon.png": ("apple-touch-icon.png", "image/png"),
+    "/og-image.png": ("og-image.png", "image/png"),
 }
 _GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 _GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
@@ -536,7 +537,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Location', REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -680,7 +681,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
             self.send_error(404, "Not found")
             return
         body = b""
