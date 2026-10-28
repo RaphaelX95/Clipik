@@ -18,6 +18,7 @@
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק
   </div>
+  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
     <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
@@ -27,7 +28,6 @@
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
-    <a href="/login.html" class="sidebar-link active"><span class="sidebar-icon">👤</span>התחברות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
 </aside>
@@ -79,6 +79,7 @@
 .login-ok{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-soft);color:var(--accent-2);font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .login-actions{display:flex;flex-direction:column;gap:10px}
 .email-form{display:flex;flex-direction:column;gap:10px;text-align:right}
+.email-form[hidden]{display:none}
 .email-label{font-size:14px;font-weight:600;color:var(--ink)}
 .email-input{width:100%;padding:14px 16px;border:1px solid #d0d5dd;border-radius:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;background:#fff}
 .email-input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:transparent}
@@ -172,7 +173,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     .then(d => {
       if (!d) return;
       document.getElementById('guestView').hidden = true;
-      document.getElementById('memberEmail').textContent = d.email || 'חשבון;
+      document.getElementById('memberEmail').textContent = d.email || 'חשבון';
       document.getElementById('memberView').hidden = false;
     })
     .catch(() => { /* אם השרת לא זמין, מציגים את מסך ההתחברות */ });
