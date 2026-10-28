@@ -10,3 +10,5 @@ services:
         value: 10000
       - key: FAL_KEY
         sync: false
+      - key: BASE_URL
+        value: https://clipik.pro

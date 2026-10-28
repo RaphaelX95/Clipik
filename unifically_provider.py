@@ -113,6 +113,7 @@ def generate_clip(
             "model": MODEL_ID,
             "input": {
                 "prompt": prompt,
+                "video_mode": "elements",
                 "image_urls": [image_url],
                 "start_image_index": 1,
                 "duration": duration,

@@ -325,28 +325,20 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
 
-        # Deduplication: check if this exact request was already made recently
+        uid = self._require_session_user()
+        if not uid:
+            return
+
+        # מניעת לחיצה כפולה: אותה בקשה של אותו משתמש לא נשלחת פעמיים בתוך 5 דקות.
+        # לא מחזירים סרטון של משתמש אחר ולא מנכים טוקנים פעמיים.
         import hashlib
         cache_key = hashlib.md5(
-            json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            uid.encode("utf-8") + json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
         ).hexdigest()
-        
         now = datetime.now(timezone.utc).timestamp()
-        if cache_key in _GENERATION_CACHE:
-            cached_time = _GENERATION_CACHE[cache_key]
-            if now - cached_time < _GENERATION_CACHE_TTL:
-                # Return the most recent project with same parameters
-                projects = read_projects()
-                for project in projects:
-                    if project.get("status") == "completed":
-                        return self.send_json(200, {
-                            "project": project,
-                            "video_url": project.get("video_url"),
-                            "tokens_remaining": 149,  # Approximate
-                            "tokens_spent": 6,
-                            "cached": True
-                        })
-        
+        if cache_key in _GENERATION_CACHE and now - _GENERATION_CACHE[cache_key] < _GENERATION_CACHE_TTL:
+            return self.send_json(409, {"error": "אותה בקשה כבר נשלחה לפני דקות ספורות. בדקו את 'הסרטונים שלי'."})
+
         # Add to cache
         _GENERATION_CACHE[cache_key] = now
         # Clean old entries in-place to avoid global rebinding
@@ -369,7 +361,7 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self.send_json(400, {"error": str(exc)})
 
-        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
+        user_id = uid
         tokens_needed = _uni.estimate_tokens(duration, resolution)
         if not _has_enough_tokens(user_id, tokens_needed):
             return self.send_json(402, {"error": "אין מספיק טוקנים. רכשו חבילה כדי ליצור סרטון."})
@@ -402,10 +394,11 @@ class Handler(BaseHTTPRequestHandler):
                 "status": "completed",
                 "video_url": _DEMO_VIDEO_URL,
                 "demo": True,
+                "user_id": uid,
             }
             items = read_projects()
             items.insert(0, project)
-            write_projects(items[:100])
+            write_projects(items[:2000])
             return self.send_json(201, {
                 "project": project,
                 "video_url": _DEMO_VIDEO_URL,
@@ -460,10 +453,12 @@ class Handler(BaseHTTPRequestHandler):
             "creator": str(payload.get("creator", "דמות AI"))[:80],
             "status": "completed",
             "video_url": video_url,
+            "user_id": uid,
         }
         # Deduct tokens after successful generation
-        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
+        user_id = uid
         tokens_required = _uni.estimate_tokens(duration, resolution)
+        new_tokens = 0
         user = _get_user(user_id)
         if user:
             new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
@@ -471,7 +466,7 @@ class Handler(BaseHTTPRequestHandler):
         
         items = read_projects()
         items.insert(0, project)
-        write_projects(items[:100])
+        write_projects(items[:2000])
         return self.send_json(201, {"project": project, "video_url": video_url, "tokens_remaining": new_tokens if user else 0, "tokens_spent": tokens_required})
 
     REDIRECTS = {
@@ -496,6 +491,13 @@ class Handler(BaseHTTPRequestHandler):
     def _session_user_id(self):
         sess = self._session()
         return sess["uid"] if sess and sess.get("uid") else None
+
+    def _require_session_user(self):
+        """מחזיר מזהה משתמש מהסשן החתום בלבד. בלי סשן עונה 401 ומחזיר None."""
+        uid = self._session_user_id()
+        if not uid:
+            self.send_json(401, {"error": "צריך להתחבר כדי להמשיך."})
+        return uid
 
     def _secure_flag(self):
         return "; Secure" if _BASE_URL.startswith("https://") else ""
@@ -652,9 +654,14 @@ class Handler(BaseHTTPRequestHandler):
             configured = bool(os.environ.get("UNIFICALLY_API_KEY"))
             return self.send_json(200, {"configured": configured, "model": _uni.MODEL_ID})
         if path == "/api/projects":
-            return self.send_json(200, {"projects": read_projects()})
+            uid = self._require_session_user()
+            if not uid:
+                return
+            return self.send_json(200, {"projects": [p for p in read_projects() if p.get("user_id") == uid]})
         if path == "/api/users/me":
-            user_id = self._session_user_id() or self.headers.get('X-User-Id', 'demo-user')
+            user_id = self._require_session_user()
+            if not user_id:
+                return
             user = _get_user(user_id)
             if not user:
                 return self.send_json(404, {"error": "User not found"})
@@ -839,6 +846,9 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
+        uid = self._require_session_user()
+        if not uid:
+            return
         project = {
             "id": uuid.uuid4().hex[:10],
             "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -855,10 +865,11 @@ class Handler(BaseHTTPRequestHandler):
             "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
             "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
             "status": "draft",
+            "user_id": uid,
         }
         items = read_projects()
         items.insert(0, project)
-        write_projects(items[:100])
+        write_projects(items[:2000])
         return self.send_json(201, {"project": project})
 
     def _handle_product_page(self):
@@ -993,7 +1004,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(400, {"error": "Invalid JSON"})
 
         package_id = self._sanitize(payload.get("package_id", ""), 40)
-        user_id = self._session_user_id() or self._sanitize(payload.get("user_id", "demo-user"), 40)
+        user_id = self._session_user_id()
+        if not user_id:
+            return self.send_json(401, {"error": "צריך להתחבר כדי לרכוש טוקנים."})
         user_email = self._sanitize(payload.get("email", ""), 120)
 
         # המחיר נקבע בשרת לפי מזהה החבילה. סכום שנשלח מהלקוח מתעלם.

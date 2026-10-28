@@ -37,6 +37,33 @@ class FalRouteTests(unittest.TestCase):
         self.assertEqual(data["estimated_cost_usd"], "1.134")
         self.assertEqual(data["model"], "kuaishou/kling-4.0-video")
 
+    def test_generation_requires_login(self):
+        body = json.dumps({"duration": 10, "image_data_url": "x"}).encode("utf-8")
+        request = urllib.request.Request(
+            self.base + "/api/generations", data=body,
+            headers={"Content-Type": "application/json"}, method="POST",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            urllib.request.urlopen(request)
+        self.assertEqual(caught.exception.code, 401)
+        caught.exception.close()
+
+    def test_projects_and_payments_require_login(self):
+        for path in ("/api/projects", "/api/users/me"):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                urllib.request.urlopen(self.base + path)
+            self.assertEqual(caught.exception.code, 401, path)
+            caught.exception.close()
+        body = json.dumps({"package_id": "720p-5-1", "user_id": "someone-else"}).encode("utf-8")
+        request = urllib.request.Request(
+            self.base + "/api/icount/create-payment", data=body,
+            headers={"Content-Type": "application/json"}, method="POST",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            urllib.request.urlopen(request)
+        self.assertEqual(caught.exception.code, 401)
+        caught.exception.close()
+
     def test_generation_requires_configured_key_and_valid_payload(self):
         body = json.dumps({"approved_cost": True, "duration": 10}).encode("utf-8")
         request = urllib.request.Request(
@@ -47,7 +74,7 @@ class FalRouteTests(unittest.TestCase):
         )
         with self.assertRaises(urllib.error.HTTPError) as caught:
             urllib.request.urlopen(request)
-        self.assertEqual(caught.exception.code, 400)
+        self.assertEqual(caught.exception.code, 401)
         raw_error = caught.exception.read()
         caught.exception.close()
         error = json.loads(raw_error)

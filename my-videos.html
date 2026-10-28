@@ -161,11 +161,7 @@ async function loadVideos() {
     const r = await fetch('/api/projects');
     if (!r.ok) throw new Error('Failed');
     const d = await r.json();
-    // Normalize status for demo data
-    videos = (d.projects || []).map(p => ({
-      ...p,
-      status: p.status === 'draft' ? (Math.random() > 0.5 ? 'completed' : 'processing') : p.status
-    }));
+    videos = d.projects || [];
     renderVideos();
   } catch (e) {
     document.getElementById('videosGrid').innerHTML = `
