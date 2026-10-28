@@ -6,7 +6,7 @@
   <title>קליפיק | יוצרים סרטוני AI למוצרים - UGC ויראלי</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;600;700&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -48,12 +48,12 @@
       <section class="stage active" id="stageProduct">
         <div class="field">
           <div class="label"><label for="productName">שם המוצר</label></div>
-          <input class="input" id="productName" placeholder="לדוגמה: פלאנר טבעולוג�יני">
+          <input class="input" id="productName" placeholder="לדוגמה: סבון יד טבעי">
         </div>
         <div class="field">
           <div class="label"><label for="url">קישור למוצר</label><small>או העלו תמונה</small></div>
           <div class="inputrow">
-            <input id="url" type="url" placeholder="https://yourstore.com/products/..." style="flex:1">
+            <input class="input" id="url" type="url" placeholder="https://yourstore.com/products/...">
             <button class="btn btn-secondary" id="addUrl">🔗 הוספה</button>
           </div>
           <div style="text-align:center;color:var(--muted);font-size:13px;margin:10px 0">או</div>
@@ -84,8 +84,12 @@
             <select class="select" id="duration"><option value="5">5 שניות</option><option value="10">10 שניות</option><option value="15" selected>15 שניות</option><option value="20">20 שניות</option><option value="30">30 שניות</option></select>
           </div>
           <div class="field">
-            <div class="label"><label for="resolution">רזולוציה</label></div>
-            <select class="select" id="resolution"><option value="720p" selected>720p · סטנדרטי</option><option value="1080p">1080p · איכות גבוהה</option></select>
+            <div class="label"><span>רזולוציה</span></div>
+            <div class="segmented" id="resolutionGroup" role="group" aria-label="רזולוציה">
+              <button type="button" class="seg" data-value="720p" aria-pressed="true">720p<small>סטנדרטי</small></button>
+              <button type="button" class="seg" data-value="1080p" aria-pressed="false">1080p<small>איכות גבוהה</small></button>
+            </div>
+            <input type="hidden" id="resolution" value="720p">
           </div>
         </div>
         <button class="btn btn-primary btn-large" id="toScripts" style="width:100%;margin-top:18px">
@@ -322,5 +326,13 @@
     updateDetails();
     renderScripts();
   </script>
+<script>
+document.querySelectorAll('#resolutionGroup .seg').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#resolutionGroup .seg').forEach(function(b){ b.setAttribute('aria-pressed', String(b === btn)); });
+    document.getElementById('resolution').value = btn.dataset.value;
+  });
+});
+</script>
 </body>
 </html>

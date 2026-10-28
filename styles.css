@@ -1,22 +1,25 @@
-/* Clipik - Clean Light Design System */
+/* Clipik - Studio Light Design System */
 :root{
-  --bg:#ffffff;
-  --bg-2:#f8fafc;
+  /* הרקע קריר ואפור-בהיר, והתוכן יושב על כרטיסים לבנים: ההפרדה בין השניים היא המבנה */
+  --bg:#f2f3f5;
+  --bg-2:#e9ebef;
   --surface:#ffffff;
-  --surface-2:#f1f5f9;
-  --ink:#0f172a;
-  --ink-2:#334155;
-  --muted:#64748b;
-  --line:#e2e8f0;
-  --accent:#7c3aed;
-  --accent-2:#6d28d9;
-  --accent-soft:#ede9fe;
+  --surface-2:#f4f5f7;
+  --ink:#14161a;
+  --ink-2:#3b4048;
+  --muted:#6b717c;
+  --line:#e3e5ea;
+  /* צבע מותג אחד בלבד: אדום-כתום, לכפתור הראשי, לשלב הפעיל ולפוקוס */
+  --accent:#ff5a1f;
+  --accent-2:#e2470f;
+  --accent-soft:#fff0e8;
   --teal:#0d9488;
-  --radius:16px;
-  --radius-sm:12px;
-  --shadow:0 10px 30px rgba(15,23,42,0.08);
-  --shadow-lg:0 20px 50px rgba(15,23,42,0.12);
-  --font:'Heebo','Assistant','Inter',"Noto Sans Hebrew","Segoe UI",system-ui,sans-serif;
+  --radius:14px;
+  --radius-sm:10px;
+  --shadow:0 1px 2px rgba(20,22,26,0.05),0 6px 20px rgba(20,22,26,0.05);
+  --shadow-lg:0 2px 4px rgba(20,22,26,0.06),0 14px 36px rgba(20,22,26,0.09);
+  --font:'Heebo','Noto Sans Hebrew',system-ui,sans-serif;
+  --display:'Frank Ruhl Libre','Heebo',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -722,3 +725,100 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
     display: none !important;
   }
 }
+
+/* ===== רענון עיצוב: כפתורים, שדות, סיידבר, תנועה ===== */
+
+h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;letter-spacing:0}
+.hero h1{font-size:clamp(34px,5vw,52px);line-height:1.08}
+
+/* כפתורים: מוצק, בלי זוהר וגרדיאנט */
+.btn{transition:background .18s,color .18s,border-color .18s,transform .12s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:none}
+.btn-primary:hover{background:var(--accent-2);transform:none;box-shadow:none}
+.btn-primary:focus-visible,.btn-secondary:focus-visible,.seg:focus-visible,.sidebar-link:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+.btn-secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn-secondary:hover{background:var(--surface-2);border-color:#d3d6dd}
+
+/* טקסט מודגש בכותרות: בלי גרדיאנט */
+.gradient-text{background:none;-webkit-text-fill-color:currentColor;color:var(--ink)}
+
+/* כרטיסים: בלי קפיצה בריחוף */
+.card{border:1px solid var(--line);box-shadow:var(--shadow)}
+.card:hover{transform:none;box-shadow:var(--shadow)}
+.avatar{background:var(--ink)}
+
+/* שדות: גבול עדין, פוקוס בצבע המותג */
+.input,.select,.textarea{border-color:var(--line);background:#fff;border-radius:var(--radius-sm)}
+.input:hover,.select:hover,.textarea:hover{border-color:#cdd1d9}
+.select option{background:#fff;color:var(--ink)}
+.select option:checked{background:var(--accent-soft);color:var(--ink)}
+
+/* בורר מקטעים: במקום רשימה נפתחת לאפשרויות מעטות */
+.segmented{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;width:100%}
+.seg{
+  border:0;background:transparent;border-radius:9px;padding:9px 12px;cursor:pointer;
+  font:inherit;font-weight:700;color:var(--ink-2);display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.25;
+  transition:background .18s,color .18s,box-shadow .18s;
+}
+.seg small{font-size:12px;font-weight:500;color:var(--muted)}
+.seg:hover{color:var(--ink)}
+.seg[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,22,26,.08),0 0 0 1px var(--line)}
+.seg[aria-pressed="true"] small{color:var(--accent-2)}
+
+/* שלבי הטופס */
+.step.active{background:var(--ink);color:#fff}
+.step.done{background:var(--ink);color:#fff}
+.step-line{background:var(--line)}
+
+/* סיידבר: נקי, פריט פעיל בכהה */
+.sidebar{background:#fff;border-left:1px solid var(--line)}
+.sidebar-link{border-radius:10px;transition:background .15s,color .15s}
+.sidebar-link.active{background:var(--ink);color:#fff}
+.sidebar-link.active:hover{background:var(--ink-2)}
+.sidebar-link .sidebar-icon{display:none}
+.sidebar-section{letter-spacing:0;color:var(--muted);font-weight:600;font-size:12px;text-transform:none}
+
+/* תנועה אחת מתוזמנת: כניסה של הטופס בעליה עדינה */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes sweep{from{background-position:-200% 0}to{background-position:200% 0}}
+.stage.active > .card,.stage.active > .form-card{animation:rise .55s cubic-bezier(.2,.7,.2,1) both}
+.btn-primary:disabled{opacity:.85;background-image:linear-gradient(90deg,transparent 0,rgba(255,255,255,.22) 50%,transparent 100%);background-size:200% 100%;animation:sweep 1.6s linear infinite}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+.inputrow{display:flex;gap:8px;align-items:center}
+.inputrow input{flex:1;min-width:0}
+.inputrow .btn{flex:0 0 auto}
+
+/* דף החבילות: הסרת התפריט הישן שנשאר בצד, כי הסיידבר החדש כבר מוצג */
+.layout > .side{display:none}
+.layout{display:block}
+.popular-badge{background:var(--accent);color:#fff;box-shadow:none}
+.package-card.popular{border-color:var(--accent)}
+
+/* כרטיסי חבילות: רשת נקייה, כל שורה = סוג סרטון ושורות של מחיר */
+.packages-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:8px 0 24px}
+.package-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.package-card .package-header{margin-bottom:12px}
+.package-card h3{font-family:var(--display);font-size:24px;font-weight:600;line-height:1.2}
+.package-card .package-duration{color:var(--muted);font-size:13px;margin-top:4px}
+.package-card .package-features{display:flex;flex-direction:column}
+.package-card .feature{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink-2)}
+.package-card .feature > span{min-width:0}
+.package-card .feature .buy-btn{flex:0 0 auto;min-width:104px;padding:8px 12px;font-size:14px}
+.package-card .feature:first-child{border-top:0}
+.package-card .package-price{display:none}
+@media (max-width:1000px){.packages-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.packages-grid{grid-template-columns:1fr}}
+/* שורת הטאבים הישנה בדף החבילות כוללת אנליטיקס לדוגמה, לכן מוסתרת */
+.layout > div[style*="grid-column"]{display:none}
+
+/* ריווח התוכן מהסיידבר ומהקצוות */
+.main-content{padding:28px clamp(16px,3vw,40px) 56px}
+.main-content .container{padding:0}
+.ai-glow{box-shadow:var(--shadow) !important;animation:none !important}
+.trial-banner{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin:8px 0 22px}
+.trial-banner .trial-badge{display:inline-block;background:var(--accent-soft);color:var(--accent-2);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.trial-banner h2{font-size:28px;margin-top:6px}
