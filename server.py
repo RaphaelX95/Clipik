@@ -350,12 +350,13 @@ class Handler(BaseHTTPRequestHandler):
         write_projects(items[:100])
         return self.send_json(201, {"project": project, "video_url": video_url, "tokens_remaining": new_tokens if user else 0, "tokens_spent": tokens_required})
 
-REDIRECTS = {
-    '/templates.html': '/create.html',
-    '/tips.html': '/create.html',
-    '/product-page.html': '/packages.html',
-    '/analytics.html': '/packages.html',
-}
+    REDIRECTS = {
+        '/templates.html': '/create.html',
+        '/tips.html': '/create.html',
+        '/product-page.html': '/packages.html',
+        '/analytics.html': '/packages.html',
+    }
+
     def do_HEAD(self):
         path = urlparse(self.path).path
         if path in REDIRECTS:
