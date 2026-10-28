@@ -888,3 +888,11 @@ aside.side{display:none !important}
 .style-grid .chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
 .style-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media (max-width:720px){.style-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== סרגל עליון בעמוד הבית: כפתור התחברות בצד שמאל ===== */
+.home-topbar{display:flex;justify-content:flex-end;align-items:center;padding:14px clamp(16px,3vw,40px) 0}
+.home-login-btn{padding:10px 18px;font-size:15px;white-space:nowrap}
+@media (max-width:768px){
+  .home-topbar{padding:12px 16px 0;margin-top:0}
+  .home-login-btn{padding:9px 14px;font-size:14px}
+}
