@@ -10,3 +10,7 @@ services:
         value: 10000
       - key: FAL_KEY
         sync: false
+    disk:
+      name: data
+      mountPath: /opt/render/project/src
+      sizeGB: 1
