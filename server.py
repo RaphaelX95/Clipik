@@ -685,6 +685,10 @@ class Handler(BaseHTTPRequestHandler):
             if not user_id:
                 return
             user = _get_user(user_id)
+            if not user and user_id.startswith("email:"):
+                # הסשן תקף אבל רשומת המשתמש לא נשמרה (למשל תקלת אחסון): יוצרים אותה מחדש
+                _ensure_user(user_id, user_id[len("email:"):])
+                user = _get_user(user_id)
             if not user:
                 return self.send_json(404, {"error": "User not found"})
             return self.send_json(200, {"user": user})
