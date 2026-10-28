@@ -366,48 +366,6 @@ class Handler(BaseHTTPRequestHandler):
         if not _has_enough_tokens(user_id, tokens_needed):
             return self.send_json(402, {"error": "אין מספיק טוקנים. רכשו חבילה כדי ליצור סרטון."})
         
-        # Check if user can use free trial (demo video instead of real generation)
-        if _has_free_trial_available(user_id):
-            _mark_free_trial_used(user_id)
-            tokens_required = _uni.estimate_tokens(duration, resolution)
-            user = _get_user(user_id)
-            new_tokens = 0
-            if user:
-                new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
-                _update_user_tokens(user_id, new_tokens)
-            
-            project = {
-                "id": uuid.uuid4().hex[:10],
-                "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "product": self._sanitize(payload.get("product", "מוצר לדוגמה"), 120),
-                "product_url": self._sanitize(payload.get("product_url", ""), 500),
-                "audience": self._sanitize(payload.get("audience", ""), 300),
-                "language": self._sanitize(payload.get("language", "עברית"), 40),
-                "platform": self._sanitize(payload.get("platform", "אנכי · 9:16"), 40),
-                "duration": self._sanitize(payload.get("duration", "15"), 20),
-                "script": self._sanitize(payload.get("script", ""), 750),
-                "captions": self._sanitize(payload.get("captions", ""), 50),
-                "music": self._sanitize(payload.get("music", "ללא מוזיקה"), 40),
-                "ar_effects": self._sanitize(payload.get("ar_effects", "[]"), 200),
-                "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
-                "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
-                "status": "completed",
-                "video_url": _DEMO_VIDEO_URL,
-                "demo": True,
-                "user_id": uid,
-            }
-            items = read_projects()
-            items.insert(0, project)
-            write_projects(items[:2000])
-            return self.send_json(201, {
-                "project": project,
-                "video_url": _DEMO_VIDEO_URL,
-                "tokens_remaining": new_tokens if user else 0,
-                "tokens_spent": tokens_required,
-                "demo": True,
-                "message": "סרטון הדגמה מוכן! רוצים סרטון אמיתי? קנו טוקנים",
-            })
-
         prompt = payload.get("prompt") or _fal_provider.build_prompt(
             product=payload.get("product", "מוצר לדוגמה"),
             audience=payload.get("audience", ""),
