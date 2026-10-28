@@ -25,3 +25,4 @@ server.log
 *.swo
 Thumbs.db
 .DS_Store
+temp_uploads/

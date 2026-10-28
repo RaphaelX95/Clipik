@@ -1,4 +1,4 @@
-"""מודם fal.ai צד-שרתי ל-Klipik MVP."""
+"""עזרי תסריט, פרומפט ואימות תמונה ל-Clipik. ספק הווידאו נמצא ב-unifically_provider.py."""
 from __future__ import annotations
 
 import base64
@@ -10,28 +10,9 @@ import shutil
 import subprocess
 from decimal import Decimal
 
-MODEL_ID = "kling/v4/image-to-video"
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
-PROMO_END = dt.date(2026, 10, 31)
-PROMO_RATE_768P = Decimal("0.157")
-REGULAR_RATE_768P = Decimal("0.157")
-TOKEN_PRICE = Decimal("2.70")
-USD_TO_ILS = Decimal("3.45")
 ALLOWED_DURATIONS = {3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30}
 
-
-def estimate_tokens(duration: int) -> int:
-    if duration <= 5:
-        return 2
-    if duration <= 10:
-        return 4
-    if duration <= 15:
-        return 6
-    if duration <= 20:
-        return 8
-    if duration <= 25:
-        return 10
-    return 12
 
 def split_duration(duration: int) -> list[int]:
     """פיצול משך סרטון Finals לקטעי גeneration של עד 15 שניות."""
@@ -53,14 +34,6 @@ def split_duration(duration: int) -> list[int]:
     if any(part < 5 or part > 15 for part in parts):
         raise ValueError("אורך הקטע אינו נתמך על ידי מודל הווידאו")
     return parts
-
-
-def estimate_cost_usd(duration: int, day: dt.date | None = None) -> Decimal:
-    """הערכת עלות היצירה (בדולרים) לפי משך הסרטון, לפני ניסיונות ומס."""
-    parts = split_duration(duration)
-    today = day or dt.date.today()
-    rate = PROMO_RATE_768P if today <= PROMO_END else REGULAR_RATE_768P
-    return sum((Decimal(part) * rate for part in parts), Decimal("0")).quantize(Decimal("0.001"))
 
 
 def validate_image_data_url(data_url: str) -> tuple[str, bytes]:
@@ -339,34 +312,3 @@ def build_prompt(
     )
 
 
-def generate_clip(*, image_bytes: bytes, content_type: str, prompt: str, duration: int) -> str:
-    """העלאת תמונת מוצר וקריאת המודל ליצירת קטע וידאו אחד ב-fal.ai."""
-    if not os.environ.get("FAL_KEY"):
-        raise RuntimeError("מפתח fal.ai חסר. הגדירו FAL_KEY בקובץ .env המקומי.")
-    if duration < 5 or duration > 15:
-        raise ValueError("המודל תומך בקטעים של 5–15 שניות")
-    try:
-        import fal_client
-    except ImportError as exc:
-        raise RuntimeError("חסרה ספריית fal-client. הפעילו מחדש דרך start.bat להתקנה.") from exc
-    image_url = fal_client.upload(
-        image_bytes,
-        content_type,
-        file_name="clipic-product.png" if content_type == "image/png" else "clipic-product.jpg",
-    )
-    result = fal_client.subscribe(
-        MODEL_ID,
-        arguments={
-            "prompt": prompt,
-            "start_image_url": image_url,
-            "duration": duration,
-            "resolution": "720p",
-        },
-        with_logs=False,
-        client_timeout=900,
-    )
-    video = result.get("video") if isinstance(result, dict) else None
-    url = video.get("url") if isinstance(video, dict) else None
-    if not isinstance(url, str) or not url.startswith("https://"):
-        raise RuntimeError("fal.ai לא החזיר קישור תקין לסרטון")
-    return url

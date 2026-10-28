@@ -2,6 +2,7 @@
 """Tiny dependency-free local server for the Clipic MVP."""
 from __future__ import annotations
 import json
+import re
 from decimal import Decimal
 import os
 import threading
@@ -10,7 +11,7 @@ import webbrowser
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 import sys
 from pathlib import Path as _Path
 sys.path.insert(0, str(_Path(__file__).resolve().parent))
@@ -20,6 +21,7 @@ try:
 except Exception:
     pass
 import fal_provider as _fal_provider
+import unifically_provider as _uni
 import requests as _requests
 
 ROOT = Path(__file__).resolve().parent
@@ -43,6 +45,8 @@ _GENERATION_CACHE: dict[str, float] = {}
 _GENERATION_CACHE_TTL = 300  # 5 minutes
 
 # Demo video for free trial users (pre-generated, no cost)
+_UPLOAD_DIR = Path(__file__).resolve().parent / "temp_uploads"
+_TEMP_IMAGE_RE = re.compile(r"[0-9a-f]{32}\.(png|jpg)")
 _DEMO_VIDEO_URL = "https://v3b.fal.media/files/b/0aafe5c3/fAPg5-ZZJpXUy1q3uEUju_output.mp4"
 
 
@@ -189,6 +193,24 @@ def _check_rate_limit(ip):
     _request_counts[ip].append(now)
     return True
 
+
+def _publish_temp_image(image_bytes, content_type):
+    """שומר את תמונת המוצר זמנית כדי ש-UnificAlly יוכל לקרוא אותה מכתובת ציבורית."""
+    _UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    ext = "png" if content_type == "image/png" else "jpg"
+    name = f"{uuid.uuid4().hex}.{ext}"
+    path = _UPLOAD_DIR / name
+    path.write_bytes(image_bytes)
+    return path, f"{_BASE_URL}/uploads/{name}"
+
+
+def _remove_temp_image(path):
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "ClipicMVP/0.1"
 
@@ -251,12 +273,18 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self.send_json(400, {"error": str(exc)})
 
+        resolution = str(payload.get("resolution", "720p"))
+        try:
+            duration, resolution = _uni.validate_options(payload.get("duration", 15), resolution)
+        except ValueError as exc:
+            return self.send_json(400, {"error": str(exc)})
+
         user_id = payload.get('user_id', 'demo-user')
         
         # Check if user can use free trial (demo video instead of real generation)
         if _has_free_trial_available(user_id):
             _mark_free_trial_used(user_id)
-            tokens_required = _fal_provider.estimate_tokens(int(payload.get("duration", 15)))
+            tokens_required = _uni.estimate_tokens(duration, resolution)
             user = _get_user(user_id)
             new_tokens = 0
             if user:
@@ -305,19 +333,21 @@ class Handler(BaseHTTPRequestHandler):
             creator=payload.get("creator", "דמות AI"),
             ar_effects=json.loads(payload.get("ar_effects", "[]") or "[]"),
         )
-        duration = int(payload.get("duration", 15))
-
+        image_path, image_url = _publish_temp_image(image_bytes, content_type)
         try:
-            video_url = _fal_provider.generate_clip(
-                image_bytes=image_bytes,
-                content_type=content_type,
+            video_url = _uni.generate_clip(
+                image_url=image_url,
                 prompt=prompt,
                 duration=duration,
+                resolution=resolution,
+                platform=str(payload.get("platform", "אנכי · 9:16")),
             )
         except RuntimeError as exc:
             return self.send_json(500, {"error": str(exc)})
         except Exception as exc:
-            return self.send_json(500, {"error": f" Generation failed: {exc}"})
+            return self.send_json(500, {"error": f"Generation failed: {exc}"})
+        finally:
+            _remove_temp_image(image_path)
 
         project = {
             "id": uuid.uuid4().hex[:10],
@@ -328,6 +358,7 @@ class Handler(BaseHTTPRequestHandler):
             "language": str(payload.get("language", "עברית"))[:40],
             "platform": str(payload.get("platform", "אנכי · 9:16"))[:40],
             "duration": str(duration)[:20],
+            "resolution": resolution,
             "script": str(payload.get("script", ""))[:750],
             "captions": str(payload.get("captions", ""))[:50],
             "music": str(payload.get("music", "ללא מוזיקה"))[:40],
@@ -339,7 +370,7 @@ class Handler(BaseHTTPRequestHandler):
         }
         # Deduct tokens after successful generation
         user_id = payload.get('user_id', 'demo-user')
-        tokens_required = _fal_provider.estimate_tokens(duration)
+        tokens_required = _uni.estimate_tokens(duration, resolution)
         user = _get_user(user_id)
         if user:
             new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
@@ -426,8 +457,8 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
         if path == "/api/fal/status":
-            configured = bool(os.environ.get("FAL_KEY"))
-            return self.send_json(200, {"configured": configured, "model": _fal_provider.MODEL_ID})
+            configured = bool(os.environ.get("UNIFICALLY_API_KEY"))
+            return self.send_json(200, {"configured": configured, "model": _uni.MODEL_ID})
         if path == "/api/projects":
             return self.send_json(200, {"projects": read_projects()})
         if path == "/api/users/me":
@@ -461,17 +492,30 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body.encode("utf-8"))
             return
         if path == "/api/fal/estimate":
+            query = parse_qs(urlparse(self.path).query)
             try:
-                duration = int(urlparse(self.path).query.split("duration=")[-1].split("&")[0])
-            except Exception:
-                duration = 15
-            try:
-                cost = _fal_provider.estimate_cost_usd(duration)
-                tokens = _fal_provider.estimate_tokens(duration)
-                cost_ils = float((cost * _fal_provider.USD_TO_ILS).quantize(Decimal("0.01")))
-            except Exception as exc:
+                duration = int(query.get("duration", ["15"])[0])
+                resolution = query.get("resolution", ["720p"])[0]
+                duration, resolution = _uni.validate_options(duration, resolution)
+                cost = _uni.estimate_cost_usd(duration, resolution)
+                tokens = _uni.estimate_tokens(duration, resolution)
+                cost_ils = float((cost * _uni.USD_TO_ILS).quantize(Decimal("0.01")))
+            except ValueError as exc:
                 return self.send_json(400, {"error": str(exc)})
-            return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
+            return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _uni.MODEL_ID, "duration": duration, "resolution": resolution})
+        if path.startswith("/uploads/"):
+            name = path.rsplit("/", 1)[-1]
+            file_path = _UPLOAD_DIR / name
+            if not _TEMP_IMAGE_RE.fullmatch(name) or not file_path.is_file():
+                return self.send_error(404, "Not found")
+            data = file_path.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/png" if name.endswith(".png") else "image/jpeg")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/contact.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico"):
             self.send_error(404, "Not found")
             return

@@ -83,6 +83,10 @@
             <div class="label"><label for="duration">אורך (שניות)</label></div>
             <select class="select" id="duration"><option value="5">5 שניות</option><option value="10">10 שניות</option><option value="15" selected>15 שניות</option><option value="20">20 שניות</option><option value="30">30 שניות</option></select>
           </div>
+          <div class="field">
+            <div class="label"><label for="resolution">רזולוציה</label></div>
+            <select class="select" id="resolution"><option value="720p" selected>720p · סטנדרטי</option><option value="1080p">1080p · איכות גבוהה</option></select>
+          </div>
         </div>
         <button class="btn btn-primary btn-large" id="toScripts" style="width:100%;margin-top:18px">
           <span>✳</span>המשיכו לרעיונות לתסריט
@@ -268,6 +272,7 @@
         language: $("#language").value,
         platform: $("#platform").value,
         duration: duration,
+        resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
         creator: "דמות AI"
@@ -299,6 +304,7 @@
         language: $("#language").value,
         platform: $("#platform").value,
         duration: $("#duration").value,
+        resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
         creator: "דמות AI"

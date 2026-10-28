@@ -30,6 +30,7 @@ sitemap.xml
 robots.txt
 server.py
 fal_provider.py
+unifically_provider.py
 users.json
 transactions.json
 projects.json
@@ -38,7 +39,8 @@ projects.json
 ### 4. הגדרת משתני סביבה
 הגדירו ב-`.env` או בממשק השרת:
 ```env
-FAL_KEY=fal_sk_...
+UNIFICALLY_API_KEY=...
+BASE_URL=https://clipik.pro
 ICOUNT_CID=...
 ICOUNT_USER=...
 ICOUNT_PASS=...
