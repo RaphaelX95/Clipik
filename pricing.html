@@ -231,8 +231,38 @@
     }
   } catch (e) { /* אם האחסון לא זמין, אין שחזור */ }
 
-  cta.addEventListener('click', function (e) {
-    if (cta.getAttribute('aria-disabled') === 'true') e.preventDefault();
+  cta.addEventListener('click', async function (e) {
+    e.preventDefault();
+    if (cta.getAttribute('aria-disabled') === 'true') return;
+    var sel = document.querySelector('.pr-opt[aria-pressed="true"]');
+    if (!sel) return;
+    var pkg = sel.dataset.pkg, amount = parseFloat(sel.dataset.price || '0');
+    var label = cta.textContent;
+    var email = '';
+    try { email = localStorage.getItem('clipic_email') || ''; } catch (err) { /* אין אחסון */ }
+    if (!email) {
+      email = prompt('הכניסו כתובת אימייל לקבל קבלה ולעדכן טוקנים:\n(האימייל יישמר עבור קניות עתידיות)');
+      if (email === null) return;
+      email = email.trim();
+      if (!email || email.indexOf('@') < 0) { alert('נא להכניס כתובת אימייל תקינה'); return; }
+      try { localStorage.setItem('clipic_email', email); } catch (err) { /* אין אחסון */ }
+    }
+    cta.textContent = 'מעביר לתשלום...';
+    cta.classList.add('is-disabled');
+    try {
+      var r = await fetch('/api/icount/create-payment', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({package_id: pkg, amount: amount, user_id: 'demo-user', email: email})
+      });
+      var d = await r.json();
+      if (d.redirect_url) { window.location.href = d.redirect_url; return; }
+      alert('שגיאה: ' + (d.error || 'לא הצלחנו ליצור תשלום'));
+    } catch (err) {
+      alert('שגיאה: ' + err.message);
+    }
+    cta.textContent = label;
+    cta.classList.remove('is-disabled');
   });
 })();
 </script>
