@@ -2,6 +2,7 @@
 """Tiny dependency-free local server for the Clipic MVP."""
 from __future__ import annotations
 import base64
+import html
 import hashlib
 import hmac
 import json
@@ -608,6 +609,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
+        if path.startswith("/p/"):
+            return self._serve_product_page(path[3:].strip("/"))
         if path == "/api/auth/logout":
             return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
         if path == "/api/auth/me":
@@ -858,6 +861,43 @@ class Handler(BaseHTTPRequestHandler):
         items.insert(0, project)
         write_projects(items[:2000])
         return self.send_json(201, {"project": project})
+
+    def _serve_product_page(self, slug):
+        pages = _store.load("product_pages", [], DATA_DIR)
+        page = next((p for p in pages if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(pages, list) else None
+        if not page or not re.fullmatch(r"[a-f0-9]{8}", slug or ""):
+            body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק</a></p></body></html>".encode("utf-8")
+            self.send_response(404)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        e = lambda v: html.escape(str(v or ""), quote=True)
+        bullets = "".join(f"<li>{e(b)}</li>" for b in page.get("bullets", []))
+        cta_url = page.get("cta_url") or "/pricing.html"
+        if not (cta_url.startswith("/") or cta_url.startswith("https://") or cta_url.startswith("http://")):
+            cta_url = "/pricing.html"
+        video = f"<video src=\"{e(page.get('video_url'))}\" controls playsinline style='width:100%;border-radius:12px'></video>" if str(page.get("video_url", "")).startswith(("https://", "/")) else ""
+        body = f"""<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>{e(page.get('headline') or page.get('product'))} - קליפיק</title>
+<style>body{{margin:0;font-family:Arial,sans-serif;background:#f6f6fb;color:#1d1d2b}}
+.wrap{{max-width:640px;margin:0 auto;padding:24px 16px}}h1{{font-size:28px;margin:12px 0}}
+p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:12px;background:#ff6b3d;color:#fff;text-decoration:none;font-weight:700}}
+</style></head><body><div class="wrap">
+<h1>{e(page.get('headline') or page.get('product'))}</h1>
+{video}
+<p>{e(page.get('description'))}</p>
+<ul>{bullets}</ul>
+<a class="cta" href="{e(cta_url)}">{e(page.get('cta_text') or 'קנו עכשיו')}</a>
+</div></body></html>""".encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self.wfile.write(body)
 
     def _handle_product_page(self):
         try:
