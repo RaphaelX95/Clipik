@@ -282,7 +282,7 @@
   cta.insertAdjacentElement('afterend', box);
   fetch('/api/users/me', { credentials: 'same-origin' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); })
+    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); if (d && d.user && d.user.email) cta.textContent = '👤 ' + d.user.email; })
     .catch(function () {});
 })();
 </script>
