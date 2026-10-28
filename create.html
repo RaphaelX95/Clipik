@@ -267,7 +267,7 @@
           <button type="button" class="script-accordion" data-toggle="${i}" aria-expanded="${i===openScript}">
             <span class="script-title"><span>${t.title}</span><small class="accordion-arrow">${i===openScript?"▲":"▼"}</small></span>
           </button>
-          <div class="script-panel ${i===openScript?"":"hidden"}>
+          <div class="script-panel ${i===openScript?"":"hidden"}">
             <textarea class="script-text" id="scriptText-${i}" data-script-index="${i}" placeholder="${t.manual?"כתבו כאן את התסריט שלכם…":"אפשר לערוך את הנוסח כאן…"}">${escHtml(scriptTexts[i]||"")}</textarea>
           </div>
         </section>
