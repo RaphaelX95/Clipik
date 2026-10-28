@@ -30,6 +30,7 @@
     <div class="sidebar-section">עריכה</div>
     <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
     <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon">📦</span>יצירת דף מוצר</a>
     <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
@@ -374,7 +375,7 @@
           link.href = "/login.html"; link.textContent = "להתחברות";
         } else if (e.status === 402) {
           text.textContent = "אין לכם מספיק טוקנים ליצירת הסרטון. ";
-          link.href = "/packages.html"; link.textContent = "לרכישת חבילה";
+          link.href = "/pricing.html"; link.textContent = "למחירון ולרכישה";
         } else {
           text.textContent = e.message || "אירעה שגיאה. נסו שוב.";
         }
