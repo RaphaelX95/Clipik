@@ -548,7 +548,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Location', REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -633,6 +633,14 @@ class Handler(BaseHTTPRequestHandler):
             if not user:
                 return self.send_json(404, {"error": "User not found"})
             return self.send_json(200, {"user": user})
+        if path == "/template.html":
+            body = (ROOT / "template.html").read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if path == "/payment/success":
             body = (ROOT / "payment_success.html").read_bytes()
             self.send_response(200)
@@ -692,7 +700,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
             self.send_error(404, "Not found")
             return
         body = b""
