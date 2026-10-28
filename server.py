@@ -287,7 +287,7 @@ _request_counts = defaultdict(list)
 def _check_rate_limit(ip):
     now = time.time()
     window = 60
-    max_requests = 10
+    max_requests = 120  # מספיק לדף אחד עם כמה בקשות API, ועדיין מונע הצפה
     _request_counts[ip] = [t for t in _request_counts[ip] if now - t < window]
     if len(_request_counts[ip]) >= max_requests:
         return False
@@ -314,6 +314,12 @@ def _remove_temp_image(path):
 
 class Handler(BaseHTTPRequestHandler):
     server_version = "ClipicMVP/0.1"
+
+    def _client_ip(self):
+        fwd = self.headers.get("X-Forwarded-For", "") if hasattr(self, "headers") else ""
+        if fwd:
+            return fwd.split(",")[0].strip()[:64]
+        return self.client_address[0] if hasattr(self, "client_address") else "unknown"
 
     def send_json(self, status, payload):
         raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -599,7 +605,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        ip = self.client_address[0] if hasattr(self, "client_address") else "unknown"
+        ip = self._client_ip()
         path = urlparse(self.path).path
         # ההגבלה חלה על ה-API בלבד. דף אחד טוען עשרות קבצים (CSS, JS, תמונות, פונטים),
         # ולכן הגבלה על כל בקשה שברה את העיצוב אצל משתמשים רגילים.
@@ -790,7 +796,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self):
-        ip = self.client_address[0] if hasattr(self, "client_address") else "unknown"
+        ip = self._client_ip()
         if not _check_rate_limit(ip):
             self.send_json(429, {"error": "Too many requests"})
             return
