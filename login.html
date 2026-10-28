@@ -173,7 +173,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     .then(d => {
       if (!d) return;
       document.getElementById('guestView').hidden = true;
-      document.getElementById('memberEmail').textContent = d.email || 'חשבון;
+      document.getElementById('memberEmail').textContent = d.email || 'חשבון';
       document.getElementById('memberView').hidden = false;
     })
     .catch(() => { /* אם השרת לא זמין, מציגים את מסך ההתחברות */ });
