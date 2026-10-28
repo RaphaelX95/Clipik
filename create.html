@@ -73,19 +73,36 @@
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
           <div class="field">
             <div class="label"><label for="language">שפת הסרטון</label></div>
-            <select class="select" id="language"><option>עברית</option><option>English</option><option>العربية</option></select>
+            <div class="segmented seg-wrap" data-for="language" role="group" aria-label="שפת הסרטון">
+              <button type="button" class="seg" data-value="עברית" aria-pressed="false">עברית</button>
+              <button type="button" class="seg" data-value="English" aria-pressed="false">English</button>
+              <button type="button" class="seg" data-value="العربية" aria-pressed="false">العربية</button>
+            </div>
+            <input type="hidden" id="language" value="עברית">
           </div>
           <div class="field">
             <div class="label"><label for="platform">פורמט</label></div>
-            <select class="select" id="platform"><option>אנכי · 9:16</option><option>ריבוע · 1:1</option><option>רחב · 16:9</option></select>
+            <div class="segmented seg-wrap" data-for="platform" role="group" aria-label="פורמט">
+              <button type="button" class="seg" data-value="אנכי · 9:16" aria-pressed="false">אנכי · 9:16</button>
+              <button type="button" class="seg" data-value="ריבוע · 1:1" aria-pressed="false">ריבוע · 1:1</button>
+              <button type="button" class="seg" data-value="רחב · 16:9" aria-pressed="false">רחב · 16:9</button>
+            </div>
+            <input type="hidden" id="platform" value="אנכי · 9:16">
           </div>
           <div class="field">
             <div class="label"><label for="duration">אורך (שניות)</label></div>
-            <select class="select" id="duration"><option value="5">5 שניות</option><option value="10">10 שניות</option><option value="15" selected>15 שניות</option><option value="20">20 שניות</option><option value="30">30 שניות</option></select>
+            <div class="segmented seg-wrap" data-for="duration" role="group" aria-label="אורך (שניות)">
+              <button type="button" class="seg" data-value="5" aria-pressed="false">5 שניות</button>
+              <button type="button" class="seg" data-value="10" aria-pressed="false">10 שניות</button>
+              <button type="button" class="seg" data-value="15" aria-pressed="true">15 שניות</button>
+              <button type="button" class="seg" data-value="20" aria-pressed="false">20 שניות</button>
+              <button type="button" class="seg" data-value="30" aria-pressed="false">30 שניות</button>
+            </div>
+            <input type="hidden" id="duration" value="15">
           </div>
           <div class="field">
             <div class="label"><span>רזולוציה</span></div>
-            <div class="segmented" id="resolutionGroup" role="group" aria-label="רזולוציה">
+            <div class="segmented seg-wrap" data-for="resolution" role="group" aria-label="רזולוציה">
               <button type="button" class="seg" data-value="720p" aria-pressed="true">720p<small>סטנדרטי</small></button>
               <button type="button" class="seg" data-value="1080p" aria-pressed="false">1080p<small>איכות גבוהה</small></button>
             </div>
@@ -327,10 +344,14 @@
     renderScripts();
   </script>
 <script>
-document.querySelectorAll('#resolutionGroup .seg').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    document.querySelectorAll('#resolutionGroup .seg').forEach(function(b){ b.setAttribute('aria-pressed', String(b === btn)); });
-    document.getElementById('resolution').value = btn.dataset.value;
+document.querySelectorAll('.seg-wrap').forEach(function(group){
+  var input = document.getElementById(group.dataset.for);
+  group.querySelectorAll('.seg').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      group.querySelectorAll('.seg').forEach(function(b){ b.setAttribute('aria-pressed', String(b === btn)); });
+      input.value = btn.dataset.value;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
   });
 });
 </script>
