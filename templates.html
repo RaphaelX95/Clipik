@@ -7,7 +7,7 @@
   <meta name="description" content="תבניות סרטוני UGC מוכנות: הדגמת מוצר, פתיחת חבילה, ביקורת, מדריך קצר ומבצע. בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -34,7 +34,7 @@
 
   <main class="container" style="padding-top:48px;padding-bottom:80px">
     <div style="text-align:center;margin-bottom:40px">
-      <h1 class="section-title" style="font-size:30px">📑 תבניות סרטונים מוכנות</h1>
+      <h1 class="h1" class="section-title" style="font-size:30px">📑 תבניות סרטונים מוכנות</h1>
       <p class="section-sub" style="font-size:16px">בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות</p>
     </div>
 
@@ -76,7 +76,7 @@
       grid.innerHTML = list.map(t => `
         <div class="card">
           <div style="font-size:42px;margin-bottom:10px">${t.icon}</div>
-          <h3 style="font-size:16px;font-weight:800;margin-bottom:6px">${t.title}</h3>
+          <h3 class="h3" style="font-size:16px;font-weight:800;margin-bottom:6px">${t.title}</h3>
           <p style="color:var(--muted);font-size:13px;margin-bottom:12px">${t.desc}</p>
           <div class="chips" style="margin-bottom:14px">
             ${t.tags.map(tag => `<span class="chip" style="cursor:default">${tag}</span>`).join('')}

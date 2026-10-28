@@ -7,10 +7,31 @@
 <meta name="description" content="ניהול סרטוני המוצרים שלכם ב-קליפיק. צפו, הורידו ומחקו סרטונים.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+      Clipik
+    </a>
+    <nav class="nav desktop">
+      <a href="/templates.html">תבניות</a>
+      <a href="/create.html">צור סרטון</a>
+      <a href="/my-videos.html">הסרטונים שלי</a>
+      <a href="/pricing.html">מחירון</a>
+      <a href="/examples.html">דוגמאות</a>
+      <a href="/faq.html">שאלות נפוצות</a>
+      <a href="/contact.html">צור קשר</a>
+    </nav>
+    <div class="header-actions">
+      <a href="/login.html"><button class="btn btn-secondary">התחברות</button></a>
+      <a href="/create.html"><button class="btn btn-primary">התחל עכשיו</button></a>
+    </div>
+  </div>
+</header>
 <div class="layout">
 <aside class="side">
   <div class="brand">
@@ -195,5 +216,17 @@ window.addEventListener('resize', () => {
 
 loadVideos();
 </script>
+<footer class="footer">
+  <div class="container">
+    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <a href="/pricing.html">מחירון</a>
+      <a href="/faq.html">שאלות נפוצות</a>
+      <a href="/contact.html">צור קשר</a>
+      <a href="/examples.html">דוגמאות</a>
+      <a href="/login.html">התחברות</a>
+    </div>
+    <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
+  </div>
+</footer>
 </body>
 </html>
