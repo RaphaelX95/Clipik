@@ -519,7 +519,7 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/robots.txt":
             body = (ROOT / "robots.txt").read_bytes()
         elif path == "/":
-            body = (ROOT / "index.html").read_bytes()
+            body = (ROOT / "create.html").read_bytes()
         if path == "/packages.html":
             body = (ROOT / "packages.html").read_bytes()
         if path == "/my-videos.html":
