@@ -600,7 +600,9 @@ class Handler(BaseHTTPRequestHandler):
             sess = self._session()
             if not sess:
                 return self.send_json(401, {"error": "not logged in"})
-            return self.send_json(200, {"user_id": f"google:{sess['sub']}"})
+            uid = f"google:{sess['sub']}"
+            row = _get_user(uid) or {}
+            return self.send_json(200, {"user_id": uid, "email": row.get("email", ""), "tokens": row.get("tokens", 0)})
         if path == "/api/fal/status":
             configured = bool(os.environ.get("UNIFICALLY_API_KEY"))
             return self.send_json(200, {"configured": configured, "model": _uni.MODEL_ID})
