@@ -909,3 +909,9 @@ aside.side{display:none !important}
     text-align: right;
   }
 }
+
+/* שורת שפה / פורמט / אורך: שלוש עמודות בנייד ומחשב, ורשימה אנכית במחשב שולחני */
+.options-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (min-width: 901px) {
+  .options-row{grid-template-columns:1fr}
+}
