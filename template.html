@@ -128,12 +128,14 @@
   }
 
   var productImage = '';
+  var imageLabel = '';
   var resolution = '720p';
   var selectedScript = 0;
 
   function productLabel() {
     var name = $('productName').value.trim();
     if (name) return name;
+    if (imageLabel) return imageLabel;
     var u = $('productUrl').value.trim();
     if (!u) return 'המוצר';
     try {
@@ -191,6 +193,9 @@
     e.target.value = '';
     if (!f) return;
     if (f.size > 10 * 1024 * 1024) { toast('תמונה גדולה מדי (מקס 10MB)'); return; }
+    imageLabel = f.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+    var list0 = scriptsFor(productLabel());
+    $('scriptText').value = list0[selectedScript].text;
     var r = new FileReader();
     r.onload = function () {
       productImage = r.result;
