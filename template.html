@@ -64,7 +64,7 @@
       <input type="file" id="file" accept="image/png,image/jpeg" hidden>
       <div id="imgPreview" style="margin-top:12px"></div>
       <div class="field" style="margin-top:16px">
-        <label class="label" for="productName">שם המוצר (אפשר לכתוב, בלי קשר לתמונה או לקישור)</label>
+        <label class="label" for="productName">שם המוצר (חובה)</label>
         <input class="input" id="productName" placeholder="למשל: מכשיר ניקוי אלחוטי">
       </div>
       <div class="field" style="margin-top:16px">
@@ -204,6 +204,7 @@
   $('createBtn').onclick = async function () {
     var status = $('status');
     if (!productImage) { status.textContent = 'כדי ליצור סרטון צריך להעלות תמונה של המוצר'; return; }
+    if (!$('productName').value.trim()) { status.textContent = 'כדי ליצור סרטון צריך לכתוב שם למוצר'; $('productName').focus(); return; }
     var btn = $('createBtn');
     btn.disabled = true; btn.textContent = 'יוצר...';
     status.textContent = 'שולח בקשה…';
