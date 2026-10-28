@@ -64,8 +64,8 @@
       <input type="file" id="file" accept="image/png,image/jpeg" hidden>
       <div id="imgPreview" style="margin-top:12px"></div>
       <div class="field" style="margin-top:16px">
-        <label class="label" for="productName">שם המוצר</label>
-        <input class="input" id="productName" placeholder="למשל: מכשיר ניקוי אלחוטי">
+        <label class="label" for="productUrl">או קישור למוצר (לא חובה)</label>
+        <input class="input" id="productUrl" type="url" inputmode="url" placeholder="https://yourstore.com/products/...">
       </div>
     </section>
 
@@ -127,7 +127,15 @@
   var resolution = '720p';
   var selectedScript = 0;
 
-  function productLabel() { return ($('productName').value.trim() || 'המוצר'); }
+  function productLabel() {
+    var u = $('productUrl').value.trim();
+    if (!u) return 'המוצר';
+    try {
+      var seg = new URL(u).pathname.split('/').filter(Boolean).pop() || '';
+      seg = decodeURIComponent(seg).replace(/[-_]+/g, ' ').replace(/\.[a-z]+$/i, '').trim();
+      return seg && seg.length < 60 ? seg : 'המוצר';
+    } catch (e) { return 'המוצר'; }
+  }
 
   function scriptsFor(p) {
     return [
@@ -151,7 +159,7 @@
     selectedScript = +b.dataset.idx;
     renderScripts();
   });
-  $('productName').addEventListener('input', function () {
+  $('productUrl').addEventListener('input', function () {
     var list = scriptsFor(productLabel());
     $('scriptText').value = list[selectedScript].text;
   });
@@ -192,7 +200,7 @@
     var payload = {
       image_data_url: productImage,
       product: productLabel(),
-      product_url: '',
+      product_url: $('productUrl').value.trim(),
       audience: $('audience').value.trim(),
       language: 'עברית',
       platform: 'אנכי · 9:16',
