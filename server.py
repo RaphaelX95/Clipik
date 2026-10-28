@@ -105,29 +105,23 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _OTP_TTL = 600          # קוד תקף 10 דקות
 _OTP_COOLDOWN = 60     # שליחה חוזרת לאותה כתובת אחרי דקה
 _OTP_MAX_TRIES = 5
-def _otp_load() -> dict:
-    data = _store.load("login_codes", {}, DATA_DIR)
-    return data if isinstance(data, dict) else {}
+_OTP_STORE: dict = {}  # email -> {"hash", "exp", "tries", "sent_at"} (בזיכרון, כמו בגרסה שעבדה)
+_OTP_LOCK = threading.Lock()
 
 
 def _otp_get(email: str):
-    return _otp_load().get(email)
+    return _OTP_STORE.get(email)
 
 
 def _otp_put(email: str, entry: dict) -> None:
-    data = _otp_load()
     now = time.time()
-    data = {k: v for k, v in data.items() if isinstance(v, dict) and v.get("exp", 0) > now - 3600}
-    data[email] = entry
-    _store.save("login_codes", data, DATA_DIR)
+    for k in [k for k, v in _OTP_STORE.items() if v.get("exp", 0) < now - 3600]:
+        _OTP_STORE.pop(k, None)
+    _OTP_STORE[email] = entry
 
 
 def _otp_del(email: str) -> None:
-    data = _otp_load()
-    if email in data:
-        data.pop(email, None)
-        _store.save("login_codes", data, DATA_DIR)
-_OTP_LOCK = threading.Lock()
+    _OTP_STORE.pop(email, None)
 
 
 def _otp_hash(email: str, code: str) -> str:
@@ -180,6 +174,14 @@ def _unsign(token: str) -> dict | None:
 
 
 def _ensure_user(user_id: str, email: str) -> None:
+    """יוצר משתמש אם חסר. שגיאת אחסון לא מפילה את ההתחברות: הסשן נחתם בנפרד."""
+    try:
+        _ensure_user_inner(user_id, email)
+    except Exception as exc:
+        print(f"[auth] could not save user record: {exc!r}", flush=True)
+
+
+def _ensure_user_inner(user_id: str, email: str) -> None:
     data = _load_users()
     users = data.setdefault("users", [])
     if any(u.get("id") == user_id for u in users):
