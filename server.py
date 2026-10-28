@@ -10,6 +10,7 @@ import secrets
 import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
+import store as _store
 from decimal import Decimal
 import os
 import threading
@@ -62,31 +63,20 @@ _DEMO_VIDEO_URL = "https://v3b.fal.media/files/b/0aafe5c3/fAPg5-ZZJpXUy1q3uEUju_
 
 
 def read_projects():
-    try:
-        data = json.loads(DATA.read_text(encoding="utf-8"))
-        return data if isinstance(data, list) else []
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    data = _store.load("projects", [], DATA_DIR)
+    return data if isinstance(data, list) else []
 
 
 def write_projects(items):
-    tmp = DATA.with_suffix(".tmp")
-    tmp.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(DATA)
+    _store.save("projects", items, DATA_DIR)
 
-
-_USERS_PATH = DATA_DIR / 'users.json'
 
 def _load_users() -> dict:
-    if not _USERS_PATH.exists():
-        return {'users': []}
-    try:
-        return json.loads(_USERS_PATH.read_text(encoding='utf-8'))
-    except (json.JSONDecodeError, OSError):
-        return {'users': []}
+    data = _store.load("users", {'users': []}, DATA_DIR)
+    return data if isinstance(data, dict) else {'users': []}
 
 def _save_users(data: dict) -> None:
-    _USERS_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    _store.save("users", data, DATA_DIR)
 
 def _get_user(user_id: str) -> dict | None:
     data = _load_users()
@@ -881,13 +871,11 @@ class Handler(BaseHTTPRequestHandler):
             "video_url": video_url,
             "slug": uuid.uuid4().hex[:8],
         }
-        pages_path = DATA_DIR / "product_pages.json"
-        try:
-            pages = json.loads(pages_path.read_text(encoding="utf-8"))
-        except (FileNotFoundError, json.JSONDecodeError):
+        pages = _store.load("product_pages", [], DATA_DIR)
+        if not isinstance(pages, list):
             pages = []
         pages.insert(0, page)
-        pages_path.write_text(json.dumps(pages[:100], ensure_ascii=False, indent=2), encoding="utf-8")
+        _store.save("product_pages", pages[:100], DATA_DIR)
         page_url = f"{_BASE_URL}/p/{page['slug']}"
         return self.send_json(201, {"ok": True, "page": page, "page_url": page_url})
 
@@ -1010,15 +998,11 @@ class Handler(BaseHTTPRequestHandler):
                 "docnum": result.get("docnum"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
-            pending_file = DATA_DIR / "pending_payments.json"
-            pending_list = []
-            if pending_file.exists():
-                try:
-                    pending_list = json.loads(pending_file.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+            pending_list = _store.load("pending_payments", [], DATA_DIR)
+            if not isinstance(pending_list, list):
+                pending_list = []
             pending_list.append(pending)
-            pending_file.write_text(json.dumps(pending_list, ensure_ascii=False, indent=2), encoding="utf-8")
+            _store.save("pending_payments", pending_list, DATA_DIR)
 
             # Build redirect URL with our success/failure URLs
             cc_url = result.get("cc_page_url", result.get("doc_url", ""))
@@ -1059,13 +1043,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"status": "ok"})
 
         # Find pending payment by docnum
-        pending_file = DATA_DIR / "pending_payments.json"
-        pending_list = []
-        if pending_file.exists():
-            try:
-                pending_list = json.loads(pending_file.read_text(encoding="utf-8"))
-            except Exception:
-                pass
+        pending_list = _store.load("pending_payments", [], DATA_DIR)
+        if not isinstance(pending_list, list):
+            pending_list = []
 
         matched = None
         remaining = []
@@ -1084,13 +1064,9 @@ class Handler(BaseHTTPRequestHandler):
                 _update_user_tokens(user_id, new_total)
 
             # Save transaction record
-            tx_file = DATA_DIR / "transactions.json"
-            txs = []
-            if tx_file.exists():
-                try:
-                    txs = json.loads(tx_file.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+            txs = _store.load("transactions", [], DATA_DIR)
+            if not isinstance(txs, list):
+                txs = []
             txs.append({
                 "docnum": docnum,
                 "user_id": user_id,
@@ -1101,10 +1077,10 @@ class Handler(BaseHTTPRequestHandler):
                 "status": "paid",
                 "created_at": datetime.now(timezone.utc).isoformat(),
             })
-            tx_file.write_text(json.dumps(txs, ensure_ascii=False, indent=2), encoding="utf-8")
+            _store.save("transactions", txs, DATA_DIR)
 
             # Update pending list
-            pending_file.write_text(json.dumps(remaining, ensure_ascii=False, indent=2), encoding="utf-8")
+            _store.save("pending_payments", remaining, DATA_DIR)
 
         return self.send_json(200, {"status": "ok", "tokens_added": matched.get("tokens") if matched else 0})
 
