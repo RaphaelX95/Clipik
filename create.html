@@ -120,16 +120,6 @@
           <div class="label"><span>בחרו פתיח לסרטון</span><small>משפט ראשון שנאמר בקול ומופיע בכתוביות</small></div>
           <div id="scriptOptions" class="script-options"></div>
         </div>
-        <div class="field" style="margin-top:16px">
-          <div class="label"><span>בחרו סגנון צילום</span></div>
-          <div class="chips" id="styleChips">
-            <button class="chip active" data-style="UGC טבעי">UGC טבעי</button>
-            <button class="chip" data-style="הדגמת מוצר">הדגמת מוצר</button>
-            <button class="chip" data-style="פתיחת חבילה">פתיחת חבילה</button>
-            <button class="chip" data-style="קריינות ותקריבים">קריינות ותקריבים</button>
-            <button class="chip" data-style="מדריך קצר">מדריך קצר</button>
-          </div>
-        </div>
         <div style="display:flex;gap:12px;margin-top:18px">
           <button class="btn btn-secondary" id="prevStep2">← חזרה</button>
           <button class="btn btn-primary btn-large" id="toPreview" style="flex:1">המשיכו לתצוגה →</button>
@@ -138,6 +128,16 @@
 
       <!-- Step 3: Preview & Create -->
       <section class="stage" id="stagePreview">
+        <div class="field style-picker">
+          <div class="label"><span>בחרו סגנון צילום</span></div>
+          <div class="chips style-grid" id="styleChips" role="group" aria-label="סגנון צילום">
+            <button type="button" class="chip active" data-style="UGC טבעי" aria-pressed="true">UGC טבעי</button>
+            <button type="button" class="chip" data-style="הדגמת מוצר" aria-pressed="false">הדגמת מוצר</button>
+            <button type="button" class="chip" data-style="פתיחת חבילה" aria-pressed="false">פתיחת חבילה</button>
+            <button type="button" class="chip" data-style="קריינות ותקריבים" aria-pressed="false">קריינות ותקריבים</button>
+            <button type="button" class="chip" data-style="מדריך קצר" aria-pressed="false">מדריך קצר</button>
+          </div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
           <div>
             <div class="label" style="margin-bottom:10px"><span>תצוגה מקדימה</span><small id="previewFormat">9:16 · אנכי</small></div>
@@ -298,7 +298,7 @@
     $("#styleChips").onclick = e => {
       const b = e.target.closest("[data-style]"); if (!b) return;
       style = b.dataset.style;
-      document.querySelectorAll("#styleChips .chip").forEach(c => c.classList.toggle("active", c === b));
+      document.querySelectorAll("#styleChips .chip").forEach(c => { c.classList.toggle("active", c === b); c.setAttribute("aria-pressed", String(c === b)); });
       updateDetails();
     };
 
