@@ -33,7 +33,10 @@ import token_packages as _token_packages
 import requests as _requests
 
 ROOT = Path(__file__).resolve().parent
-DATA = ROOT / "projects.json"
+# תיקיית הנתונים (קבצי JSON של משתמשים, פרויקטים ותשלומים). ברירת מחדל: תיקיית הקוד.
+DATA_DIR = Path(os.environ.get("DATA_DIR") or ROOT)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATA = DATA_DIR / "projects.json"
 MAX_BODY = 1_000_000
 
 # Base URL for the application (used for iCount redirects and meta tags)
@@ -72,7 +75,7 @@ def write_projects(items):
     tmp.replace(DATA)
 
 
-_USERS_PATH = Path(__file__).with_name('users.json')
+_USERS_PATH = DATA_DIR / 'users.json'
 
 def _load_users() -> dict:
     if not _USERS_PATH.exists():
@@ -845,7 +848,7 @@ class Handler(BaseHTTPRequestHandler):
             "video_url": video_url,
             "slug": uuid.uuid4().hex[:8],
         }
-        pages_path = ROOT / "product_pages.json"
+        pages_path = DATA_DIR / "product_pages.json"
         try:
             pages = json.loads(pages_path.read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError):
@@ -972,7 +975,7 @@ class Handler(BaseHTTPRequestHandler):
                 "docnum": result.get("docnum"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
-            pending_file = ROOT / "pending_payments.json"
+            pending_file = DATA_DIR / "pending_payments.json"
             pending_list = []
             if pending_file.exists():
                 try:
@@ -1021,7 +1024,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"status": "ok"})
 
         # Find pending payment by docnum
-        pending_file = ROOT / "pending_payments.json"
+        pending_file = DATA_DIR / "pending_payments.json"
         pending_list = []
         if pending_file.exists():
             try:
@@ -1046,7 +1049,7 @@ class Handler(BaseHTTPRequestHandler):
                 _update_user_tokens(user_id, new_total)
 
             # Save transaction record
-            tx_file = ROOT / "transactions.json"
+            tx_file = DATA_DIR / "transactions.json"
             txs = []
             if tx_file.exists():
                 try:
