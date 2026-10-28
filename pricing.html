@@ -44,11 +44,13 @@
       <table class="price-table">
         <thead><tr><th scope="col">סרטון</th><th scope="col">טוקנים</th><th scope="col">מחיר</th></tr></thead>
         <tbody>
-                    <tr><td>סרטון 720p באורך 15 שניות</td><td>6</td><td class="price">₪8.80</td></tr>
-          <tr><td>סרטון 1080p באורך 15 שניות</td><td>9</td><td class="price">₪13.20</td></tr>
+          <tr class="group-row"><th scope="rowgroup" colspan="3">רזולוציה 720p</th></tr>
+          <tr><td>סרטון 720p באורך 15 שניות</td><td>6</td><td class="price">₪8.80</td></tr>
           <tr><td>סרטון 720p באורך 20 שניות</td><td>8</td><td class="price">₪11.74</td></tr>
-          <tr><td>סרטון 1080p באורך 20 שניות</td><td>12</td><td class="price">₪17.61</td></tr>
           <tr><td>סרטון 720p באורך 30 שניות</td><td>12</td><td class="price">₪17.61</td></tr>
+          <tr class="group-row"><th scope="rowgroup" colspan="3">רזולוציה 1080p</th></tr>
+          <tr><td>סרטון 1080p באורך 15 שניות</td><td>9</td><td class="price">₪13.20</td></tr>
+          <tr><td>סרטון 1080p באורך 20 שניות</td><td>12</td><td class="price">₪17.61</td></tr>
           <tr><td>סרטון 1080p באורך 30 שניות <span class="promo-tag">מבצע 15%</span></td><td>18</td><td class="price">₪22.45</td></tr>
         </tbody>
       </table>
@@ -69,6 +71,7 @@
 .price-table th,.price-table td{text-align:right;padding:14px 10px;border-top:1px solid var(--line);font-size:15px}
 .price-table thead th{border-top:0;color:var(--muted);font-weight:600;font-size:13px}
 .price-table .price{font-weight:700;font-variant-numeric:tabular-nums}
+.price-table .group-row th{background:var(--surface-2,#f7f8fa);color:var(--ink);font-size:13px;font-weight:700;padding:12px 10px;border-top:1px solid var(--line)}
 .promo-tag{display:inline-block;margin-inline-start:8px;background:var(--accent-soft);color:var(--accent-2);padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700}
 .fine{color:var(--muted);font-size:13px;margin-top:14px}
 .pricing-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
