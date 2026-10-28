@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>יצירת דף מוצר - קליפיק</title>
+<meta name="description" content="צרו ד页 מוצר AI מודרני עם hero, תאורים, טענות, שאלות נפוצות ו-CTA. כל זה בחנות שלכם.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="brand">
+    <div class="brand-logo"><img src="/logo-source.jpg" alt="קליפיק" width="32" height="32"></div>
+    <div class="brand-name">קליפיק</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-title">הסטודיו</div>
+    <button onclick="window.location.href='/create.html'"><span class="ico">✨</span> יצירת סרטון</button>
+    <button onclick="window.location.href='/create.html'"><span class="ico">📋</span> תבניות</button>
+    <button onclick="window.location.href='/packages.html'"><span class="ico">🎟️</span> יצירת דף מוצר</button>
+    <button onclick="window.location.href='/packages.html?token=YO4DfXieWO5axgFYUleauA'"><span class="ico">📊</span> אנליטיקס</button>
+    <div class="nav-title">ניווט</div>
+    <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
+    <button onclick="window.location.href='/pricing.html'"><span class="ico">💳</span> מחירון</button>
+  </nav>
+</aside>
+<main class="main">
+  <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
+  <div class="page-header">
+    <div>
+      <h1 class="gradient-text">📦 בונידו דף מוצר</h1>
+      <p class="page-subtitle">צרו דף מוצר AI מודרני עם hero, תאורים, שאלות נפוצות ו-CTA</p>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <section class="panel editor">
+      <div class="field">
+        <div class="label"><label for="pbTitle">שם המוצר</label></div>
+        <input class="input" id="pbTitle" placeholder="לדוגמה: פלאנר טבעולוגני">
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbHeadline">כותרת ראשית (hero)</label></div>
+        <input class="input" id="pbHeadline" placeholder="לדוגמה: הפתרון הטבעולוגני הרביעי">
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbPrice">מחיר</label></div>
+        <input class="input" id="pbPrice" placeholder="₪99.90">
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbDesc">תיאור קצר</label></div>
+        <textarea id="pbDesc" rows="3" placeholder="תיאור קצר של המוצר שיופיע מתחת לכותרת..."></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbBullets">נקודות למהירות (מופרדות בשורה חדשה)</label></div>
+        <textarea id="pbBullets" rows="4" placeholder="✓ עדכון אוטומטי
+✓ תמיכה 24/7
+✓ אינטגרציה עם Shopify"></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbTestimonials">טענות לקוחות (מופרדות בשורה חדשה)</label></div>
+        <textarea id="pbTestimonials" rows="3" placeholder=""השירות מדהים — השתפרתי את המכירות ב-40%"
+"אחדfromהטובים שקניתי השנה""></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbFaq">שאלות נפוצות (שאלה | תשובה)</label></div>
+        <textarea id="pbFaq" rows="4" placeholder="איך זה עובד? | פשוט מאוד — העלו תמונה וקיבלתם סרטון
+האם יש תמיכה? | כן, 24/7 דרך הצ'אט"></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbCta">כתובת CTA</label></div>
+        <input class="input" id="pbCta" placeholder="/packages.html">
+      </div>
+      <button class="btn btn-primary btn-large" id="generateBtn" onclick="generateProductPage()">
+        <span>✨</span> צרו דף מוצר
+      </button>
+    </section>
+
+    <aside class="panel preview">
+      <div class="prevhead"><span>תצוגה מקדימה</span></div>
+      <div class="prevbody" id="productPreview">
+        <div class="empty">
+          <div class="empty-icon">📦</div>
+          <p>התחילו למלא פרטים ולראות את תצוגת הדף כאן</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function toggleMenu() {
+  const side = document.querySelector('.side');
+  const btn = document.getElementById('menuBtn');
+  if (!side) return;
+  if (side.style.display === 'block') {
+    side.style.display = '';
+    btn.textContent = '☰ תפריט';
+  } else {
+    side.style.display = 'block';
+    side.style.position = 'fixed';
+    side.style.top = '0';
+    side.style.right = '0';
+    side.style.bottom = '0';
+    side.style.zIndex = '999';
+    side.style.width = '260px';
+    side.style.boxShadow = '-4px 0 20px #0003';
+    btn.textContent = '✕ סגירה';
+  }
+}
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 680) {
+    const side = document.querySelector('.side');
+    if (side) {
+      side.style.display = '';
+      side.style.position = '';
+      side.style.top = '';
+      side.style.right = '';
+      side.style.bottom = '';
+      side.style.zIndex = '';
+      side.style.width = '';
+      side.style.boxShadow = '';
+    }
+    const btn = document.getElementById('menuBtn');
+    if (btn) btn.textContent = '☰ תפריט';
+  }
+});
+
+function parseFaq(text) {
+  if (!text) return [];
+  return text.split('\n').filter(line => line.includes('|')).map(line => {
+    const parts = line.split('|');
+    return { q: parts[0].trim(), a: parts.slice(1).join('|').trim() };
+  });
+}
+
+function renderPreview() {
+  const title = document.getElementById('pbTitle').value || 'שם המוצר';
+  const headline = document.getElementById('pbHeadline').value || title;
+  const price = document.getElementById('pbPrice').value || '₪99.90';
+  const desc = document.getElementById('pbDesc').value || 'תיאור קצר של המוצר יופיע כאן...';
+  const bulletsRaw = document.getElementById('pbBullets').value || '';
+  const bullets = bulletsRaw.split('\n').filter(l => l.trim());
+  const testimonialsRaw = document.getElementById('pbTestimonials').value || '';
+  const testimonials = testimonialsRaw.split('\n').filter(l => l.trim());
+  const faqRaw = document.getElementById('pbFaq').value || '';
+  const faq = parseFaq(faqRaw);
+
+  const preview = document.getElementById('productPreview');
+  preview.innerHTML = `
+    <div class="preview-page">
+      <div class="preview-hero">
+        <h1>${esc(headline)}</h1>
+        <div class="preview-price">${esc(price)}</div>
+        <p>${esc(desc)}</p>
+        <button class="btn btn-primary">קנו עכשיו</button>
+      </div>
+      ${bullets.length ? `
+      <div class="preview-section">
+        <h2>למה לבחור במוצר זה?</h2>
+        <ul class="preview-bullets">
+          ${bullets.map(b => `<li>${esc(b)}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+      ${testimonials.length ? `
+      <div class="preview-section">
+        <h2>מה הלקוחות אומרים</h2>
+        <div class="preview-testimonials">
+          ${testimonials.map(t => `<blockquote>"${esc(t)}"</blockquote>`).join('')}
+        </div>
+      </div>` : ''}
+      ${faq.length ? `
+      <div class="preview-section">
+        <h2>שאלות נפוצות</h2>
+        <div class="preview-faq">
+          ${faq.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
+        </div>
+      </div>` : ''}
+      <div class="preview-section">
+        <button class="btn btn-primary btn-large">קנו עכשיו</button>
+      </div>
+    </div>
+  `;
+}
+
+async function generateProductPage() {
+  const btn = document.getElementById('generateBtn');
+  const payload = {
+    product: document.getElementById('pbTitle').value.trim() || 'מוצר לדוגמה',
+    headline: document.getElementById('pbHeadline').value.trim(),
+    price: document.getElementById('pbPrice').value.trim(),
+    description: document.getElementById('pbDesc').value.trim(),
+    bullets: document.getElementById('pbBullets').value.split('\n').filter(l => l.trim()),
+    cta_text: 'קנו עכשיו',
+    cta_url: document.getElementById('pbCta').value.trim() || '/pricing.html',
+    style: 'UGC טבעי'
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> יוצר דף...';
+
+  try {
+    const r = await fetch('/api/product-page', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'שגיאה ביצירת הדף');
+    toast('הדף נוצר בהצלחה ✓');
+    const preview = document.getElementById('productPreview');
+    preview.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">✅</div>
+        <h3>הדף מוכן!</h3>
+        <p>הדף זמין בכתובת:</p>
+        <a href="${esc(d.page_url)}" target="_blank" class="gradient-text">${esc(d.page_url)}</a>
+        <button class="btn btn-secondary mt-2" onclick="window.open('${esc(d.page_url)}', '_blank')">פתחו דף</button>
+      </div>`;
+  } catch (e) {
+    toast('שגיאה: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span>✨</span> צרו דף מוצר';
+  }
+}
+
+// Live preview on input
+['pbTitle','pbHeadline','pbPrice','pbDesc','pbBullets','pbTestimonials','pbFaq','pbCta'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', renderPreview);
+});
+
+renderPreview();
+</script>
+</body>
+</html>

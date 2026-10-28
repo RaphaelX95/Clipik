@@ -1,224 +1,114 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>קליפיק | יוצרים סרטוני AI למוצרים - UGC ויראלי</title>
-<meta name="description" content="יצירת סרטונים ויראליים למוצרים באמצעות AI. קליפיק מאפשר לבעלי חנויות לייצר סרטוני UGC בחנות, להעלות תמונה, לבחור סגנון ולייצר סרטון איכותי בשניות. סרטון ראשון במבצע 9.99 ש״ח!">
-<meta name="keywords" content="סרטוני מוצרים, UGC, ויראלי, AI, בינה מלאכותית, יצירת סרטונים, פרסום בחנויות, Shopify, טיקטוק, רילס, שורטס">
-<meta name="google-site-verification" content="google7cfae0c73b4d1768.html">
-<link rel="icon" type="image/svg+xml" href="/logo-source.jpg">
-<link rel="apple-touch-icon" href="/logo-source.jpg">
-<link rel="canonical" href="/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<meta property="og:title" content="קליפיק | יוצרים סרטוני AI למוצרים">
-<meta property="og:description" content="יצירת סרטונים ויראליים למוצרים באמצעות AI. סרטון ראשון במבצע 9.99 ש״ח!">
-<meta property="og:type" content="website">
-<meta property="og:url" content="/">
-<meta property="og:image" content="/logo-source.jpg">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="קליפיק | יוצרים סרטוני AI למוצרים">
-<meta name="twitter:description" content="יצירת סרטונים ויראליים למוצרים באמצעות AI. סרטון ראשון במבצע 9.99 ש״ח!">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "קליפיק",
-  "url": "https://clipik.pro",
-  "logo": "https://clipik.pro/logo-source.jpg",
-  "description": "קליפיק - יצירת סרטוני מוצר/UGC באמצעות AI. תסריט אוטומטי, דמות מדברת, כתוביות, מוזיקה ואפקטים AR."
-}
-</script>
-<link rel="stylesheet" href="/styles.css"><script>
-window.analytics = {
-  track(eventType, data) {
-    try {
-      fetch('/api/analytics/event', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({type: eventType, data, ts: Date.now()})
-      });
-    } catch (e) {}
-  }
-};
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>קליפיק | יוצרים סרטוני AI למוצרים - UGC ויראלי</title>
+  <meta name="description" content="יצירת סרטונים ויראליים למוצרים באמצעות AI. סרטון ראשון במבצע 9.99 ש״ח!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body><div class="layout">
-<aside class="side"><div class="logo"><a href="/" class="logo-link"><img src="/logo-source.jpg" alt="קליפיק" class="logo-img"></a></div><div><div class="nav-title">הסטודיו</div><nav class="nav"><button class="active"><i>＋</i><span>יצירת סרטון</span></button><button onclick="openProjects()"><i>▤</i><span>הטיוטות שלי</span></button><button onclick="window.location.href='/create.html';"><i>📑</i><span>תבניות</span></button><button onclick="window.location.href='/packages.html';"><i>✨</i><span>יצירת דף מוצר</span></button><button onclick="window.location.href='/packages.html?token=YO4DfXieWO5axgFYUleauA';"><i>📊</i><span>אנליטיקס</span></button><button onclick="window.location.href='/packages.html';"><i>📦</i><span>חבילות</span></button><button onclick="window.location.href='/create.html';"><i>💡</i><span>טיפים לפרסום</span></button></nav></div><div class="sidefoot"><div class="note"><strong>הסבר</strong>יצירת הסרטון כאן היא הדמיה. החיבור למנוע AI יגיע בשלב הבא.</div><div class="profile"><span class="avatar">א</span><div><b>התכנית שלי</b><small>תוכנית התנסות</small></div></div></div></aside>
-<main class="main"><div class="top"><div class="crumb">הסטודיו <span>/</span><b>יצירת סרטון</b></div><div class="topright"><span class="pill">✳ סביבת התנסות</span></div></div>
-<button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
-    <button id="tokenBtn" class="token-btn" onclick="window.location.href='/packages.html'">
-    <span>🎟️</span>
-    <span>טוקנים:</span>
-    <span id="userTokens" class="token-badge">0</span>
-</button>
-<div id="promoBanner" class="promo-banner"><div>🎟️ סרטון ראשון במבצע 9.99 ש"ח — 15 שניות!</div><div>6 טוקנים<br><small>~1 סרטון 15 שניות או 3 סרטוני 5 שניות</small></div></div>
-<div class="head"><div><h1>יוצרים סרטון חדש</h1><p>מוצר אחד, כמה צעדים פשוטים, והסרטון אצלך.</p></div><div class="progress"><span class="step current" id="step1"><b>1</b> מוצר</span><i class="line"></i><span class="step" id="step2"><b>2</b> תסריט</span><i class="line"></i><span class="step" id="step3"><b>3</b> תצוגה</span></div></div>
-
-  <div class="script-help">
-    <strong>💡 טיפ לשיפור התוצאה</strong>
-    <p>כדי לקבל תוצאה טובה יותר, מומלץ לכתוב את הפרומפט באנגלית — גם אם הטקסט שיופיע בסרטון יהיה בעברית.</p>
-  </div>
-
-<div class="workspace"><section class="panel editor"><div class="editor-head"><h2 id="stageTitle">נתחיל מהמוצר</h2><span id="stageCount">שלב 1 מתוך 3</span></div>
-<div class="stage active" id="stageProduct"><div><button class="btn" id="prevBtn" onclick="prevStage()">← חזרה</button><button class="btn" id="nextBtn" onclick="nextStage()">← קדימה</button></div><div class="field"><div class="label"><label for="url">קישור למוצר</label><small>או העלו תמונה</small></div><div class="inputrow"><input id="url" type="url" placeholder="https://yourstore.com/products/..." aria-label="קישור למוצר"><button class="btn" id="addUrl">🔗 הוספת קישור</button></div><div class="or">או</div><button class="btn upload-btn" id="uploadBtn">📤 העלאת תמונות (PNG/JPG)</button><input id="file" type="file" accept="image/png,image/jpeg" multiple><div class="product" id="product"><span class="thumbs" id="thumbs"><span class="thumb">✦</span></span><span class="meta" id="productName">המוצר שלך<small>נוסף לפרויקט</small></span><span class="ok">✓ נוסף</span></div></div>
-<div class="field"><div class="label"><label for="audience">למי הסרטון מיועד?</label><button class="optional" id="skipAudience">אפשר לדלג</button></div><p class="tip">ספרו בקצרה למי אתם מוכרים את המוצר, או למי הוא הכי מתאים.</p><input class="select" id="audience" placeholder="למשל: הורים לילדים קטנים" aria-label="קהל יעד"></div><div class="three"><div class="field"><div class="label"><label for="language">שפת הסרטון</label></div><select class="select" id="language"><option>עברית</option><option>English</option><option>العربية</option><option>רוסית · Русский</option></select></div><div class="field"><div class="label"><label for="platform">פורמט</label></div><select class="select" id="platform"><option>אנכי · 9:16</option><option>ריבוע · 1:1</option><option>רחב · 16:9</option></select></div><div class="field"><div class="label"><label for="duration">אורך הסרטון</label></div><select class="select" id="duration"><option value="5" selected>5 שניות</option><option value="10">10 שניות</option><option value="15">15 שניות</option><option value="20">20 שניות</option><option value="25">25 שניות</option><option value="30">30 שניות</option></select></div></div><p class="tip">לא צריך להכין תסריט מראש — נציע כמה אפשרויות על בסיס המידע כאן.</p><button class="primary" id="toScripts"><span class="spark">✳</span>המשיכו לרעיונות לתסריט</button></div>
-<div class="stage" id="stageScripts"><button class="back" data-back="1">חזרה</button><div class="field"><div class="label"><span>איזה פתיח מתאים לכם?</span><small>בחרו את הדרך לפתוח את הסרטון</small></div><p class="tip">הפתיח הוא המשפט הראשון בסרטון: הוא נאמר בקול ומופיע גם בכתוביות. הבחירה קובעת באיזו צורה הסרטון ייפתח — בשאלה, בהצגת בעיה או בהדגמה.</p><div id="scriptOptions" class="script-options"></div></div><button class="primary" id="toPreview"><span class="spark">✳</span>המשיכו לעיצוב הסרטון</button></div>
-<div class="stage" id="stagePreview"><button class="back" data-back="2">חזרה</button><div class="field"><div class="label"><span>בחרו סגנון צילום</span><small>אפשר לשנות בהמשך</small></div><div class="style-options" id="styles"><section class="style-item selected"><button type="button" class="style-toggle" data-style="UGC טבעי" aria-expanded="true"><span>UGC טבעי</span><small class="accordion-arrow" aria-hidden="true">▲</small></button><div class="style-detail"><p>דמות AI מדברת ישירות למצלמה בטון טבעי, כמו סרטון קצר של יוצר/ת תוכן.</p></div></section><section class="style-item"><button type="button" class="style-toggle" data-style="הדגמת מוצר" aria-expanded="false"><span>הדגמת מוצר</span><small class="accordion-arrow" aria-hidden="true">▼</small></button><div class="style-detail hidden"><p>המוצר מוצג בפעולה, והצופה רואה מה עושים איתו בזמן הקריינות.</p></div></section><section class="style-item"><button type="button" class="style-toggle" data-style="פתיחת חבילה" aria-expanded="false"><span>פתיחת חבילה</span><small class="accordion-arrow" aria-hidden="true">▼</small></button><div class="style-detail hidden"><p>הסרטון נפתח ברגע פתיחת האריזה ומציג את המוצר והפרטים שמגיעים איתו.</p></div></section><section class="style-item"><button type="button" class="style-toggle" data-style="קריינות ותקריבים" aria-expanded="false"><span>קריינות ותקריבים</span><small class="accordion-arrow" aria-hidden="true">▼</small></button><div class="style-detail hidden"><p>רואים תקריבים של המוצר בזמן שקריין מסביר — בלי דמות שמדברת למצלמה.</p></div></section><section class="style-item"><button type="button" class="style-toggle" data-style="מדריך קצר" aria-expanded="false"><span>מדריך קצר</span><small class="accordion-arrow" aria-hidden="true">▼</small></button><div class="style-detail hidden"><p>הסרטון מציג שלבי שימוש פשוטים אחד אחרי השני, כמו מדריך מהיר.</p></div></section></div></div><div class="field"><div class="label"><span>איך הסרטון יוצג?</span></div><p class="tip">בכל אפשרות הפתיח נאמר בקול ומופיע בכתוביות.</p><div class="two"><button class="choice on" data-creator="דמות AI">דמות AI מדברת</button><button class="choice" data-creator="קריינות">קריינות על צילומי מוצר</button></div></div><div class="field"><div class="label"><span>פלטפורמה</span><small id="platformName">אנכי · 9:16</small></div><p class="tip">הסרטון יותאם לפורמט שבחרתם.</p><div class="label"><span>אורך הסרטון</span><small id="durationName">15 שניות</small><small id="tokenCost"></small></div></div><button class="primary" id="create"><span class="spark">✳</span>צרו תצוגת סרטון <small id="createTokenCost"></small></button><p class="footnote">בגרסה זו תיווצר הדמיה בלבד, לא קובץ וידאו.</p><button class="btn hidden" id="saveDraft">שמירת הטיוטה</button></div>
-</section><aside class="panel preview" id="preview"><div class="prevhead"><span>תצוגה מקדימה</span><small id="previewFormat">9:16 · אנכי</small></div><div class="prevbody"><div class="phone"><span class="tagdemo">הדמיית UGC</span><span class="play">▶</span><span class="caption" id="caption">הפתרון הקטן<br>שמשדרג את היום ✨</span></div><p class="preview-copy" id="previewCopy">תצוגה לדוגמה תופיע כאן<br>כשתגיעו לשלב הסרטון.</p><div class="preview-status" id="previewStatus"></div></div></aside></div></main></div>
-<script>
-async function loadUser(){
-  try{
-    const r = await fetch('/api/users/me', {headers:{'X-User-Id':'demo-user'}});
-    if(!r.ok) return;
-    const d = await r.json();
-    const el = document.getElementById('userTokens');
-    if(el && d.user) el.textContent = d.user.tokens || 0;
-  }catch(e){}
-}
-</script>
-<div class="toast" id="toast"></div>
-<script>loadUser();updateTokenCost(Number($('#duration').value));const tplStyle=sessionStorage.getItem('clipik_template_style');const tplName=sessionStorage.getItem('clipik_template_name');const tplDuration=sessionStorage.getItem('clipik_template_duration');if(tplStyle||tplName||tplDuration){sessionStorage.removeItem('clipik_template_style');sessionStorage.removeItem('clipik_template_name');sessionStorage.removeItem('clipik_template_duration');if(tplName)addProduct(tplName);if(tplStyle){const btn=[document.querySelector(".style-toggle[data-style='"+tplStyle+"']"),document.querySelector("[data-style='"+tplStyle+"']")].find(Boolean);if(btn)btn.click()}if(tplDuration){$('#duration').value=tplDuration;$('#durationName').textContent=tplDuration+' שניות';updateTokenCost(Number(tplDuration))}if(tplName){const banner=document.createElement('div');banner.className='promo-banner';banner.textContent='📑 תבנית: '+tplName;const promo=document.getElementById('promoBanner');promo.parentNode.insertBefore(banner,promo)}}</script>
-<script>
-const $=s=>document.querySelector(s);let stage=1,selected=-1,openScript=-1,style='UGC טבעי',creator='דמות AI',productImages=[],scriptData=[],scriptTexts=[];
-function toast(m){let t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
-function setStage(n){stage=n;document.querySelectorAll('.stage').forEach((e,i)=>e.classList.toggle('active',i===n-1));for(let i=1;i<=3;i++){let e=$('#step'+i);e.classList.toggle('current',i===n);e.classList.toggle('complete',i<n);e.querySelector('b').textContent=i<n?'✓':i}$('#stageTitle').textContent=['נתחיל מהמוצר','בוחרים תסריט','עיצוב הסרטון'][n-1];$('#stageCount').textContent=`שלב ${n} מתוך 3`;if(n===3)$('#preview').classList.add('mobile-show');window.scrollTo({top:0,behavior:'smooth'})}
-function canGoNext() {
-    if (stage === 1) {
-        return $('#product').classList.contains('show') || $('#url').value.trim() || $('#file').files.length > 0;
-    } else if (stage === 2) {
-        return selected >= 0 && currentScript().trim();
-    }
-    return true;
-}
-
-function nextStage() {
-    if (!canGoNext()) {
-        toast('מלאו את השלב הנוכחי לפני שממשיכים');
-        return;
-    }
-    if (stage < 3) setStage(stage + 1);
-    updateNavButtons();
-}
-
-function prevStage() {
-    if (stage > 1) {
-        setStage(stage - 1);
-        updateNavButtons();
-    }
-}
-
-function updateNavButtons() {
-    const prev = $('#prevBtn');
-    const next = $('#nextBtn');
-    if (prev) prev.style.display = stage > 1 ? 'inline-block' : 'none';
-    if (next) {
-        next.style.display = stage < 3 ? 'inline-block' : 'none';
-        next.style.opacity = canGoNext() ? '1' : '0.5';
-    }
-}
-
-// Override setStage to update buttons
-const originalSetStage = setStage;
-setStage = function(n) {
-    originalSetStage(n);
-    updateNavButtons();
-};
-
-// Initial button state
-updateNavButtons();
-
-function addProduct(name='המוצר שלך'){ $('#productName').childNodes[0].textContent=name;$('#product').classList.add('show');const note=$('#productName').querySelector('small');if(productImages.length){$('#thumbs').innerHTML=productImages.map((image,i)=>`<span class="thumb"><img src="${image.src}" alt="תמונת מוצר ${i+1}"></span>`).join('');note.textContent=`${productImages.length} ${productImages.length===1?'תמונה':'תמונות'} של אותו מוצר`}else{$('#thumbs').innerHTML='<span class="thumb">✦</span>';note.textContent='נוסף לפרויקט'} }
-$('#addUrl').onclick=()=>{let value=$('#url').value.trim();if(value&&!/^https?:\/\/i.test(value)){toast('הקישור צריך להתחיל ב‑https://');return}let name='הדבקו קישור';if(value){try{name=new URL(value).pathname.split('/').filter(Boolean).pop()?.replace(/[-_]/g,' ')||'המוצר שלכם'}catch(e){toast('בדקו את קישור המוצר');return}}addProduct(name);toast(value?'המוצר נוסף':'הדבקו קישור למוצר')};
-$('#file').onchange=async e=>{let files=[...e.target.files];if(!files.length)return;const slots=3-productImages.length;if(files.length>slots){toast(slots?`אפשר להוסיף עוד ${slots} תמונות בלבד`:'אפשר להעלות עד 3 תמונות');files=files.slice(0,Math.max(0,slots));if(!files.length){e.target.value='';return}}const tooLarge=files.filter(f=>f.size>10*1024*1024);if(tooLarge.length)toast('כל תמונה צריכה להיות עד 10MB');files=files.filter(f=>f.size<=10*1024*1024&&['image/jpeg','image/png'].includes(f.type));if(!files.length){if(!tooLarge.length)toast('אפשר להעלות קובצי JPG או PNG בלבד');e.target.value='';return}try{const loaded=await Promise.all(files.map(f=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve({name:f.name,src:r.result});r.onerror=reject;r.readAsDataURL(f)})));productImages.push(...loaded);if(productImages.length){const name=productImages[0].name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');addProduct(name);toast(`${productImages.length} תמונות נוספו למוצר`)}else if(!tooLarge.length)toast('אפשר להעלות קובצי JPG או PNG בלבד')}catch(err){toast('לא הצלחנו לקרוא את התמונות')}e.target.value=''};
-$('#uploadBtn').onclick=()=>$('#file').click();
-$('#skipAudience').onclick=()=>{$('#audience').value='';toast('אפשר להוסיף קהל יעד מאוחר יותר')};
-const templates=[
- {title:'פתיחה בשאלה',example:(p,a)=>a?`״${a}, מחפשים פתרון פשוט יותר?״`:'״מחפשים פתרון פשוט יותר ליום-יום?״',make:(p,a)=>`${a?`${a}, מחפשים פתרון פשוט יותר?`:'מחפשים פתרון פשוט יותר ליום-יום?'} הכירו את ${p}. בסרטון נראה אותו מקרוב.`},
- {title:'בעיה ואז פתרון',example:()=>`״מחפשים דרך פשוטה יותר בשגרה?״`,make:(p,a)=>`מחפשים דרך פשוטה יותר בשגרה? הכירו את ${p}. בסרטון נציג אותו ואת הפרטים שכדאי להכיר.`},
- {title:'מתחילים בהדגמה',example:p=>`״הנה ${p} מקרוב.״`,make:p=>`הנה ${p} מקרוב. בסרטון נציג את המראה שלו ואת אופן השימוש.`},
- {title:'פתיח משלי',manual:true,example:()=>`למשל: ״רוצים להכיר את [שם המוצר] מקרוב?״`,make:()=>''}
-];
-function renderScripts(){const p=$('#productName').childNodes[0].textContent||'המוצר';const aud=$('#audience').value.trim();const previous=scriptTexts;scriptData=templates.map(t=>({...t,example:t.example(p,aud),script:t.make(p,aud)}));scriptTexts=scriptData.map((t,i)=>typeof previous[i]==='string'?previous[i]:t.script);$('#scriptOptions').innerHTML=scriptData.map((t,i)=>`<section class="script-option ${i===selected?'selected':''} ${i===openScript?'open':''}"><button type="button" class="script-accordion" data-toggle="${i}" aria-expanded="${i===openScript}" aria-label="${i===openScript?'סגירת':'פתיחת'} ${esc(t.title)}"><span class="script-title"><span>${esc(t.title)}</span><small class="accordion-arrow" aria-hidden="true">${i===openScript?'▲':'▼'}</small></span></button><div class="script-panel ${i===openScript?'':'hidden'}"><div class="script-example"><b>דוגמה:</b> ${esc(t.example)}</div><p class="script-delivery"><b>בסרטון:</b> הפתיח נאמר בקול ומוצג גם ככתוביות. בהמשך תוכלו לבחור בין דמות AI מדברת לקריינות על צילומי מוצר.</p><label class="script-text-label" for="scriptText-${i}">${t.manual?'כתבו את התסריט שלכם כאן':'התסריט של האפשרות הזאת — ערכו כאן'}</label><textarea class="script-text" id="scriptText-${i}" data-script-index="${i}" aria-label="עריכת התסריט: ${esc(t.title)}" placeholder="${t.manual?'כתבו כאן את הפתיח והתסריט שלכם…':'אפשר לערוך את הנוסח כאן…'}">${esc(scriptTexts[i])}</textarea></div></section>`).join('');document.querySelectorAll('[data-toggle]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.toggle);if(openScript===i){openScript=-1}else{openScript=i;selected=i}renderScripts()});document.querySelectorAll('.script-text').forEach(el=>el.oninput=()=>{scriptTexts[Number(el.dataset.scriptIndex)]=el.value})}
-function currentScript(){return scriptTexts[selected]||''}
-$('#toScripts').onclick=()=>{if(!$('#product').classList.contains('show'))addProduct('מוצר לדוגמה');selected=-1;openScript=-1;renderScripts();setStage(2)};document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>setStage(+b.dataset.back));$('#toPreview').onclick=()=>{if(selected<0){toast('פתחו ובחרו פתיח לפני שממשיכים');return}if(!currentScript().trim()){toast('כתבו תסריט קצר לפני שממשיכים');return}setStage(3);$('#previewStatus').classList.remove('show');$('#previewCopy').textContent='תצוגה לדוגמה תופיע כאן אחרי יצירת ההדמיה.'};
-$('#styles').onclick=e=>{const b=e.target.closest('[data-style]');if(!b)return;style=b.dataset.style;document.querySelectorAll('.style-item').forEach(item=>{const active=item.contains(b);item.classList.toggle('selected',active);const toggle=item.querySelector('.style-toggle');toggle.setAttribute('aria-expanded',String(active));toggle.querySelector('small').textContent=active?'▲':'▼';item.querySelector('.style-detail').classList.toggle('hidden',!active)})};document.querySelectorAll('[data-creator]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-creator]').forEach(x=>x.classList.toggle('on',x===b));creator=b.dataset.creator});
-$('#platform').onchange=()=>{let v=$('#platform').value;$('#platformName').textContent=v;$('#previewFormat').textContent=v.replace('·','·')};$('#duration').onchange=()=>{const d=Number($('#duration').value);$('#durationName').textContent=`${d} שניות`;updateTokenCost(d)};function updateTokenCost(duration){
-  const tokens = duration<=5?2:duration<=10?4:duration<=15?6:duration<=20?8:duration<=25?10:12;
-  const cost = (tokens * 2.70).toFixed(2);
-  $('#tokenCost').textContent = `· עלות: ${tokens} טוקנים`;
-  $('#createTokenCost').textContent = `· צריכים ${tokens} טוקנים`;
-}
-$('#create').onclick=async()=>{
-  let b=$('#create');
-  if(b.disabled)return;
-  const duration=Number($('#duration').value);
-  const tokens=duration<=5?2:duration<=10?4:duration<=15?6:duration<=20?8:duration<=25?10:12;
-  const costUsd=(tokens*0.157).toFixed(2);
-  if(!confirm(`סרטון ${duration} שניות\nעלות: ${tokens} טוקנים (~$${costUsd})\n\nלחצו OK כדי להמשיך`))return;
-  b.disabled=true;
-  b.innerHTML='<span class="spark">✳</span>יוצר סרטון…';
-  $('#previewStatus').classList.add('show');
-  $('#previewStatus').textContent='שולח בקשה ל-fal.ai…';
-  const imageDataUrl=productImages[0]?productImages[0].src:'';
-  const payload={image_data_url:imageDataUrl,product:$('#productName').childNodes[0].textContent.trim()||'מוצר לדוגמה',product_url:$('#url').value.trim(),audience:$('#audience').value.trim(),language:$('#language').value,platform:$('#platform').value,duration:Number($('#duration').value),script:currentScript().trim(),style,creator};
-  try{const r=await fetch('/api/generations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok){throw new Error(d.error||'Generation failed')}b.disabled=false;if(d.demo){b.innerHTML='<span class="spark">✓</span>סרטון הדגמה מוכן';$('#previewStatus').textContent=d.message||'סרטון הדגמה מוכן!';$('#previewCopy').textContent='רוצים סרטון אמיתי? קנו טוקנים בחבילות';$('#caption').textContent='סרטון הדגמה - רכשו טוקנים לקבלת סרטון מותאם אישית';toast(d.message||'סרטון הדגמה מוכן!')}else{b.innerHTML='<span class="spark">✓</span>התצוגה מוכנה';$('#previewStatus').textContent='הסרטון נוצר בהצלחה ✨';$('#previewCopy').textContent=`סגנון: ${d.project.style} · ${d.project.creator}`;$('#caption').textContent=d.project.script?d.project.script.slice(0,70)+(d.project.script.length>70?'…':''):'הפתרון הקטן שמשדרג את היום ✨';toast('הסרטון נוצר בהצלחה')}$('#saveDraft').classList.remove('hidden')}catch(e){b.disabled=false;b.innerHTML='<span class="spark">✳</span>צרו תצוגת סרטון';$('#previewStatus').textContent='שגיאה: '+e.message;toast('שגיאה ביצירת הסרטון')}};
-async function saveDraft(){const product=$('#productName').childNodes[0].textContent.trim()||'מוצר לדוגמה';const payload={product,product_url:$('#url').value.trim(),audience:$('#audience').value.trim(),language:$('#language').value,platform:$('#platform').value,duration:$('#duration').value,script:currentScript().trim(),style,creator};try{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('save failed');const d=await r.json();toast('הטיוטה נשמרה');$('#saveDraft').textContent='✓ הטיוטה נשמרה';$('#saveDraft').dataset.savedId=d.project.id;$('#saveDraft').disabled=true}catch(e){toast('לא הצלחנו לשמור — בדקו שהשרת פועל')}}
-$('#saveDraft').onclick=saveDraft;$('#closeProjects').onclick=()=>$('#projectsDialog').close();
-function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-updateTokenCost(Number($('#duration').value));
-window.openProjects=async function(){const box=$('#projectList');box.innerHTML='<p>טוענים טיוטות…</p>';$('#projectsDialog').showModal();try{const r=await fetch('/api/projects');if(!r.ok)throw new Error('load failed');const d=await r.json();if(!d.projects.length){box.innerHTML='<p>אין עדיין טיוטות שמורות.<br>צרו סרטון ושמרו אותו כאן.</p>';return}box.innerHTML=d.projects.map(p=>`<article><strong>${esc(p.product)}</strong><small>${esc(p.style)} · ${esc(p.platform)} · ${esc(p.duration||15)} שניות · ${new Date(p.created_at).toLocaleDateString('he-IL')}</small><p>${esc(p.script.slice(0,160))}</p></article>`).join('')}catch(e){box.innerHTML='<p>אין חיבור לשרת המקומי.</p>'}};
-window.showPackages=function(){window.location.href='/packages.html'};
-$('#closePackages')
-</script>
-
-
-
-
-<div class="toast" id="toast"></div>
-<script>loadUser();updateTokenCost(Number($('#duration').value));const tplStyle=sessionStorage.getItem('clipik_template_style');const tplName=sessionStorage.getItem('clipik_template_name');const tplDuration=sessionStorage.getItem('clipik_template_duration');if(tplStyle||tplName||tplDuration){sessionStorage.removeItem('clipik_template_style');sessionStorage.removeItem('clipik_template_name');sessionStorage.removeItem('clipik_template_duration');if(tplName)addProduct(tplName);if(tplStyle){const btn=[document.querySelector(".style-toggle[data-style='"+tplStyle+"']"),document.querySelector("[data-style='"+tplStyle+"']")].find(Boolean);if(btn)btn.click()}if(tplDuration){$('#duration').value=tplDuration;$('#durationName').textContent=tplDuration+' שניות';updateTokenCost(Number(tplDuration))}if(tplName){const banner=document.createElement('div');banner.className='promo-banner';banner.textContent='📑 תבנית: '+tplName;const promo=document.getElementById('promoBanner');promo.parentNode.insertBefore(banner,promo)}}</script>
-<dialog id="projectsDialog"><div><strong>הטיוטות שלי</strong><button class="btn" id="closeProjects">סגירה</button></div><div id="projectList"></div></dialog>
-
-<script>
-function toggleMenu(){
-  const side = document.querySelector('.side');
-  const btn = document.getElementById('menuBtn');
-  if(!side) return;
-  if(side.style.display === 'block'){
-    side.style.display = '';
-    btn.textContent = '☰ תפריט';
-  } else {
-    side.style.display = 'block';
-    side.style.position = 'fixed';
-    side.style.top = '0';
-    side.style.right = '0';
-    side.style.bottom = '0';
-    side.style.zIndex = '999';
-    side.style.width = '260px';
-    side.style.boxShadow = '-4px 0 20px #0003';
-    btn.textContent = '✕ סגירה';
-  }
-}
-window.addEventListener('resize', ()=>{
-  if(window.innerWidth > 680){
-    const side = document.querySelector('.side');
-    if(side){
-      side.style.display = '';
-      side.style.position = '';
-      side.style.top = '';
-      side.style.right = '';
-      side.style.bottom = '';
-      side.style.zIndex = '';
-      side.style.width = '';
-      side.style.boxShadow = '';
-    }
-    const btn = document.getElementById('menuBtn');
-    if(btn) btn.textContent = '☰ תפריט';
-  }
-});
-</script>
-</body></html>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+        Clipik
+      </a>
+      <nav class="nav desktop">
+        <a href="/templates.html">תבניות</a>
+        <a href="/create.html">צור סרטון</a>
+        <a href="/my-videos.html">הסרטונים שלי</a>
+        <a href="/pricing.html">מחירון</a>
+        <a href="/examples.html">דוגמאות</a>
+        <a href="/faq.html">שאלות נפוצות</a>
+        <a href="/contact.html">צור קשר</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/login.html"><button class="btn btn-secondary">התחברות</button></a>
+        <a href="/create.html"><button class="btn btn-primary">התחל עכשיו</button></a>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <span class="badge">AI Video Generator</span>
+        <h1>צרו סרטוני <span class="gradient-text">UGC ודמו商品的</span> בקנייה אחת</h1>
+        <p>הזינו מוצר, בחרו סגנון וקיבלו סרטון ויראלי מקצועי בשניות – ללא צוות צילום.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px">
+          <a href="/create.html"><button class="btn btn-primary btn-large">צור סרטון חינם →</button></a>
+          <a href="/templates.html"><button class="btn btn-secondary btn-large">צפו בתבניות</button></a>
+        </div>
+        <p style="margin-top:14px;font-size:13px;color:var(--muted)">ללא כרטיס אשראי · 6 טוקנים ראשונים בחינם</p>
+      </div>
+    </section>
+    <section class="container" style="padding-top:48px;padding-bottom:48px">
+      <div style="text-align:center;margin-bottom:32px">
+        <h2 class="section-title">איך זה עובד?</h2>
+        <p class="section-sub">שלושה צעדים simples לסרטון מוצלח</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card text-center">
+          <div style="font-size:48px;margin-bottom:10px">📝</div>
+          <h3 style="font-size:18px;margin-bottom:6px">1. הזינו מוצר</h3>
+          <p style="color:var(--muted);font-size:14px">העלו תמונה או כתבו תיאור קצר של המוצר והקהל היעד.</p>
+        </div>
+        <div class="card text-center">
+          <div style="font-size:48px;margin-bottom:10px">🎬</div>
+          <h3 style="font-size:18px;margin-bottom:6px">2. בחרו סגנון וסקריפט</h3>
+          <p style="color:var(--muted);font-size:14px">בחרו מבין עשרות תבניות UGC, ויזואליות וסגנונות דוברים.</p>
+        </div>
+        <div class="card text-center">
+          <div style="font-size:48px;margin-bottom:10px">🚀</div>
+          <h3 style="font-size:18px;margin-bottom:6px">3. קבלו סרטון</h3>
+          <p style="color:var(--muted);font-size:14px">ה-AI מייצר סרטון 9:16 מוכן לצפייה, הורדה ושיתוף.</p>
+        </div>
+      </div>
+    </section>
+    <section style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+      <div class="container" style="padding-top:56px;padding-bottom:56px">
+        <div style="text-align:center;margin-bottom:36px">
+          <h2 class="section-title">למה Clipik?</h2>
+          <p class="section-sub">טכנולוגיה שמחלצת אתכם מהשרשרת של צילום-עריכה-הפצה</p>
+        </div>
+        <div class="grid grid-3">
+          <div class="card">
+            <h4 style="font-size:15px;margin-bottom:8px">⚡ יוצר בפחות מדקה</h4>
+            <p style="color:var(--muted);font-size:14px">מתוך רעיון לעיצוב גרפי מדויק תוך דקות ספורות.</p>
+          </div>
+          <div class="card">
+            <h4 style="font-size:15px;margin-bottom:8px">🎯 ייעודי לקניית UGC</h4>
+            <p style="color:var(--muted);font-size:14px">מודל בנוי במיוחד ל-UGC טבעי ברשתות חברתיות ואצטבונות.</p>
+          </div>
+          <div class="card">
+            <h4 style="font-size:15px;margin-bottom:8px">🌐 עברית מלאה</h4>
+            <p style="color:var(--muted);font-size:14px">תמיכה מלאה בעברית, AI שמבין קונטקסט מקומי.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="container" style="padding-top:56px;padding-bottom:56px">
+      <div class="card" style="background:linear-gradient(135deg,#7c3aed,#0d9488);color:#fff;text-align:center;padding:48px 32px">
+        <h2 style="font-size:28px;font-weight:900;margin-bottom:10px">מוכנים ליצור סרטון ראשון?</h2>
+        <p style="opacity:.9;margin-bottom:22px;max-width:520px;margin-inline:auto">התחילו בחינם עם 6 טוקנים ראשונים. ללא התחייבות, ללא כרטיס אשראי.</p>
+        <a href="/create.html"><button class="btn" style="background:#fff;color:#7c3aed;font-weight:800;padding:14px 28px;border-radius:14px;font-size:16px">בואו נתחיל →</button></a>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+        <a href="/pricing.html">מחירון</a>
+        <a href="/faq.html">שאלות נפוצות</a>
+        <a href="/contact.html">צור קשר</a>
+        <a href="/examples.html">דוגמאות</a>
+        <a href="/templates.html">תבניות</a>
+      </div>
+      <p>© 2026 Clipik. כל הזכויות שמורות.</p>
+    </div>
+  </footer>
+</body>
+</html>

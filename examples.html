@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דוגמאות - קליפיק | סרטוני UGC שיצרנו</title>
+<meta name="description" content="דוגמאות לסרטוני UGC ויראליים שיצרנו לעסקים - אופנה, מזון, טכנולוגיה ועוד">
+<link rel="canonical" href="/examples.html">
+<meta property="og:title" content="דוגמאות - קליפיק">
+<meta property="og:description" content="סרטוני UGC ויראליים שיצרנו למוצרים">
+<meta property="og:type" content="website">
+<meta property="og:url" content="/examples.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Heebo:wght@400;500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="layout">
+<div style="grid-column:1/-1;padding:16px 24px 0">
+  <div class="page-header">
+    <div>
+      <h1 class="gradient-text">🎬 דוגמאות לסרטונים</h1>
+      <p class="page-subtitle">סרטוני UGC ויראליים שיצרנו למוצרים במגזרים שונים</p>
+    </div>
+  </div>
+</div>
+<aside class="side">
+  <div class="brand">
+    <div class="brand-logo">
+      <img src="/logo-source.jpg" alt="קליפיק" width="32" height="32">
+    </div>
+    <div class="brand-name">קליפיק</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-title">ניווט</div>
+    <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
+    <button onclick="window.location.href='/create.html'"><span class="ico">✨</span> יצירת סרטון</button>
+    <button onclick="window.location.href='/packages.html'"><span class="ico">🎟️</span> חבילות טוקנים</button>
+    <button class="active"><span class="ico">🎬</span> דוגמאות</button>
+    <div class="nav-title">תמיכה</div>
+    <button onclick="window.location.href='/faq.html'"><span class="ico">❓</span> שאלות נפוצות</button>
+    <button onclick="window.location.href='/contact.html'"><span class="ico">📧</span> צור קשר</button>
+  </nav>
+</aside>
+<main class="main">
+<div class="filter-bar">
+  <div class="chips" id="industryFilters">
+    <button class="chip active" data-filter="all">הכל</button>
+    <button class="chip" data-filter="fashion">👗 אופנה</button>
+    <button class="chip" data-filter="food">🍕 מזון</button>
+    <button class="chip" data-filter="tech">💻 טכנולוגיה</button>
+    <button class="chip" data-filter="beauty">💄 אלטרנטיבה</button>
+    <button class="chip" data-filter="home">🏠 בית</button>
+    <button class="chip" data-filter="fitness">💪 כושר</button>
+    <button class="chip" data-filter="kids">🧒 ילדים</button>
+    <button class="chip" data-filter="pets">🐾 חיות מחמד</button>
+  </div>
+</div>
+
+<div class="gallery-grid" id="gallery">
+  <article class="gallery-item" data-industry="fashion">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+      <div class="gallery-placeholder"><span>👗</span><small>טיקטוק · 15 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>שמלת קיץ - מדגמת אופנה</h4>
+      <p>אופנה · UGC טבעי · 15 שניות</p>
+      <span class="chip active" style="font-size:11px">אופנה</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="food">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+      <div class="gallery-placeholder"><span>🍕</span><small>רילס · 10 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>פיצה ביתית - פתיחת חבילה</h4>
+      <p>מזון · הדגמת מוצר · 10 שניות</p>
+      <span class="chip active" style="font-size:11px">מזון</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="tech">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+      <div class="gallery-placeholder"><span>💻</span><small>שורטס · 20 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>מחשב נייד - סרטון תערוכות</h4>
+      <p>טכנולוגיה · קריינות ותקריבים · 20 שניות</p>
+      <span class="chip active" style="font-size:11px">טכנולוגיה</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="beauty">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">
+      <div class="gallery-placeholder"><span>💄</span><small>טיקטוק · 5 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>קרם לחות - לפני ואחרי</h4>
+      <p>אלטרנטיבה · UGC טבעי · 5 שניות</p>
+      <span class="chip active" style="font-size:11px">אלטרנטיבה</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="home">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#fccb90,#d57eeb)">
+      <div class="gallery-placeholder"><span>🏠</span><small>רילס · 15 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>מזרן נשימה - חדר שינה מודרני</h4>
+      <p>בית · מדריך קצר · 15 שניות</p>
+      <span class="chip active" style="font-size:11px">בית</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="fitness">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
+      <div class="gallery-placeholder"><span>💪</span><small>שורטס · 10 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>כף רגל כושר - אימוץ ביתי</h4>
+      <p>כושר · הדגמת מוצר · 10 שניות</p>
+      <span class="chip active" style="font-size:11px">כושר</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="kids">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#f6d365,#fda085)">
+      <div class="gallery-placeholder"><span>🧒</span><small>טיקטוק · 15 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>צעצוע לימוד - ילדים מחמדים</h4>
+      <p>ילדים · פתיחת חבילה · 15 שניות</p>
+      <span class="chip active" style="font-size:11px">ילדים</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="pets">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#84fab0,#8fd3f4)">
+      <div class="gallery-placeholder"><span>🐾</span><small>רילס · 10 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>מזון לכלב - חיות מחמד מאושרות</h4>
+      <p>חיות מחמד · UGC טבעי · 10 שניות</p>
+      <span class="chip active" style="font-size:11px">חיות מחמד</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="fashion">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb)">
+      <div class="gallery-placeholder"><span>👗</span><small>טיקטוק · 20 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>תיק עור - אספנות מקוריות</h4>
+      <p>אופנה · קריינות ותקריבים · 20 שניות</p>
+      <span class="chip active" style="font-size:11px">אופנה</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="food">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#fddb92,#d1fdff)">
+      <div class="gallery-placeholder"><span>🍕</span><small>שורטס · 5 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>קפה אומנויות - סרטון בוקר</h4>
+      <p>מזון · UGC טבעי · 5 שניות</p>
+      <span class="chip active" style="font-size:11px">מזון</span>
+    </div>
+  </article>
+
+  <article class="gallery-item" data-industry="tech">
+    <div class="gallery-thumb" style="background:linear-gradient(135deg,#c471f5,#fa71cd)">
+      <div class="gallery-placeholder"><span>💻</span><small>טיקטוק · 15 שניות</small></div>
+    </div>
+    <div class="gallery-meta">
+      <h4>שעון חכם - אופטימיזציה יומיומית</h4>
+      <p>טכנולוגיה · פתיח משלי · 15 שניות</p>
+      <span class="chip active" style="font-size:11px">טכנולוגיה</span>
+    </div>
+  </article>
+</div>
+
+<div class="empty hidden" id="emptyState">
+  <div class="empty-icon">🎬</div>
+  <h3>אין דוגמאות בתחום זה</h3>
+  <p>נסו לבחור קטגוריה אחרת או צרו סרטון חדש</p>
+  <button class="btn btn-primary" onclick="window.location.href='/create.html'">צרו סרטון עכשיו</button>
+</div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+document.querySelectorAll('#industryFilters .chip').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('#industryFilters .chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.filter;
+    let visible=0;
+    document.querySelectorAll('.gallery-item').forEach(el=>{
+      const show=f==='all'||el.dataset.industry===f;
+      el.classList.toggle('hidden',!show);
+      if(show)visible++;
+    });
+    document.getElementById('emptyState').classList.toggle('hidden',visible>0);
+    toast(f==='all'?'כל הדוגמאות':'סונן: '+btn.textContent.trim());
+  };
+});
+</script>
+</body>
+</html>

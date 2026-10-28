@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תבניות סרטונים - קליפיק | UGC, דמו商品的, מדריכים</title>
+  <meta name="description" content="תבניות סרטוני UGC מוכנות: הדגמת מוצר, פתיחת חבילה, ביקורת, מדריך קצר ומבצע. בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+        Clipik
+      </a>
+      <nav class="nav desktop">
+        <a href="/templates.html" class="active">תבניות</a>
+        <a href="/create.html">צור סרטון</a>
+        <a href="/my-videos.html">הסרטונים שלי</a>
+        <a href="/pricing.html">מחירון</a>
+        <a href="/examples.html">דוגמאות</a>
+        <a href="/faq.html">שאלות נפוצות</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/login.html"><button class="btn btn-secondary">התחברות</button></a>
+        <a href="/create.html"><button class="btn btn-primary">צור סרטון</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:48px;padding-bottom:80px">
+    <div style="text-align:center;margin-bottom:40px">
+      <h1 class="section-title" style="font-size:30px">📑 תבניות סרטונים מוכנות</h1>
+      <p class="section-sub" style="font-size:16px">בחרו תבנית, הזינו מוצר וקבלו סרטון AI תוך דקות</p>
+    </div>
+
+    <div class="grid grid-3" id="templateGrid"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Clipik. כל הזכויות שמורות. · <a href="/create.html">צור סרטון מותאם</a></p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script>
+    const templates = [
+      { id: 'ugc-daily', icon: '🎬', title: 'הדגמת מוצר יומיומית', desc: 'סרטון UGC טבעי שמציג את המוצר בשימוש יום-יומי, כמו לידים אמיתיים.', tags: ['UGC טבעי', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
+      { id: 'unboxing', icon: '📦', title: 'פתיחת חבילה מרגשת', desc: 'רגע האמת — חושפים את המוצר לראשונה, מלווה בתוספת אפקטים חמים.', tags: ['פתיחת חבילה', '15 שניות', '6 טוקנים'], style: 'פתיחת חבילה', duration: 15 },
+      { id: 'voiceover', icon: '🎙️', title: 'קריינות ותקריבים', desc: 'תצוגה מקצועית עם קריין ותקריבים קרובים של המוצר — בלי דמות מול המצלמה.', tags: ['קריינות', '20 שניות', '8 טוקנים'], style: 'קריינות ותקריבים', duration: 20 },
+      { id: 'tutorial', icon: '📚', title: 'מדריך קצר', desc: '3-4 שלבים פשוטים אחד אחרי השני, כמו סרטון הדרכה מהיר.', tags: ['מדריך', '30 שניות', '12 טוקנים'], style: 'מדריך קצר', duration: 30 },
+      { id: 'social', icon: '✨', title: 'שיתוף ברשתות', desc: 'סרטון קצר ואופטימי שנועד לשיתוף בטיקטוק ורילס — פורמט 9:16.', tags: ['ביקורת', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
+      { id: 'promo', icon: '🛍️', title: 'מבצע מיוחד', desc: 'סרטון קליטה למבצעים — מציג את ההנחה בחדות, עם קריאה לפעולה ברורה.', tags: ['מבצע', '10 שניות', '4 טוקנים'], style: 'מבצע מיוחד', duration: 10 },
+      { id: 'problem-solve', icon: '💡', title: 'בעיה ופתרון', desc: 'תחילה הציגו בעיה שצריכה פתרון, אחר כך הראו את המוצר כפתרון.', tags: ['בעיה ופתרון', '20 שניות', '8 טוקנים'], style: 'בעיה ופתרון', duration: 20 },
+      { id: 'review', icon: '⭐', title: 'ביקורת ראשונה', desc: 'דברו בגוף ראשון כקונים שחוו את המוצר - honest review.', tags: ['ביקורת', '15 שניות', '6 טוקנים'], style: 'UGC טבעי', duration: 15 },
+      { id: 'comparison', icon: '⚖️', title: 'השוואת מוצרים', desc: 'הצגו את המוצר מול מתחרה והדגישו היתרisons ברורים.', tags: ['השוואה', '25 שניות', '10 טוקנים'], style: 'קריינות ותקריבים', duration: 25 },
+    ];
+
+    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+
+    function useTemplate(tpl) {
+      sessionStorage.setItem('clipik_template_style', tpl.style);
+      sessionStorage.setItem('clipik_template_name', tpl.title);
+      sessionStorage.setItem('clipik_template_duration', String(tpl.duration));
+      window.location.href = '/create.html';
+    }
+
+    function renderTemplates(filterStyle) {
+      const grid = $('#templateGrid');
+      const list = filterStyle ? templates.filter(t => t.style === filterStyle) : templates;
+      grid.innerHTML = list.map(t => `
+        <div class="card">
+          <div style="font-size:42px;margin-bottom:10px">${t.icon}</div>
+          <h3 style="font-size:16px;font-weight:800;margin-bottom:6px">${t.title}</h3>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:12px">${t.desc}</p>
+          <div class="chips" style="margin-bottom:14px">
+            ${t.tags.map(tag => `<span class="chip" style="cursor:default">${tag}</span>`).join('')}
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="useTemplate(templates.find(x => x.id === '${t.id}'))">בחרו תבנית ←</button>
+        </div>
+      `).join('');
+    }
+
+    // Filter tabs
+    const filterStyles = ['הכל', 'UGC טבעי', 'הדגמת מוצר', 'קריינות ותקריבים', 'מדריך קצר'];
+    let currentFilter = 'הכל';
+    const filterBar = document.createElement('div');
+    filterBar.style.cssText = 'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px';
+    filterBar.innerHTML = filterStyles.map(s =>
+      `<button class="chip ${s === 'הכל' ? 'active' : ''}" data-filter="${s}">${s}</button>`
+    ).join('');
+    filterBar.onclick = e => {
+      const b = e.target.closest('[data-filter]');
+      if (!b) return;
+      currentFilter = b.dataset.filter;
+      filterBar.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
+      renderTemplates(currentFilter === 'הכל' ? null : currentFilter);
+    };
+    document.querySelector('main').insertBefore(filterBar, document.getElementById('templateGrid'));
+    renderTemplates();
+  </script>
+</body>
+</html>

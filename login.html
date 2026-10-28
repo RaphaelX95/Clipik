@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>התחברות - קליפיק</title>
+<meta name="description" content="התחברו לחשבון קליפיק או צרו חשבון חדש">
+<link rel="canonical" href="/login.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Heebo:wght@400;500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="layout">
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="logo">
+        <img src="/logo-source.jpg" alt="קליפיק" width="40" height="40">
+        <span>קליפיק</span>
+      </div>
+      <p class="auth-subtitle">יצירת סרטוני UGC ויראליים באמצעות AI</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchTab('login')">התחברות</button>
+      <button class="auth-tab" id="signupTab" onclick="switchTab('signup')">הרשמה</button>
+    </div>
+
+    <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+      <div class="field">
+        <div class="label"><label for="loginEmail">כתובת אימייל</label></div>
+        <input class="input" id="loginEmail" type="email" placeholder="name@example.com" required>
+      </div>
+      <div class="field">
+        <div class="label"><label for="loginPassword">סיסמה</label></div>
+        <input class="input" id="loginPassword" type="password" placeholder="••••••••" required minlength="6">
+      </div>
+      <div class="field">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <span>זכרו אותי</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-large" id="loginBtn" style="width:100%">
+        התחברו
+      </button>
+      <p class="auth-footer">
+        <a href="#" onclick="showForgot(event)">שכחתם סיסמה?</a>
+      </p>
+    </form>
+
+    <form id="signupForm" class="auth-form hidden" onsubmit="handleSignup(event)">
+      <div class="field">
+        <div class="label"><label for="signupName">שם מלא</label></div>
+        <input class="input" id="signupName" type="text" placeholder="ישראל ישראלי" required>
+      </div>
+      <div class="field">
+        <div class="label"><label for="signupEmail">כתובת אימייל</label></div>
+        <input class="input" id="signupEmail" type="email" placeholder="name@example.com" required>
+      </div>
+      <div class="field">
+        <div class="label"><label for="signupPassword">סיסמה</label></div>
+        <input class="input" id="signupPassword" type="password" placeholder="לפחות 8 תווים" required minlength="8">
+        <div class="password-strength" id="passwordStrength">
+          <div class="strength-bar"></div>
+        </div>
+        <small class="strength-text" id="strengthText"></small>
+      </div>
+      <div class="field">
+        <label class="remember-me">
+          <input type="checkbox" id="agreeTerms" required>
+          <span>אני מסכים/ה ל<a href="#" onclick="event.preventDefault()">תנאי השימוש</a> ולמדיניות הפרטיות</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-large" id="signupBtn" style="width:100%">
+        צרו חשבון
+      </button>
+    </form>
+
+    <div class="auth-divider">
+      <span>או</span>
+    </div>
+
+    <button class="btn btn-secondary" style="width:100%" onclick="googleSignIn()">
+      <span>🔵</span>
+      <span>המשיכו עם Google</span>
+    </button>
+  </div>
+
+  <div class="auth-features">
+    <h2>למה קליפיק?</h2>
+    <ul class="auth-feature-list">
+      <li>✨ יצירת סרטוני UGC תוך שניות</li>
+      <li>🎬 סגנונות צילום מגוונים</li>
+      <li>🗣️ תסריט אוטומטי עם דמות AI</li>
+      <li>📱 ה Gettytail למוצרים - טיקטוק, רילס ושורטס</li>
+      <li>💡 תמיכה בעברית, אנגלית ועוד</li>
+    </ul>
+    <div class="auth-stats">
+      <div class="stat">
+        <div class="stat-value">10K+</div>
+        <div class="stat-label">סרטונים שיצרנו</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">4.8</div>
+        <div class="stat-label">דירוג משתמשים</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f=>f.classList.add('hidden'));
+  document.getElementById(tab+'Tab').classList.add('active');
+  document.getElementById(tab+'Form').classList.remove('hidden');
+}
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+function handleLogin(e){
+  e.preventDefault();
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=true;
+  btn.innerHTML='מתחבר...';
+  setTimeout(()=>{
+    toast('✅ התחברות בוצעה בהצלחה!');
+    btn.disabled=false;
+    btn.innerHTML='התחברו';
+    setTimeout(()=>{window.location.href='/'},1000);
+  },1200);
+}
+function handleSignup(e){
+  e.preventDefault();
+  const btn=document.getElementById('signupBtn');
+  btn.disabled=true;
+  btn.innerHTML='יוצר חשבון...';
+  setTimeout(()=>{
+    toast('🎉 החשבון נוצר בהצלחה!');
+    btn.disabled=false;
+    btn.innerHTML='צרו חשבון';
+    setTimeout(()=>{window.location.href='/'},1000);
+  },1500);
+}
+function googleSignIn(){
+  toast('🔵 ההרשמה עם Google תהיה זמינה בקרוב');
+}
+function showForgot(e){
+  e.preventDefault();
+  toast('📧 נשלח קישור לאיפוס סיסמה למייל שלכם');
+}
+document.getElementById('signupPassword')?.addEventListener('input',function(){
+  const v=this.value;
+  let s=0;
+  if(v.length>=8)s++;
+  if(/[A-Z]/.test(v))s++;
+  if(/[0-9]/.test(v))s++;
+  if(/[^A-Za-z0-9]/.test(v))s++;
+  const bar=document.querySelector('.strength-bar');
+  const txt=document.getElementById('strengthText');
+  bar.style.background=s<=1?'#ef4444':s===2?'#f59e0b':s===3?'#10b981':'#7c3aed';
+  bar.style.width=(s*25)+'%';
+  txt.textContent=s<=1?'חלשה':s===2?'בינונית':s===3?'טובה':'חזקה';
+  txt.style.color=bar.style.background;
+});
+</script>
+</body>
+</html>

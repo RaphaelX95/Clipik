@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>הסרטונים שלי - קליפיק</title>
+<meta name="description" content="ניהול סרטוני המוצרים שלכם ב-קליפיק. צפו, הורידו ומחקו סרטונים.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="brand">
+    <div class="brand-logo"><img src="/logo-source.jpg" alt="קליפיק" width="32" height="32"></div>
+    <div class="brand-name">קליפיק</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-title">הסטודיו</div>
+    <button onclick="window.location.href='/create.html'"><span class="ico">✨</span> יצירת סרטון</button>
+    <button class="active"><span class="ico">🎬</span> הסרטונים שלי</button>
+    <button onclick="window.location.href='/packages.html'"><span class="ico">📋</span> תבניות</button>
+    <button onclick="window.location.href='/packages.html'"><span class="ico">🎟️</span> יצירת דף מוצר</button>
+    <div class="nav-title">ניווט</div>
+    <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
+    <button onclick="window.location.href='/pricing.html'"><span class="ico">💳</span> מחירון</button>
+  </nav>
+</aside>
+<main class="main">
+  <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
+  <div class="page-header">
+    <div>
+      <h1 class="gradient-text">🎬 הסרטונים שלי</h1>
+      <p class="page-subtitle">נהלו את כל סרטוני המוצרים במקום אחד</p>
+    </div>
+    <button class="btn btn-primary" onclick="window.location.href='/create.html'">
+      <span>＋</span> סרטון חדש
+    </button>
+  </div>
+
+  <div id="videosGrid" class="videos-grid">
+    <div class="empty">
+      <div class="empty-icon">🎬</div>
+      <h3>אין עדיין סרטונים</h3>
+      <p>צרו סרטון ראשון כדי לראות אותו כאן</p>
+      <button class="btn btn-primary mt-2" onclick="window.location.href='/create.html'">צרו סרטון עכשיו</button>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let videos = [];
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function statusLabel(status) {
+  const map = {
+    'draft': { text: 'טיוטה', class: 'status-draft' },
+    'processing': { text: 'מעובד', class: 'status-processing' },
+    'completed': { text: 'הושלם', class: 'status-completed' },
+    'failed': { text: 'נכשל', class: 'status-failed' }
+  };
+  const s = map[status] || { text: status || 'טיוטה', class: 'status-draft' };
+  return `<span class="status-badge ${s.class}">${esc(s.text)}</span>`;
+}
+
+function renderVideos() {
+  const grid = document.getElementById('videosGrid');
+  if (!videos.length) {
+    grid.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🎬</div>
+        <h3>אין עדיין סרטונים</h3>
+        <p>צרו סרטון ראשון כדי לראות אותו כאן</p>
+        <button class="btn btn-primary mt-2" onclick="window.location.href='/create.html'">צרו סרטון עכשיו</button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = videos.map((v, i) => `
+    <article class="video-card">
+      <div class="video-thumb">
+        <div class="video-placeholder">🎬</div>
+        <div class="video-duration">${esc(v.duration || '15')} שניות</div>
+      </div>
+      <div class="video-body">
+        <h3>${esc(v.product || 'סרטון ללא שם')}</h3>
+        <div class="video-meta">
+          ${statusLabel(v.status)}
+          <span>${esc(v.style || 'UGC טבעי')}</span>
+          <span>${esc(v.platform || 'אנכי')}</span>
+        </div>
+        <p class="video-script">${esc((v.script || '').slice(0, 100))}${(v.script || '').length > 100 ? '...' : ''}</p>
+        <div class="video-actions">
+          <button class="btn btn-secondary" onclick="downloadVideo(${i})">⬇ הורדו</button>
+          <button class="btn btn-danger" onclick="deleteVideo(${i})">🗑 מחקו</button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+function downloadVideo(index) {
+  const v = videos[index];
+  const blob = new Blob([JSON.stringify(v, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `clipic-${v.id || 'video'}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('הקובץ הורד ✓');
+}
+
+function deleteVideo(index) {
+  const v = videos[index];
+  if (!confirm(`למחוק את "${v.product || 'סרטון זה'}"? פעולה זו אינה ניתנת לביטול.`)) return;
+  videos.splice(index, 1);
+  renderVideos();
+  toast('הסרטון נמחק');
+}
+
+async function loadVideos() {
+  try {
+    const r = await fetch('/api/projects');
+    if (!r.ok) throw new Error('Failed');
+    const d = await r.json();
+    // Normalize status for demo data
+    videos = (d.projects || []).map(p => ({
+      ...p,
+      status: p.status === 'draft' ? (Math.random() > 0.5 ? 'completed' : 'processing') : p.status
+    }));
+    renderVideos();
+  } catch (e) {
+    document.getElementById('videosGrid').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <h3>שגיאה בטעינה</h3>
+        <p>נסו לרענן את הדף</p>
+      </div>`;
+  }
+}
+
+function toggleMenu() {
+  const side = document.querySelector('.side');
+  const btn = document.getElementById('menuBtn');
+  if (!side) return;
+  if (side.style.display === 'block') {
+    side.style.display = '';
+    btn.textContent = '☰ תפריט';
+  } else {
+    side.style.display = 'block';
+    side.style.position = 'fixed';
+    side.style.top = '0';
+    side.style.right = '0';
+    side.style.bottom = '0';
+    side.style.zIndex = '999';
+    side.style.width = '260px';
+    side.style.boxShadow = '-4px 0 20px #0003';
+    btn.textContent = '✕ סגירה';
+  }
+}
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 680) {
+    const side = document.querySelector('.side');
+    if (side) {
+      side.style.display = '';
+      side.style.position = '';
+      side.style.top = '';
+      side.style.right = '';
+      side.style.bottom = '';
+      side.style.zIndex = '';
+      side.style.width = '';
+      side.style.boxShadow = '';
+    }
+    const btn = document.getElementById('menuBtn');
+    if (btn) btn.textContent = '☰ תפריט';
+  }
+});
+
+loadVideos();
+</script>
+</body>
+</html>

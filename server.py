@@ -364,32 +364,32 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Location', REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/create.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/contact.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico'):
             self.send_error(404, 'Not found')
             return
         body = b''
-        if path == '/' or path == '/index.html':
+        if path in ('/', '/index.html', '/home.html'):
             body = (ROOT / 'index.html').read_bytes()
-        elif path == '/packages.html':
-            body = (ROOT / 'packages.html').read_bytes()
-        elif path == '/tips.html':
-            body = (ROOT / 'tips.html').read_bytes()
-        elif path == '/templates.html':
-            body = (ROOT / 'templates.html').read_bytes()
         elif path == '/create.html':
             body = (ROOT / 'create.html').read_bytes()
-        elif path == '/product-page.html':
-            body = (ROOT / 'product-page.html').read_bytes()
-        elif path == '/analytics.html':
-            body = (ROOT / 'analytics.html').read_bytes()
-        elif path == '/styles.css':
-            body = (ROOT / 'styles.css').read_bytes()
-        elif path == '/logo-source.jpg':
-            body = (ROOT / 'logo-source.jpg').read_bytes()
-        elif path == '/logo.svg':
-            body = (ROOT / 'logo.svg').read_bytes()
-        elif path == '/logo.html':
-            body = (ROOT / 'logo.html').read_bytes()
+        elif path == '/templates.html':
+            body = (ROOT / 'templates.html').read_bytes()
+        elif path == '/my-videos.html':
+            body = (ROOT / 'my-videos.html').read_bytes()
+        elif path == '/product-builder.html':
+            body = (ROOT / 'product-builder.html').read_bytes()
+        elif path == '/pricing.html':
+            body = (ROOT / 'pricing.html').read_bytes()
+        elif path == '/examples.html':
+            body = (ROOT / 'examples.html').read_bytes()
+        elif path == '/faq.html':
+            body = (ROOT / 'faq.html').read_bytes()
+        elif path == '/contact.html':
+            body = (ROOT / 'contact.html').read_bytes()
+        elif path == '/login.html':
+            body = (ROOT / 'login.html').read_bytes()
+        elif path == '/packages.html':
+            body = (ROOT / 'packages.html').read_bytes()
         elif path == '/payment_success.html':
             body = (ROOT / 'payment_success.html').read_bytes()
         elif path == '/payment_failure.html':
@@ -402,6 +402,16 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'robots.txt').read_bytes()
         elif path == '/google7cfae0c73b4d1768.html':
             body = (ROOT / 'google7cfae0c73b4d1768.html').read_bytes()
+        elif path == '/logo.svg':
+            body = (ROOT / 'logo.svg').read_bytes()
+        elif path == '/logo-source.jpg':
+            body = (ROOT / 'logo-source.jpg').read_bytes()
+        elif path == '/logo.html':
+            body = (ROOT / 'logo.html').read_bytes()
+        elif path == '/styles.css':
+            body = (ROOT / 'styles.css').read_bytes()
+        elif path == '/favicon.ico':
+            body = b''
         self.send_response(200)
         self.send_header('Content-Length', str(len(body)))
         self._send_security_headers()
@@ -462,13 +472,26 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self.send_json(400, {"error": str(exc)})
             return self.send_json(200, {"estimated_cost_usd": f"{cost:.3f}", "estimated_cost_ils": cost_ils, "tokens_required": tokens, "model": _fal_provider.MODEL_ID, "duration": duration})
-        if path not in ("/", "/index.html", "/packages.html", "/tips.html", "/templates.html", "/create.html", "/product-page.html", "/analytics.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/styles.css"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/contact.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico"):
             self.send_error(404, "Not found")
             return
-        if path == "/tips.html":
-            body = (ROOT / "tips.html").read_bytes()
+        body = b""
         if path == "/templates.html":
             body = (ROOT / "templates.html").read_bytes()
+        if path == "/my-videos.html":
+            body = (ROOT / "my-videos.html").read_bytes()
+        if path == "/product-builder.html":
+            body = (ROOT / "product-builder.html").read_bytes()
+        if path == "/pricing.html":
+            body = (ROOT / "pricing.html").read_bytes()
+        if path == "/examples.html":
+            body = (ROOT / "examples.html").read_bytes()
+        if path == "/faq.html":
+            body = (ROOT / "faq.html").read_bytes()
+        if path == "/contact.html":
+            body = (ROOT / "contact.html").read_bytes()
+        if path == "/login.html":
+            body = (ROOT / "login.html").read_bytes()
         if path == "/create.html":
             body = (ROOT / "create.html").read_bytes()
         if path == "/google7cfae0c73b4d1768.html":
@@ -497,8 +520,24 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "index.html").read_bytes()
         if path == "/packages.html":
             body = (ROOT / "packages.html").read_bytes()
+        if path == "/my-videos.html":
+            body = (ROOT / "my-videos.html").read_bytes()
+        if path == "/product-builder.html":
+            body = (ROOT / "product-builder.html").read_bytes()
+        if path == "/pricing.html":
+            body = (ROOT / "pricing.html").read_bytes()
+        if path == "/examples.html":
+            body = (ROOT / "examples.html").read_bytes()
+        if path == "/faq.html":
+            body = (ROOT / "faq.html").read_bytes()
+        if path == "/contact.html":
+            body = (ROOT / "contact.html").read_bytes()
+        if path == "/login.html":
+            body = (ROOT / "login.html").read_bytes()
         if path == "/styles.css":
             body = (ROOT / "styles.css").read_bytes()
+        if path == "/favicon.ico":
+            body = b''
 
         # Set correct content type for non-HTML files
         if path == "/sitemap.xml":
@@ -583,6 +622,49 @@ class Handler(BaseHTTPRequestHandler):
         items.insert(0, project)
         write_projects(items[:100])
         return self.send_json(201, {"project": project})
+
+    def _handle_product_page(self):
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > MAX_BODY:
+                return self.send_json(413, {"error": "Request too large"})
+            payload = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            return self.send_json(400, {"error": "Invalid JSON"})
+
+        product = self._sanitize(payload.get("product", "מוצר לדוגמה"), 120)
+        product_url = self._sanitize(payload.get("product_url", ""), 500)
+        headline = self._sanitize(payload.get("headline", product), 200)
+        description = self._sanitize(payload.get("description", ""), 500)
+        bullets = [self._sanitize(b, 120) for b in payload.get("bullets", [])][:8]
+        cta_text = self._sanitize(payload.get("cta_text", "קנו עכשיו"), 80)
+        cta_url = self._sanitize(payload.get("cta_url", product_url or "/packages.html"), 200)
+        style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
+        video_url = self._sanitize(payload.get("video_url", ""), 500)
+
+        page = {
+            "id": uuid.uuid4().hex[:10],
+            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "product": product,
+            "product_url": product_url,
+            "headline": headline,
+            "description": description,
+            "bullets": bullets,
+            "cta_text": cta_text,
+            "cta_url": cta_url,
+            "style": style,
+            "video_url": video_url,
+            "slug": uuid.uuid4().hex[:8],
+        }
+        pages_path = ROOT / "product_pages.json"
+        try:
+            pages = json.loads(pages_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError):
+            pages = []
+        pages.insert(0, page)
+        pages_path.write_text(json.dumps(pages[:100], ensure_ascii=False, indent=2), encoding="utf-8")
+        page_url = f"{_BASE_URL}/p/{page['slug']}"
+        return self.send_json(201, {"ok": True, "page": page, "page_url": page_url})
 
     def _handle_script_generate(self):
         try:
