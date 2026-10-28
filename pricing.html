@@ -260,6 +260,7 @@
       msg.textContent = '';
       step1.style.display = 'block'; step2.style.display = 'none';
       document.getElementById('lpSend').style.display = 'inline-block';
+      document.getElementById('lpResend').style.display = 'none';
       var vb = document.getElementById('lpVerify'); vb.style.display = 'none'; vb.textContent = 'אישור והמשך';
       wrap.style.display = 'flex';
 
@@ -271,6 +272,12 @@
       }
 
       document.getElementById('lpCancel').onclick = function () { close(false); };
+      document.getElementById('lpResend').onclick = function () {
+        msg.textContent = 'שולחים קוד חדש...';
+        post('/api/auth/email/request', { email: sentTo }).then(function (res) {
+          msg.textContent = res.ok ? 'שלחנו קוד חדש. השתמשו רק בקוד האחרון שהגיע אליכם.' : (res.d.error || 'שליחת הקוד נכשלה');
+        });
+      };
       document.getElementById('lpSend').onclick = function () {
         var em = emailIn.value.trim();
         if (!em || em.indexOf('@') < 0) { msg.textContent = 'נא להכניס אימייל תקין'; return; }
@@ -281,6 +288,7 @@
           document.getElementById('lpTo').textContent = em;
           step1.style.display = 'none'; step2.style.display = 'block';
           document.getElementById('lpSend').style.display = 'none';
+          document.getElementById('lpResend').style.display = 'inline-block';
           var vb2 = document.getElementById('lpVerify'); vb2.style.display = 'inline-block'; vb2.textContent = 'אישור והמשך';
           msg.textContent = 'הקוד נשלח לאימייל שלכם';
           codeIn.focus();
@@ -290,7 +298,7 @@
         var code = codeIn.value.trim();
         if (!code) { msg.textContent = 'נא להכניס את הקוד'; return; }
         post('/api/auth/email/verify', { email: sentTo, code: code }).then(function (res) {
-          if (!res.ok) { msg.textContent = res.d.error || 'הקוד לא תקין'; return; }
+          if (!res.ok) { msg.textContent = (res.d.error || 'הקוד לא תקין') + ' (אם הקוד ישן, לחצו על "שלחו לי קוד חדש")'; return; }
           try { localStorage.setItem('clipic_email', sentTo); } catch (e) {}
           close(true);
         });
@@ -358,6 +366,7 @@
     <div style="display:flex;gap:10px;justify-content:flex-start;margin-top:8px">
       <button id="lpSend" type="button" class="btn btn-primary" style="display:inline-block">שליחת קוד</button>
       <button id="lpVerify" type="button" class="btn btn-primary" style="display:none"></button>
+      <button id="lpResend" type="button" style="display:none;background:none;border:none;color:#e0562b;cursor:pointer;font-size:15px;text-decoration:underline">שלחו לי קוד חדש</button>
       <button id="lpCancel" type="button" style="background:none;border:none;color:#666;cursor:pointer;font-size:15px">ביטול</button>
     </div>
   </div>
