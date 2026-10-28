@@ -221,49 +221,56 @@ def _icount_session() -> str:
     return ""
 
 
-def _icount_create_payment_link(amount: float, description: str, client_name: str, client_email: str) -> dict:
+def _icount_create_payment_link(amount: float, order_id: str, description: str, client_email: str) -> dict:
+    """יוצר קישור לדף סליקה ייעודי לעסקה אחת, עם הסכום שנקבע בשרת."""
     sid = _icount_session()
     if not sid:
         return {"error": "iCount session failed"}
+    if not _ICOUNT_PAGE_ID:
+        return {"error": "ICOUNT_PAGE_ID not set"}
     try:
         payload = {
             "sid": sid,
-            "doctype": "receipt",
-            "client_name": client_name,
+            "paypage_id": int(_ICOUNT_PAGE_ID),
+            "sum": float(amount),
+            "x_order_id": order_id,
+            "description": description,
             "email": client_email,
-            "currency_code": "ILS",
-            "lang": "he",
-            "items": [
-                {"description": description, "quantity": 1, "unitprice": float(amount)}
-            ],
-            "cc": {
-                "sum": str(amount),
-                "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                "num_of_payments": 1,
-                "first_payment": str(amount),
-                "card_type": "VISA",
-                "card_number": "0000",
-                "exp_year": datetime.now().year + 1,
-                "exp_month": 12,
-                "holder_id": "000000000",
-                "holder_name": client_name or "Customer",
-                "confirmation_code": "pending",
-            },
         }
-        r = _requests.post(f"{_ICOUNT_BASE}/doc/create", json=payload, timeout=20)
+        r = _requests.post(f"{_ICOUNT_BASE}/paypage/generate_sale", json=payload, timeout=20)
         data = r.json()
-        if data.get("status"):
-            doc_url = data.get("doc_url", "")
-            cc_page = data.get("cc_page_url", "")
-            return {
-                "ok": True,
-                "docnum": data.get("docnum"),
-                "doc_url": doc_url,
-                "cc_page_url": cc_page or doc_url,
-            }
+        sale_url = data.get("sale_url", "")
+        if sale_url:
+            return {"ok": True, "sale_url": sale_url}
         return {"error": data.get("error_description", "Failed")}
     except Exception as exc:
         return {"error": str(exc)}
+
+
+def _icount_verify_payment(confirmation_code: str, expected_amount: float) -> bool:
+    """בודק מול iCount שהתשלום קיים ושהסכום תואם. לא סומכים על ה-IPN לבד."""
+    if not confirmation_code:
+        return False
+    sid = _icount_session()
+    if not sid:
+        return False
+    try:
+        r = _requests.post(
+            f"{_ICOUNT_BASE}/cc/transactions",
+            json={"sid": sid, "confirmation_code": confirmation_code},
+            timeout=20,
+        )
+        data = r.json()
+        results = data.get("results_list") or {}
+        items = list(results.values()) if isinstance(results, dict) else list(results)
+        for tx in items:
+            if str(tx.get("confirmation_code", "")) != str(confirmation_code):
+                continue
+            tx_sum = float(tx.get("sum", tx.get("payment_sum", 0)) or 0)
+            return abs(tx_sum - float(expected_amount)) < 0.01
+        return False
+    except Exception:
+        return False
 
 
 
@@ -980,109 +987,89 @@ class Handler(BaseHTTPRequestHandler):
         tokens = pkg["tokens"]
         amount = float(pkg["price_ils"])
 
+        order_id = secrets.token_urlsafe(16)
         description = f"טוקנים - {tokens} טוקנים (חבילה {package_id})"
         result = _icount_create_payment_link(
             amount=amount,
+            order_id=order_id,
             description=description,
-            client_name=user_id,
             client_email=user_email or "customer@example.com",
         )
 
-        if result.get("ok"):
-            # Store pending payment
-            pending = {
-                "user_id": user_id,
-                "package_id": package_id,
-                "tokens": tokens,
-                "amount": amount,
-                "docnum": result.get("docnum"),
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            }
-            pending_list = _store.load("pending_payments", [], DATA_DIR)
-            if not isinstance(pending_list, list):
-                pending_list = []
-            pending_list.append(pending)
-            _store.save("pending_payments", pending_list, DATA_DIR)
-
-            # Build redirect URL with our success/failure URLs
-            cc_url = result.get("cc_page_url", result.get("doc_url", ""))
-            sep = "&" if "?" in cc_url else "?"
-            redirect_url = (
-                f"{cc_url}{sep}"
-                f"success_url={_BASE_URL}/payment/success&"
-                f"failure_url={_BASE_URL}/payment/failure&"
-                f"cancel_url={_BASE_URL}/payment/cancel&"
-                f"ipn_url={_BASE_URL}/api/icount/ipn"
-            )
-            return self.send_json(200, {"redirect_url": redirect_url, "docnum": result.get("docnum")})
-        else:
+        if not result.get("ok"):
             return self.send_json(500, {"error": result.get("error", "Failed")})
 
-    def _handle_icount_ipn(self):
-        # iCount sends form data with payment confirmation
-        length = int(self.headers.get("Content-Length", "0") or "0")
-        if length <= 0:
-            return self.send_json(200, {"status": "ok"})
-        try:
-            raw = self.rfile.read(length).decode("utf-8", errors="replace")
-            data = {}
-            for pair in raw.split("&"):
-                if "=" in pair:
-                    k, v = pair.split("=", 1)
-                    data[k] = v
-        except Exception:
-            return self.send_json(200, {"status": "ok"})
-
-        # Verify minimum required fields
-        docnum = data.get("docnum") or data.get("doc_number") or data.get("doc")
-        confirmation = data.get("confirmation_code") or data.get("confirmation") or ""
-        amount = data.get("sum") or data.get("amount") or "0"
-        customer_id = data.get("customer_id") or data.get("client_id") or ""
-
-        if not docnum:
-            return self.send_json(200, {"status": "ok"})
-
-        # Find pending payment by docnum
+        pending = {
+            "order_id": order_id,
+            "user_id": user_id,
+            "package_id": package_id,
+            "tokens": tokens,
+            "amount": amount,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
         pending_list = _store.load("pending_payments", [], DATA_DIR)
         if not isinstance(pending_list, list):
             pending_list = []
+        pending_list.append(pending)
+        _store.save("pending_payments", pending_list, DATA_DIR)
 
-        matched = None
-        remaining = []
-        for p in pending_list:
-            if str(p.get("docnum")) == str(docnum) and matched is None:
-                matched = p
-            else:
-                remaining.append(p)
+        return self.send_json(200, {"redirect_url": result["sale_url"], "order_id": order_id})
 
-        if matched:
-            user_id = matched.get("user_id", "demo-user")
-            tokens_to_add = int(matched.get("tokens", 0))
-            user = _get_user(user_id)
-            if user:
-                new_total = int(user.get("tokens", 0)) + tokens_to_add
-                _update_user_tokens(user_id, new_total)
+    def _handle_icount_ipn(self):
+        # iCount שולח אישור תשלום. לא סומכים על התוכן לבד: בודקים מול iCount לפני זיכוי.
+        length = int(self.headers.get("Content-Length", "0") or "0")
+        if length <= 0 or length > MAX_BODY:
+            return self.send_json(200, {"status": "ignored"})
+        try:
+            raw = self.rfile.read(length).decode("utf-8", errors="replace")
+            form = {k: v[0] for k, v in parse_qs(raw, keep_blank_values=True).items()}
+        except Exception:
+            return self.send_json(200, {"status": "ignored"})
 
-            # Save transaction record
-            txs = _store.load("transactions", [], DATA_DIR)
-            if not isinstance(txs, list):
-                txs = []
-            txs.append({
-                "docnum": docnum,
-                "user_id": user_id,
-                "tokens": tokens_to_add,
-                "amount": amount,
-                "confirmation": confirmation,
-                "customer_id": customer_id,
-                "status": "paid",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            })
-            _store.save("transactions", txs, DATA_DIR)
+        order_id = form.get("x_order_id", "")
+        confirmation = form.get("confirmation_code", "")
+        if not order_id or not confirmation:
+            return self.send_json(200, {"status": "ignored"})
 
-            # Update pending list
-            _store.save("pending_payments", remaining, DATA_DIR)
+        pending_list = _store.load("pending_payments", [], DATA_DIR)
+        if not isinstance(pending_list, list):
+            pending_list = []
+        matched = next((p for p in pending_list if str(p.get("order_id")) == order_id), None)
+        if matched is None:
+            return self.send_json(200, {"status": "unknown_order"})
 
-        return self.send_json(200, {"status": "ok", "tokens_added": matched.get("tokens") if matched else 0})
+        # מניעת זיכוי כפול: אותו אישור תשלום לא נזקף פעמיים
+        txs = _store.load("transactions", [], DATA_DIR)
+        if not isinstance(txs, list):
+            txs = []
+        if any(t.get("confirmation") == confirmation for t in txs):
+            return self.send_json(200, {"status": "already_credited"})
+
+        if not _icount_verify_payment(confirmation, float(matched.get("amount", 0))):
+            return self.send_json(200, {"status": "not_verified"})
+
+        user_id = matched.get("user_id", "")
+        tokens_to_add = int(matched.get("tokens", 0))
+        user = _get_user(user_id) if user_id else None
+        if user:
+            new_total = int(user.get("tokens", 0)) + tokens_to_add
+            _update_user_tokens(user_id, new_total)
+
+        txs.append({
+            "order_id": order_id,
+            "user_id": user_id,
+            "tokens": tokens_to_add,
+            "amount": matched.get("amount"),
+            "confirmation": confirmation,
+            "status": "paid",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        _store.save("transactions", txs, DATA_DIR)
+
+        remaining = [p for p in pending_list if str(p.get("order_id")) != order_id]
+        _store.save("pending_payments", remaining, DATA_DIR)
+
+        return self.send_json(200, {"status": "ok", "tokens_added": tokens_to_add})
 
 
     def _send_security_headers(self):
