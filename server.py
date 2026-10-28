@@ -33,7 +33,10 @@ import token_packages as _token_packages
 import requests as _requests
 
 ROOT = Path(__file__).resolve().parent
-DATA = ROOT / "projects.json"
+# תיקיית הנתונים (קבצי JSON של משתמשים, פרויקטים ותשלומים). ברירת מחדל: תיקיית הקוד.
+DATA_DIR = Path(os.environ.get("DATA_DIR") or ROOT)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATA = DATA_DIR / "projects.json"
 MAX_BODY = 1_000_000
 
 # Base URL for the application (used for iCount redirects and meta tags)
@@ -72,7 +75,7 @@ def write_projects(items):
     tmp.replace(DATA)
 
 
-_USERS_PATH = Path(__file__).with_name('users.json')
+_USERS_PATH = DATA_DIR / 'users.json'
 
 def _load_users() -> dict:
     if not _USERS_PATH.exists():
@@ -100,11 +103,41 @@ _SITE_ICONS = {
     "/apple-touch-icon.png": ("apple-touch-icon.png", "image/png"),
     "/og-image.png": ("og-image.png", "image/png"),
 }
-_GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-_GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 _SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
 SESSION_COOKIE = "clipik_session"
-STATE_COOKIE = "clipik_oauth_state"
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_OTP_TTL = 600          # קוד תקף 10 דקות
+_OTP_COOLDOWN = 60     # שליחה חוזרת לאותה כתובת אחרי דקה
+_OTP_MAX_TRIES = 5
+_OTP_STORE: dict = {}  # email -> {"hash", "exp", "tries", "sent_at"}
+_OTP_LOCK = threading.Lock()
+
+
+def _otp_hash(email: str, code: str) -> str:
+    return hmac.new(_SESSION_SECRET.encode(), f"{email}:{code}".encode(), hashlib.sha256).hexdigest()
+
+
+def _send_login_code(email: str, code: str) -> bool:
+    """שולח את הקוד במייל דרך Resend. מחזיר False אם השליחה נכשלה."""
+    api_key = os.environ.get("RESEND_API_KEY", "")
+    sender = os.environ.get("MAIL_FROM", "")
+    if not (api_key and sender):
+        return False
+    try:
+        r = _requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "from": sender,
+                "to": [email],
+                "subject": "קוד ההתחברות שלכם לקליפיק",
+                "text": f"קוד ההתחברות שלכם: {code}\nהקוד תקף 10 דקות. אם לא ביקשתם אותו, אפשר להתעלם מההודעה.",
+            },
+            timeout=15,
+        )
+        return r.ok
+    except Exception:
+        return False
 
 
 def _sign(payload: dict) -> str:
@@ -300,28 +333,20 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
 
-        # Deduplication: check if this exact request was already made recently
+        uid = self._require_session_user()
+        if not uid:
+            return
+
+        # מניעת לחיצה כפולה: אותה בקשה של אותו משתמש לא נשלחת פעמיים בתוך 5 דקות.
+        # לא מחזירים סרטון של משתמש אחר ולא מנכים טוקנים פעמיים.
         import hashlib
         cache_key = hashlib.md5(
-            json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            uid.encode("utf-8") + json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
         ).hexdigest()
-        
         now = datetime.now(timezone.utc).timestamp()
-        if cache_key in _GENERATION_CACHE:
-            cached_time = _GENERATION_CACHE[cache_key]
-            if now - cached_time < _GENERATION_CACHE_TTL:
-                # Return the most recent project with same parameters
-                projects = read_projects()
-                for project in projects:
-                    if project.get("status") == "completed":
-                        return self.send_json(200, {
-                            "project": project,
-                            "video_url": project.get("video_url"),
-                            "tokens_remaining": 149,  # Approximate
-                            "tokens_spent": 6,
-                            "cached": True
-                        })
-        
+        if cache_key in _GENERATION_CACHE and now - _GENERATION_CACHE[cache_key] < _GENERATION_CACHE_TTL:
+            return self.send_json(409, {"error": "אותה בקשה כבר נשלחה לפני דקות ספורות. בדקו את 'הסרטונים שלי'."})
+
         # Add to cache
         _GENERATION_CACHE[cache_key] = now
         # Clean old entries in-place to avoid global rebinding
@@ -344,52 +369,11 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self.send_json(400, {"error": str(exc)})
 
-        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
+        user_id = uid
         tokens_needed = _uni.estimate_tokens(duration, resolution)
         if not _has_enough_tokens(user_id, tokens_needed):
             return self.send_json(402, {"error": "אין מספיק טוקנים. רכשו חבילה כדי ליצור סרטון."})
         
-        # Check if user can use free trial (demo video instead of real generation)
-        if _has_free_trial_available(user_id):
-            _mark_free_trial_used(user_id)
-            tokens_required = _uni.estimate_tokens(duration, resolution)
-            user = _get_user(user_id)
-            new_tokens = 0
-            if user:
-                new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
-                _update_user_tokens(user_id, new_tokens)
-            
-            project = {
-                "id": uuid.uuid4().hex[:10],
-                "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "product": self._sanitize(payload.get("product", "מוצר לדוגמה"), 120),
-                "product_url": self._sanitize(payload.get("product_url", ""), 500),
-                "audience": self._sanitize(payload.get("audience", ""), 300),
-                "language": self._sanitize(payload.get("language", "עברית"), 40),
-                "platform": self._sanitize(payload.get("platform", "אנכי · 9:16"), 40),
-                "duration": self._sanitize(payload.get("duration", "15"), 20),
-                "script": self._sanitize(payload.get("script", ""), 750),
-                "captions": self._sanitize(payload.get("captions", ""), 50),
-                "music": self._sanitize(payload.get("music", "ללא מוזיקה"), 40),
-                "ar_effects": self._sanitize(payload.get("ar_effects", "[]"), 200),
-                "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
-                "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
-                "status": "completed",
-                "video_url": _DEMO_VIDEO_URL,
-                "demo": True,
-            }
-            items = read_projects()
-            items.insert(0, project)
-            write_projects(items[:100])
-            return self.send_json(201, {
-                "project": project,
-                "video_url": _DEMO_VIDEO_URL,
-                "tokens_remaining": new_tokens if user else 0,
-                "tokens_spent": tokens_required,
-                "demo": True,
-                "message": "סרטון הדגמה מוכן! רוצים סרטון אמיתי? קנו טוקנים",
-            })
-
         prompt = payload.get("prompt") or _fal_provider.build_prompt(
             product=payload.get("product", "מוצר לדוגמה"),
             audience=payload.get("audience", ""),
@@ -435,10 +419,12 @@ class Handler(BaseHTTPRequestHandler):
             "creator": str(payload.get("creator", "דמות AI"))[:80],
             "status": "completed",
             "video_url": video_url,
+            "user_id": uid,
         }
         # Deduct tokens after successful generation
-        user_id = self._session_user_id() or payload.get('user_id', 'demo-user')
+        user_id = uid
         tokens_required = _uni.estimate_tokens(duration, resolution)
+        new_tokens = 0
         user = _get_user(user_id)
         if user:
             new_tokens = max(0, int(user.get('tokens', 0)) - tokens_required)
@@ -446,7 +432,7 @@ class Handler(BaseHTTPRequestHandler):
         
         items = read_projects()
         items.insert(0, project)
-        write_projects(items[:100])
+        write_projects(items[:2000])
         return self.send_json(201, {"project": project, "video_url": video_url, "tokens_remaining": new_tokens if user else 0, "tokens_spent": tokens_required})
 
     REDIRECTS = {
@@ -470,7 +456,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def _session_user_id(self):
         sess = self._session()
-        return f"google:{sess['sub']}" if sess and sess.get("sub") else None
+        return sess["uid"] if sess and sess.get("uid") else None
+
+    def _require_session_user(self):
+        """מחזיר מזהה משתמש מהסשן החתום בלבד. בלי סשן עונה 401 ומחזיר None."""
+        uid = self._session_user_id()
+        if not uid:
+            self.send_json(401, {"error": "צריך להתחבר כדי להמשיך."})
+        return uid
 
     def _secure_flag(self):
         return "; Secure" if _BASE_URL.startswith("https://") else ""
@@ -483,52 +476,68 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
-    def _google_start(self):
-        if not (_GOOGLE_CLIENT_ID and _GOOGLE_CLIENT_SECRET and _SESSION_SECRET):
-            return self._redirect("/login.html?error=google_not_configured")
-        state = secrets.token_urlsafe(24)
-        params = urlencode({
-            "client_id": _GOOGLE_CLIENT_ID,
-            "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
-            "response_type": "code",
-            "scope": "openid email profile",
-            "state": state,
-            "prompt": "select_account",
-        })
-        cookie = (f"{STATE_COOKIE}={_sign({'state': state, 'exp': time.time() + 600})}"
-                  f"; Path=/; Max-Age=600; HttpOnly; SameSite=Lax{self._secure_flag()}")
-        return self._redirect("https://accounts.google.com/o/oauth2/v2/auth?" + params, [cookie])
-
-    def _google_callback(self):
-        qs = parse_qs(urlparse(self.path).query)
-        code = (qs.get("code") or [""])[0]
-        state = (qs.get("state") or [""])[0]
-        saved = _unsign(self._cookie(STATE_COOKIE))
-        clear_state = f"{STATE_COOKIE}=; Path=/; Max-Age=0"
-        if not code or not state or not saved or saved.get("state") != state:
-            return self._redirect("/login.html?error=google_state", [clear_state])
+    def _read_small_json(self):
         try:
-            tok = _requests.post("https://oauth2.googleapis.com/token", data={
-                "code": code,
-                "client_id": _GOOGLE_CLIENT_ID,
-                "client_secret": _GOOGLE_CLIENT_SECRET,
-                "redirect_uri": f"{_BASE_URL}/api/auth/google/callback",
-                "grant_type": "authorization_code",
-            }, timeout=15)
-            tok.raise_for_status()
-            info = _requests.get("https://openidconnect.googleapis.com/v1/userinfo",
-                                 headers={"Authorization": f"Bearer {tok.json()['access_token']}"}, timeout=15)
-            info.raise_for_status()
-            profile = info.json()
-        except Exception:
-            return self._redirect("/login.html?error=google_failed", [clear_state])
-        sub = str(profile.get("sub", ""))
-        if not sub:
-            return self._redirect("/login.html?error=google_failed", [clear_state])
-        _ensure_user(f"google:{sub}", str(profile.get("email", "")))
-        session = _sign({"sub": sub, "exp": time.time() + 30 * 86400})
-        cookie = (f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}")
-        return self._redirect("/create.html", [clear_state, cookie])
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 10_000:
+                return None
+            payload = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            return None
+        return payload if isinstance(payload, dict) else None
+
+    def _email_request_code(self):
+        """שלב 1: שולחים קוד בן 6 ספרות לאימייל."""
+        if not _SESSION_SECRET:
+            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
+        payload = self._read_small_json()
+        if payload is None:
+            return self.send_json(400, {"error": "בקשה לא תקינה"})
+        email = str(payload.get("email", "")).strip().lower()
+        if len(email) > 254 or not _EMAIL_RE.match(email):
+            return self.send_json(400, {"error": "נא להזין כתובת אימייל תקינה"})
+        now = time.time()
+        with _OTP_LOCK:
+            last = _OTP_STORE.get(email, {}).get("sent_at", 0)
+            if now - last < _OTP_COOLDOWN:
+                return self.send_json(429, {"error": "כבר שלחנו קוד. נסו שוב בעוד דקה."})
+            code = f"{secrets.randbelow(1_000_000):06d}"
+            if not _send_login_code(email, code):
+                return self.send_json(503, {"error": "שליחת הקוד נכשלה. נסו שוב מאוחר יותר."})
+            _OTP_STORE[email] = {"hash": _otp_hash(email, code), "exp": now + _OTP_TTL,
+                                 "tries": 0, "sent_at": now}
+        return self.send_json(200, {"sent": True})
+
+    def _email_verify_code(self):
+        """שלב 2: בודקים את הקוד ופותחים סשן."""
+        if not _SESSION_SECRET:
+            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
+        payload = self._read_small_json()
+        if payload is None:
+            return self.send_json(400, {"error": "בקשה לא תקינה"})
+        email = str(payload.get("email", "")).strip().lower()
+        code = re.sub(r"\s", "", str(payload.get("code", "")))
+        invalid = {"error": "הקוד לא תקין או שפג תוקפו. בקשו קוד חדש."}
+        with _OTP_LOCK:
+            entry = _OTP_STORE.get(email)
+            if not entry or time.time() > entry["exp"] or entry["tries"] >= _OTP_MAX_TRIES:
+                _OTP_STORE.pop(email, None)
+                return self.send_json(400, invalid)
+            entry["tries"] += 1
+            if not hmac.compare_digest(entry["hash"], _otp_hash(email, code)):
+                return self.send_json(400, invalid)
+            _OTP_STORE.pop(email, None)
+        uid = f"email:{email}"
+        _ensure_user(uid, email)
+        session = _sign({"uid": uid, "exp": time.time() + 30 * 86400})
+        cookie = f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}"
+        body = json.dumps({"user_id": uid, "email": email}).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_HEAD(self):
         path = urlparse(self.path).path
@@ -598,26 +607,27 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/health":
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
-        if path == "/api/auth/google/start":
-            return self._google_start()
-        if path == "/api/auth/google/callback":
-            return self._google_callback()
         if path == "/api/auth/logout":
             return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
         if path == "/api/auth/me":
             sess = self._session()
             if not sess:
                 return self.send_json(401, {"error": "not logged in"})
-            uid = f"google:{sess['sub']}"
+            uid = sess.get("uid", "")
             row = _get_user(uid) or {}
             return self.send_json(200, {"user_id": uid, "email": row.get("email", ""), "tokens": row.get("tokens", 0)})
         if path == "/api/fal/status":
             configured = bool(os.environ.get("UNIFICALLY_API_KEY"))
             return self.send_json(200, {"configured": configured, "model": _uni.MODEL_ID})
         if path == "/api/projects":
-            return self.send_json(200, {"projects": read_projects()})
+            uid = self._require_session_user()
+            if not uid:
+                return
+            return self.send_json(200, {"projects": [p for p in read_projects() if p.get("user_id") == uid]})
         if path == "/api/users/me":
-            user_id = self._session_user_id() or self.headers.get('X-User-Id', 'demo-user')
+            user_id = self._require_session_user()
+            if not user_id:
+                return
             user = _get_user(user_id)
             if not user:
                 return self.send_json(404, {"error": "User not found"})
@@ -778,6 +788,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._verify_csrf():
             return self.send_json(403, {"error": "CSRF check failed"})
         path = urlparse(self.path).path
+        if path == "/api/auth/email/request":
+            return self._email_request_code()
+        if path == "/api/auth/email/verify":
+            return self._email_verify_code()
         if path == "/api/generations":
             return self._handle_generation()
         if path == "/api/script/generate":
@@ -808,6 +822,9 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
+        uid = self._require_session_user()
+        if not uid:
+            return
         project = {
             "id": uuid.uuid4().hex[:10],
             "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -824,10 +841,11 @@ class Handler(BaseHTTPRequestHandler):
             "style": self._sanitize(payload.get("style", "UGC טבעי"), 80),
             "creator": self._sanitize(payload.get("creator", "דמות AI"), 80),
             "status": "draft",
+            "user_id": uid,
         }
         items = read_projects()
         items.insert(0, project)
-        write_projects(items[:100])
+        write_projects(items[:2000])
         return self.send_json(201, {"project": project})
 
     def _handle_product_page(self):
@@ -863,7 +881,7 @@ class Handler(BaseHTTPRequestHandler):
             "video_url": video_url,
             "slug": uuid.uuid4().hex[:8],
         }
-        pages_path = ROOT / "product_pages.json"
+        pages_path = DATA_DIR / "product_pages.json"
         try:
             pages = json.loads(pages_path.read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError):
@@ -962,7 +980,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(400, {"error": "Invalid JSON"})
 
         package_id = self._sanitize(payload.get("package_id", ""), 40)
-        user_id = self._session_user_id() or self._sanitize(payload.get("user_id", "demo-user"), 40)
+        user_id = self._session_user_id()
+        if not user_id:
+            return self.send_json(401, {"error": "צריך להתחבר כדי לרכוש טוקנים."})
         user_email = self._sanitize(payload.get("email", ""), 120)
 
         # המחיר נקבע בשרת לפי מזהה החבילה. סכום שנשלח מהלקוח מתעלם.
@@ -990,7 +1010,7 @@ class Handler(BaseHTTPRequestHandler):
                 "docnum": result.get("docnum"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
-            pending_file = ROOT / "pending_payments.json"
+            pending_file = DATA_DIR / "pending_payments.json"
             pending_list = []
             if pending_file.exists():
                 try:
@@ -1039,7 +1059,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"status": "ok"})
 
         # Find pending payment by docnum
-        pending_file = ROOT / "pending_payments.json"
+        pending_file = DATA_DIR / "pending_payments.json"
         pending_list = []
         if pending_file.exists():
             try:
@@ -1064,7 +1084,7 @@ class Handler(BaseHTTPRequestHandler):
                 _update_user_tokens(user_id, new_total)
 
             # Save transaction record
-            tx_file = ROOT / "transactions.json"
+            tx_file = DATA_DIR / "transactions.json"
             txs = []
             if tx_file.exists():
                 try:
