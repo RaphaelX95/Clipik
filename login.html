@@ -15,7 +15,7 @@
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק
   </div>
   <nav class="sidebar-nav">
@@ -183,7 +183,7 @@ document.getElementById('signupPassword')?.addEventListener('input',function(){
   if(/[^A-Za-z0-9]/.test(v))s++;
   const bar=document.querySelector('.strength-bar');
   const txt=document.getElementById('strengthText');
-  bar.style.background=s<=1?'#ef4444':s===2?'#f59e0b':s===3?'#10b981':'#7c3aed';
+  bar.style.background=s<=1?'#ef4444':s===2?'#f59e0b':s===3?'#10b981':'#ff5a1f';
   bar.style.width=(s*25)+'%';
   txt.textContent=s<=1?'חלשה':s===2?'בינונית':s===3?'טובה':'חזקה';
   txt.style.color=bar.style.background;

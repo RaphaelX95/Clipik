@@ -822,3 +822,26 @@ h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;l
 .trial-banner{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin:8px 0 22px}
 .trial-banner .trial-badge{display:inline-block;background:var(--accent-soft);color:var(--accent-2);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
 .trial-banner h2{font-size:28px;margin-top:6px}
+  --accent:#ff5a1f;
+  --accent-2:#e2470f;
+  --teal:#14161a;
+  width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff5a1f,#14161a);color:#fff;
+  background:linear-gradient(135deg,#ff5a1f,#e2470f);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,0.35);
+  background:linear-gradient(135deg,#ff5a1f,#14161a);
+  background:linear-gradient(135deg,#ff5a1f,#14161a);color:#fff;
+.progress > span{display:block;height:100%;background:linear-gradient(135deg,#ff5a1f,#14161a);width:0%;transition:width .4s}
+  background: linear-gradient(90deg, #ff5a1f, #14161a);
+  background: linear-gradient(135deg, #ff5a1f 0%, #e2470f 100%);
+  background: linear-gradient(135deg, #ff5a1f, #e2470f);
+  outline: 3px solid #ff5a1f;
+
+/* סימון שלבים: מספר בעיגול, כי השלבים הם רצף אמיתי */
+.step-no{width:40px;height:40px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:20px;margin:0 auto 14px}
+/* מצב פוקוס ברור לכל אלמנט אינטראקטיבי */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px;box-shadow:0 0 0 1px var(--accent)}
+button,[role="button"],a{cursor:pointer}
+button:disabled{cursor:not-allowed}
+
+/* תפריט צד ישן שנשאר בחלק מהעמודים: מוסתר, כי הסיידבר החדש הוא היחיד */
+aside.side{display:none !important}
+.main-content .container{padding:0 !important}
