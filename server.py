@@ -147,7 +147,7 @@ def _send_login_code(email: str, code: str) -> bool:
             json={
                 "from": sender,
                 "to": [email],
-                "subject": "קוד ההתחברות שלכם לקליפיק",
+                "subject": "קוד ההתחברות שלכם לקליפיק פרו",
                 "text": f"קוד ההתחברות שלכם: {code}\nהקוד תקף 10 דקות. אם לא ביקשתם אותו, אפשר להתעלם מההודעה.",
             },
             timeout=15,
@@ -913,7 +913,7 @@ class Handler(BaseHTTPRequestHandler):
         pages = _store.load("product_pages", [], DATA_DIR)
         page = next((p for p in pages if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(pages, list) else None
         if not page or not re.fullmatch(r"[a-f0-9]{8}", slug or ""):
-            body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק</a></p></body></html>".encode("utf-8")
+            body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק פרו</a></p></body></html>".encode("utf-8")
             self.send_response(404)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -928,7 +928,7 @@ class Handler(BaseHTTPRequestHandler):
         video = f"<video src=\"{e(page.get('video_url'))}\" controls playsinline style='width:100%;border-radius:12px'></video>" if str(page.get("video_url", "")).startswith(("https://", "/")) else ""
         body = f"""<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>{e(page.get('headline') or page.get('product'))} - קליפיק</title>
+<title>{e(page.get('headline') or page.get('product'))} - קליפיק פרו</title>
 <style>body{{margin:0;font-family:Arial,sans-serif;background:#f6f6fb;color:#1d1d2b}}
 .wrap{{max-width:640px;margin:0 auto;padding:24px 16px}}h1{{font-size:28px;margin:12px 0}}
 p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:12px;background:#ff6b3d;color:#fff;text-decoration:none;font-weight:700}}
