@@ -238,3 +238,141 @@ details p{margin-top:10px;color:var(--ink-2);font-size:14px}
 /* Footer */
 .footer{border-top:1px solid var(--line);padding:24px;text-align:center;color:var(--muted);font-size:13px;background:var(--bg-2)}
 .footer a{color:var(--accent)}
+
+/* Page grids */
+.templates-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.gallery-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.videos-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.packages-grid{display:grid;grid-template-columns:1fr;gap:16px}
+
+/* Create page workspace */
+.workspace{display:flex;flex-direction:column;gap:16px}
+
+/* ===== Desktop / Laptop Optimization ===== */
+@media (min-width: 1024px) {
+  /* Typography */
+  body { font-size: 16px; }
+  .section-title { font-size: 32px; }
+  .hero h1 { font-size: clamp(36px, 5vw, 56px); }
+  .hero p { font-size: 20px; max-width: 720px; }
+
+  /* Header */
+  .header-inner { padding: 16px 32px; gap: 24px; }
+  .nav.desktop { gap: 8px; }
+  .nav a, .nav button { padding: 10px 16px; font-size: 15px; }
+  .logo { font-size: 20px; }
+  .logo img { height: 34px; }
+
+  /* Container */
+  .container { max-width: 1280px; padding: 32px; }
+
+  /* Hero */
+  .hero { padding: 96px 24px 72px; }
+  .hero .badge { font-size: 14px; padding: 8px 16px; }
+
+  /* Buttons */
+  .btn { padding: 12px 20px; font-size: 15px; }
+  .btn-large { padding: 16px 28px; font-size: 17px; }
+
+  /* Cards */
+  .card { padding: 28px; }
+
+  /* Grids */
+  .grid { gap: 24px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  /* Templates */
+  .templates-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .template-card { padding: 28px; }
+  .template-icon { font-size: 48px; }
+  .template-card h3 { font-size: 20px; }
+
+  /* Pricing */
+  .packages-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .package-card { padding: 32px; }
+  .package-price { font-size: 40px; }
+  .package-header h3 { font-size: 22px; }
+
+  /* Create page - side by side on desktop */
+  .workspace {
+    grid-template-columns: minmax(0, 1.2fr) 340px;
+    gap: 24px;
+  }
+  .preview {
+    position: sticky;
+    top: 24px;
+  }
+  .phone {
+    width: 280px;
+  }
+
+  /* Forms */
+  .input, .select, .textarea {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+  .field { margin-top: 20px; }
+  .label { font-size: 15px; margin-bottom: 8px; }
+
+  /* Buttons in create */
+  .stage-actions { gap: 14px; }
+  .primary { padding: 16px 20px; font-size: 16px; margin-top: 28px; }
+
+  /* Steps indicator */
+  .steps { gap: 14px; margin: 24px 0; }
+  .step { width: 42px; height: 42px; font-size: 16px; }
+  .step-line { width: 50px; }
+
+  /* Tips */
+  .tips-container { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .tip-card { padding: 28px; }
+  .tip-icon { font-size: 32px; }
+
+  /* Gallery */
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .gallery-item img, .gallery-item video { aspect-ratio: 9/16; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns: 1.2fr 0.8fr; gap: 32px; }
+
+  /* FAQ */
+  details { padding: 16px 20px; }
+  summary { font-size: 16px; }
+  details p { font-size: 15px; }
+
+  /* Pricing toggle */
+  .toggle button { padding: 10px 20px; font-size: 15px; }
+
+  /* My videos */
+  .videos-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  /* Analytics */
+  .analytics-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .analytics-card { padding: 28px; }
+  .analytics-value { font-size: 32px; }
+
+  /* Footer */
+  .footer { padding: 32px; font-size: 14px; }
+
+  /* Mobile tabs hidden on desktop */
+  .mobile-tabs { display: none !important; }
+}
+
+/* Large desktop */
+@media (min-width: 1280px) {
+  .container { max-width: 1400px; }
+  .templates-grid { grid-template-columns: repeat(4, 1fr); }
+  .packages-grid { grid-template-columns: repeat(4, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+  .videos-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .templates-grid { grid-template-columns: repeat(2, 1fr); }
+  .packages-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .videos-grid { grid-template-columns: repeat(2, 1fr); }
+  .workspace { grid-template-columns: minmax(0, 1fr) 260px; }
+}
