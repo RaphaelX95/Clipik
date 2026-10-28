@@ -45,16 +45,16 @@
 <div class="container" style="max-width:1040px;padding-top:32px;padding-bottom:64px">
   <a href="/templates.html" style="color:var(--accent);font-weight:600;font-size:14px">→ חזרה לכל התבניות</a>
   <header style="margin:16px 0 24px">
-    <h1 class="h1" style="font-size:30px" id="tplTitle">📦 פתיחת חבילה</h1>
-    <p class="section-sub" style="font-size:16px">רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.</p>
+    <h1 class="h1" style="font-size:30px" id="tplTitle"></h1>
+    <p class="section-sub" style="font-size:16px" id="tplDesc"></p>
   </header>
 
-  <div id="tplError" class="card" style="display:none;color:var(--accent);font-weight:600">התבנית הזאת עוד לא זמינה כאן. חזרו לעמוד התבניות.</div>
+  <div id="tplError" class="card" style="display:none;color:var(--accent);font-weight:600">התבנית הזאת לא נמצאה. חזרו לעמוד התבניות.</div>
 
   <div id="tplBody">
     <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
-      <span class="chip" style="cursor:default">סגנון: פתיחת חבילה</span>
-      <span class="chip" style="cursor:default">אורך: 15 שניות</span>
+      <span class="chip" style="cursor:default" id="chipStyle"></span>
+      <span class="chip" style="cursor:default" id="chipDuration"></span>
       <span style="color:var(--muted);font-size:13px">התבנית קבועה. אפשר לשנות רק את מה שמופיע למטה.</span>
     </div>
 
@@ -76,8 +76,8 @@
     <section class="card" style="margin-bottom:20px">
       <h2 style="font-size:18px;margin:0 0 12px">2. רזולוציה וקהל</h2>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-secondary res-opt" type="button" data-res="720p" aria-pressed="true">720p · 6 טוקנים</button>
-        <button class="btn btn-secondary res-opt" type="button" data-res="1080p" aria-pressed="false">1080p · 9 טוקנים</button>
+        <button class="btn btn-secondary res-opt" type="button" data-res="720p" aria-pressed="true"></button>
+        <button class="btn btn-secondary res-opt" type="button" data-res="1080p" aria-pressed="false"></button>
       </div>
       <div class="field" style="margin-top:16px">
         <label class="label" for="audience">למי הסרטון מיועד?</label>
@@ -100,7 +100,6 @@
 </div>
 </main>
 
-
 <div class="toast" id="toast"></div>
 <footer class="footer">
   <div class="container">
@@ -115,17 +114,62 @@
 
 <script>
 (function () {
-  var STYLE = 'פתיחת חבילה';
-  var DURATION = 15;
+  // כל התבניות: סגנון, אורך, טוקנים לפי רזולוציה, ושלושה תסריטים לכל אחת.
+  var TEMPLATES = {
+    'UGC טבעי': { duration: 15, icon: '🎬', desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.', tokens: { '720p': 6, '1080p': 9 },
+      scripts: [
+        { title: 'המלצה אישית', text: function (p) { return 'אני משתמש/ת ב-' + p + ' כבר כמה ימים, וזה שינה לי את השגרה.'; } },
+        { title: 'לפני ואחרי', text: function (p) { return 'לפני ' + p + ' הכל היה לוקח יותר זמן. עכשיו זה נראה אחרת לגמרי.'; } },
+        { title: 'שאלה מהלקוח', text: function (p) { return 'שאלו אותי אם ' + p + ' באמת שווה את זה. הנה מה שראיתי.'; } }
+      ] },
+    'הדגמת מוצר': { duration: 15, icon: '🔍', desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.', tokens: { '720p': 6, '1080p': 9 },
+      scripts: [
+        { title: 'מתחילים בהדגמה', text: function (p) { return 'הנה ' + p + ' מקרוב. נראה את המראה שלו ואת אופן השימוש.'; } },
+        { title: 'שלבים פשוטים', text: function (p) { return 'שלוש דקות עם ' + p + ': מוציאים, מפעילים, ומתחילים לעבוד.'; } },
+        { title: 'הפונקציה בפעולה', text: function (p) { return 'זה ' + p + ' בפעולה. שימו לב מה קורה כשמפעילים אותו.'; } }
+      ] },
+    'פתיחת חבילה': { duration: 15, icon: '📦', desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.', tokens: { '720p': 6, '1080p': 9 },
+      scripts: [
+        { title: 'רגע הגילוי', text: function (p) { return 'פותחים את ' + p + '. הנה הרגע שבו הוא יוצא מהאריזה.'; } },
+        { title: 'מהחבילה למוצר', text: function (p) { return 'זה מה שנמצא בתוך החבילה: ' + p + '. בואו נראה אותו מקרוב.'; } },
+        { title: 'חשיפה ראשונה', text: function (p) { return p + ' הגיע. ככה הוא נראה ביום הראשון.'; } }
+      ] },
+    'קריינות ותקריבים': { duration: 20, icon: '🎙️', desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.', tokens: { '720p': 8, '1080p': 12 },
+      scripts: [
+        { title: 'הצגה מקצועית', text: function (p) { return 'הכירו את ' + p + ': פרטים קטנים, איכות גבוהה, ותוצאה שאפשר לראות.'; } },
+        { title: 'יתרונות', text: function (p) { return p + ' מציע שלושה דברים שחשוב לדעת לפני שקונים.'; } },
+        { title: 'סיום בקריאה לפעולה', text: function (p) { return p + ': עכשיו הזמן לנסות בעצמכם.'; } }
+      ] },
+    'מדריך קצר': { duration: 30, icon: '📚', desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.', tokens: { '720p': 12, '1080p': 18 },
+      scripts: [
+        { title: 'שלבים פשוטים', text: function (p) { return 'איך משתמשים ב-' + p + ' בארבעה שלבים פשוטים. שלב ראשון: ההכנה.'; } },
+        { title: 'לפני שמתחילים', text: function (p) { return 'לפני שמתחילים עם ' + p + ', הנה מה שצריך לדעת.'; } },
+        { title: 'טיפים לתוצאה', text: function (p) { return 'שלושה טיפים שיעזרו לכם להוציא את המקסימום מ-' + p + '.'; } }
+      ] }
+  };
+
   function $(id) { return document.getElementById(id); }
   function toast(msg) { var t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(function () { t.classList.remove('show'); }, 2600); }
 
   var params = new URLSearchParams(location.search);
-  if (params.get('style') !== STYLE || params.get('duration') !== String(DURATION)) {
+  var style = params.get('style') || '';
+  var duration = +(params.get('duration') || 0);
+  var cfg = TEMPLATES[style];
+  if (!cfg || cfg.duration !== duration) {
     $('tplBody').style.display = 'none';
     $('tplError').style.display = 'block';
     return;
   }
+
+  document.title = style + ' - קליפיק';
+  $('tplTitle').textContent = cfg.icon + ' ' + style;
+  $('tplDesc').textContent = cfg.desc;
+  $('chipStyle').textContent = 'סגנון: ' + style;
+  $('chipDuration').textContent = 'אורך: ' + duration + ' שניות';
+  document.querySelectorAll('.res-opt').forEach(function (b) {
+    var r = b.dataset.res;
+    b.textContent = r + ' · ' + cfg.tokens[r] + ' טוקנים';
+  });
 
   var productImage = '';
   var resolution = '720p';
@@ -143,20 +187,12 @@
     } catch (e) { return 'המוצר'; }
   }
 
-  function scriptsFor(p) {
-    return [
-      { title: 'רגע הגילוי', text: 'פותחים את ' + p + '. הנה הרגע שבו הוא יוצא מהאריזה.' },
-      { title: 'מהחבילה למוצר', text: 'זה מה שנמצא בתוך החבילה: ' + p + '. בואו נראה אותו מקרוב.' },
-      { title: 'חשיפה ראשונה', text: p + ' הגיע. ככה הוא נראה ביום הראשון.' }
-    ];
-  }
-
   function renderScripts() {
-    var list = scriptsFor(productLabel());
-    $('scriptOptions').innerHTML = list.map(function (s, i) {
+    var p = productLabel();
+    $('scriptOptions').innerHTML = cfg.scripts.map(function (s, i) {
       return '<button type="button" class="btn ' + (i === selectedScript ? 'btn-primary' : 'btn-secondary') + '" data-idx="' + i + '" style="justify-content:flex-start;text-align:right">' + s.title + '</button>';
     }).join('');
-    $('scriptText').value = list[selectedScript].text;
+    $('scriptText').value = cfg.scripts[selectedScript].text(p);
   }
 
   $('scriptOptions').addEventListener('click', function (e) {
@@ -165,14 +201,8 @@
     selectedScript = +b.dataset.idx;
     renderScripts();
   });
-  $('productName').addEventListener('input', function () {
-    var list = scriptsFor(productLabel());
-    $('scriptText').value = list[selectedScript].text;
-  });
-  $('productUrl').addEventListener('input', function () {
-    var list = scriptsFor(productLabel());
-    $('scriptText').value = list[selectedScript].text;
-  });
+  $('productName').addEventListener('input', renderScripts);
+  $('productUrl').addEventListener('input', renderScripts);
 
   document.querySelectorAll('.res-opt').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -215,10 +245,10 @@
       audience: $('audience').value.trim(),
       language: 'עברית',
       platform: 'אנכי · 9:16',
-      duration: DURATION,
+      duration: duration,
       resolution: resolution,
       script: $('scriptText').value.trim(),
-      style: STYLE
+      style: style
     };
     try {
       var r = await fetch('/api/generations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -255,5 +285,6 @@
     .catch(function () {});
 })();
 </script>
+
 </body>
 </html>

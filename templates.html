@@ -85,9 +85,7 @@
 
   var grid = document.getElementById('templateGrid');
   grid.innerHTML = templates.map(function (t) {
-    var href = t.style === 'פתיחת חבילה'
-      ? '/template.html?style=' + encodeURIComponent(t.style) + '&duration=' + t.duration
-      : '/create.html?style=' + encodeURIComponent(t.style) + '&duration=' + t.duration;
+    var href = '/template.html?style=' + encodeURIComponent(t.style) + '&duration=' + t.duration;
     return '<div class="card">' +
       '<div style="font-size:40px;margin-bottom:10px">' + t.icon + '</div>' +
       '<h3 class="h3" style="font-size:18px;margin-bottom:6px">' + t.title + '</h3>' +
