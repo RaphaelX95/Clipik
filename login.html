@@ -27,7 +27,6 @@
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
     <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
-    <a href="/contact.html" class="sidebar-link"><span class="sidebar-icon">📧</span>צור קשר</a>
     <a href="/login.html" class="sidebar-link"><span class="sidebar-icon">👤</span>התחברות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק</div>
@@ -168,8 +167,17 @@ function handleSignup(e){
   },1500);
 }
 function googleSignIn(){
-  toast('🔵 ההרשמה עם Google תהיה זמינה בקרוב');
+  window.location.href = '/api/auth/google/start';
 }
+(function(){
+  const err = new URLSearchParams(location.search).get('error');
+  const msgs = {
+    google_not_configured: 'התחברות עם Google עדיין לא הוגדרה',
+    google_state: 'ההתחברות פגה, נסו שוב',
+    google_failed: 'ההתחברות עם Google נכשלה, נסו שוב'
+  };
+  if (err && msgs[err]) toast(msgs[err]);
+})();
 function showForgot(e){
   e.preventDefault();
   toast('📧 נשלח קישור לאיפוס סיסמה למייל שלכם');
@@ -194,7 +202,6 @@ document.getElementById('signupPassword')?.addEventListener('input',function(){
     <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
       <a href="/pricing.html">מחירון</a>
       <a href="/faq.html">שאלות נפוצות</a>
-      <a href="/contact.html">צור קשר</a>
       <a href="/examples.html">טיפים</a>
       <a href="/login.html">התחברות</a>
     </div>
