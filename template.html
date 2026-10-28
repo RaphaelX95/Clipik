@@ -64,6 +64,10 @@
       <input type="file" id="file" accept="image/png,image/jpeg" hidden>
       <div id="imgPreview" style="margin-top:12px"></div>
       <div class="field" style="margin-top:16px">
+        <label class="label" for="productName">שם המוצר (לא חובה)</label>
+        <input class="input" id="productName" placeholder="למשל: מכשיר ניקוי אלחוטי">
+      </div>
+      <div class="field" style="margin-top:16px">
         <label class="label" for="productUrl">או קישור למוצר (לא חובה)</label>
         <input class="input" id="productUrl" type="url" inputmode="url" placeholder="https://yourstore.com/products/...">
       </div>
@@ -128,6 +132,8 @@
   var selectedScript = 0;
 
   function productLabel() {
+    var name = $('productName').value.trim();
+    if (name) return name;
     var u = $('productUrl').value.trim();
     if (!u) return 'המוצר';
     try {
@@ -158,6 +164,10 @@
     if (!b) return;
     selectedScript = +b.dataset.idx;
     renderScripts();
+  });
+  $('productName').addEventListener('input', function () {
+    var list = scriptsFor(productLabel());
+    $('scriptText').value = list[selectedScript].text;
   });
   $('productUrl').addEventListener('input', function () {
     var list = scriptsFor(productLabel());
