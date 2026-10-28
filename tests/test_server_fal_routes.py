@@ -12,7 +12,7 @@ import server
 class FalRouteTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_key = os.environ.pop("FAL_KEY", None)
+        cls.old_key = os.environ.pop("UNIFICALLY_API_KEY", None)
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
         cls.thread = threading.Thread(target=cls.httpd.serve_forever, daemon=True)
         cls.thread.start()
@@ -23,19 +23,19 @@ class FalRouteTests(unittest.TestCase):
         cls.httpd.shutdown()
         cls.httpd.server_close()
         if cls.old_key is not None:
-            os.environ["FAL_KEY"] = cls.old_key
+            os.environ["UNIFICALLY_API_KEY"] = cls.old_key
 
     def test_provider_status_never_returns_the_secret(self):
         with urllib.request.urlopen(self.base + "/api/fal/status") as response:
             data = json.load(response)
         self.assertIn("configured", data)
-        self.assertNotIn("FAL_KEY", json.dumps(data))
+        self.assertNotIn("UNIFICALLY_API_KEY", json.dumps(data))
 
     def test_estimate_endpoint_returns_cost_without_submitting_a_job(self):
         with urllib.request.urlopen(self.base + "/api/fal/estimate?duration=10") as response:
             data = json.load(response)
-        self.assertEqual(data["estimated_cost_usd"], "1.570")
-        self.assertEqual(data["model"], "kling/v4/image-to-video")
+        self.assertEqual(data["estimated_cost_usd"], "1.134")
+        self.assertEqual(data["model"], "kuaishou/kling-4.0-video")
 
     def test_generation_requires_configured_key_and_valid_payload(self):
         body = json.dumps({"approved_cost": True, "duration": 10}).encode("utf-8")

@@ -1,9 +1,9 @@
 import base64
-import datetime as dt
 import unittest
 from decimal import Decimal
 
-from fal_provider import build_prompt, estimate_cost_usd, estimate_tokens, fit_image_to_platform, partition_script, split_duration, validate_image_data_url
+from fal_provider import build_prompt, fit_image_to_platform, partition_script, split_duration, validate_image_data_url
+from unifically_provider import estimate_cost_usd, estimate_tokens
 
 
 class FalProviderTests(unittest.TestCase):
@@ -18,12 +18,14 @@ class FalProviderTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             split_duration(15.5)
 
-    def test_estimates_temporary_and_regular_768p_costs(self):
-        promo_day = dt.date(2026, 10, 25)
-        after_promo = dt.date(2026, 11, 1)
-        self.assertEqual(estimate_cost_usd(10, promo_day), Decimal("1.570"))
-        self.assertEqual(estimate_cost_usd(10, promo_day), Decimal("1.570"))
-        self.assertEqual(estimate_cost_usd(5, after_promo), Decimal("0.785"))
+    def test_estimates_unifically_cost_per_resolution(self):
+        self.assertEqual(estimate_cost_usd(10), Decimal("1.134"))
+        self.assertEqual(estimate_cost_usd(10, "1080p"), Decimal("1.701"))
+        self.assertEqual(estimate_cost_usd(5), Decimal("0.567"))
+
+    def test_rejects_unknown_resolution(self):
+        with self.assertRaises(ValueError):
+            estimate_cost_usd(10, "4k")
 
     def test_fits_uploaded_image_to_selected_output_ratio(self):
         png = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+cVuoAAAAASUVORK5CYII=")
@@ -58,6 +60,7 @@ class FalProviderTests(unittest.TestCase):
         self.assertEqual(estimate_tokens(20), 8)
         self.assertEqual(estimate_tokens(25), 10)
         self.assertEqual(estimate_tokens(30), 12)
+        self.assertEqual(estimate_tokens(15, "1080p"), 9)
 
     def test_voiceover_mode_requests_product_shots_not_a_talking_head(self):
         prompt = build_prompt(

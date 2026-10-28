@@ -7,7 +7,7 @@
 - ממשק RTL בעברית, מותאם למובייל
 - חבילות טוקנים: חינם初次 + חבילות 3/5/10 סרטונים + חבילות גדולות
 - תשלום דינמי דרך iCount
-- שים Kling 4.0 (fal.ai) ליצירת וידאו
+- Kling 4.0 דרך UnificAlly ליצירת וידאו, בחירה של 720p או 1080p
 - תיקון אוטומטי של טקסט עברי לפני קריינות
 - מניעת חיובים כפולים במטמון 5 דקות
 - מדור טיפים לפרסום מוצרים ברשתות (SEO)
@@ -17,7 +17,7 @@
 
 - Frontend: HTML/CSS/JavaScript (RTL)
 - Backend: Python HTTP server
-- וידאו: fal.ai Kling 4.0
+- וידאו: UnificAlly (kuaishou/kling-4.0-video)
 - תשלומים: iCount
 - בדיקות: unittest
 
@@ -26,7 +26,7 @@
 ### דרישות
 - Python 3.10+
 - uv (מנהל תלויות)
-- מפתחות API: `FAL_KEY`, `ICOUNT_CID`, `ICOUNT_USER`, `ICOUNT_PASS`, `ICOUNT_PAGE_ID`
+- מפתחות API: `UNIFICALLY_API_KEY`, `ICOUNT_CID`, `ICOUNT_USER`, `ICOUNT_PASS`, `ICOUNT_PAGE_ID`
 
 ### התקנה
 
@@ -61,7 +61,7 @@ uv run python -m unittest discover -s tests -v
 ### משתני סביבה נדרשים
 
 ```env
-FAL_KEY=
+UNIFICALLY_API_KEY=
 ICOUNT_CID=
 ICOUNT_USER=
 ICOUNT_PASS=
@@ -77,7 +77,8 @@ PORT=8765
 ├── packages.html       # חבילות טוקנים
 ├── tips.html          # מדור טיפים לפרסום
 ├── server.py          # שרת HTTP + API
-├── fal_provider.py    # מתאם Kling 4.0
+├── fal_provider.py    # עזרי תסריט ופרומפט
+├── unifically_provider.py # מתאם Kling 4.0 דרך UnificAlly
 ├── deploy.py          # סקריפט פריסה
 ├── sitemap.xml        # מפת אתר
 ├── robots.txt         # הגבלות גירדפלג
@@ -89,15 +90,16 @@ PORT=8765
 
 - `GET /api/health` - בדיקת בריאות
 - `GET /api/fal/status` - סטטוס ספק וידאו
-- `GET /api/fal/estimate?duration=15` - הערכת עלות טוקנים
+- `GET /api/fal/estimate?duration=15&resolution=720p` - הערכת עלות טוקנים
 - `POST /api/generations` - יצירת סרטון
 - `POST /api/icount/create-payment` - יצירת תשלום
 - `GET /api/users/me` - פרטי משתמש נוכחי
 
 ## עלות
 
-- סרטון 15 שניות ≈ $1.67 (fal.ai)
-- מחיר טוקן: ₪2.70 (רווח 50%)
+- סרטון 15 שניות ב-720p ≈ $1.70, ב-1080p ≈ $2.55 (UnificAlly, לפני ניסיונות חוזרים)
+- 1080p עולה פי 1.5 מ-720p, ולכן גם הטוקנים מוכפלים ב-1.5
+- מחיר טוקן: ₪1.47 (פי 1.5 מהעלות, לפי שער דולר ₪3.45)
 - חבילות: 6 טוקנים חינם初次, 3/5/10 סרטונים, סטארטאפ/סטנדרט/פרימיום/אולטרה
 
 ## רישיון
