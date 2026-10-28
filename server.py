@@ -98,6 +98,38 @@ def _get_user(user_id: str) -> dict | None:
 _SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
 SESSION_COOKIE = "clipik_session"
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_OTP_TTL = 600          # קוד תקף 10 דקות
+_OTP_COOLDOWN = 60     # שליחה חוזרת לאותה כתובת אחרי דקה
+_OTP_MAX_TRIES = 5
+_OTP_STORE: dict = {}  # email -> {"hash", "exp", "tries", "sent_at"}
+_OTP_LOCK = threading.Lock()
+
+
+def _otp_hash(email: str, code: str) -> str:
+    return hmac.new(_SESSION_SECRET.encode(), f"{email}:{code}".encode(), hashlib.sha256).hexdigest()
+
+
+def _send_login_code(email: str, code: str) -> bool:
+    """שולח את הקוד במייל דרך Resend. מחזיר False אם השליחה נכשלה."""
+    api_key = os.environ.get("RESEND_API_KEY", "")
+    sender = os.environ.get("MAIL_FROM", "")
+    if not (api_key and sender):
+        return False
+    try:
+        r = _requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "from": sender,
+                "to": [email],
+                "subject": "קוד ההתחברות שלכם לקליפיק",
+                "text": f"קוד ההתחברות שלכם: {code}\nהקוד תקף 10 דקות. אם לא ביקשתם אותו, אפשר להתעלם מההודעה.",
+            },
+            timeout=15,
+        )
+        return r.ok
+    except Exception:
+        return False
 
 
 def _sign(payload: dict) -> str:
@@ -476,28 +508,65 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
-    def _email_login(self):
-        """התחברות עם אימייל בלבד (בלי סיסמה). מייצר סשן חתום ל-30 יום."""
-        if not _SESSION_SECRET:
-            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
+    def _read_small_json(self):
         try:
             length = int(self.headers.get("Content-Length", "0"))
             if length <= 0 or length > 10_000:
-                return self.send_json(400, {"error": "בקשה לא תקינה"})
+                return None
             payload = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):
+            return None
+        return payload if isinstance(payload, dict) else None
+
+    def _email_request_code(self):
+        """שלב 1: שולחים קוד בן 6 ספרות לאימייל."""
+        if not _SESSION_SECRET:
+            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
+        payload = self._read_small_json()
+        if payload is None:
             return self.send_json(400, {"error": "בקשה לא תקינה"})
-        email = str((payload or {}).get("email", "")).strip().lower()
+        email = str(payload.get("email", "")).strip().lower()
         if len(email) > 254 or not _EMAIL_RE.match(email):
             return self.send_json(400, {"error": "נא להזין כתובת אימייל תקינה"})
+        now = time.time()
+        with _OTP_LOCK:
+            last = _OTP_STORE.get(email, {}).get("sent_at", 0)
+            if now - last < _OTP_COOLDOWN:
+                return self.send_json(429, {"error": "כבר שלחנו קוד. נסו שוב בעוד דקה."})
+            code = f"{secrets.randbelow(1_000_000):06d}"
+            if not _send_login_code(email, code):
+                return self.send_json(503, {"error": "שליחת הקוד נכשלה. נסו שוב מאוחר יותר."})
+            _OTP_STORE[email] = {"hash": _otp_hash(email, code), "exp": now + _OTP_TTL,
+                                 "tries": 0, "sent_at": now}
+        return self.send_json(200, {"sent": True})
+
+    def _email_verify_code(self):
+        """שלב 2: בודקים את הקוד ופותחים סשן."""
+        if not _SESSION_SECRET:
+            return self.send_json(503, {"error": "ההתחברות לא הוגדרה עדיין. נסו שוב מאוחר יותר."})
+        payload = self._read_small_json()
+        if payload is None:
+            return self.send_json(400, {"error": "בקשה לא תקינה"})
+        email = str(payload.get("email", "")).strip().lower()
+        code = re.sub(r"\s", "", str(payload.get("code", "")))
+        invalid = {"error": "הקוד לא תקין או שפג תוקפו. בקשו קוד חדש."}
+        with _OTP_LOCK:
+            entry = _OTP_STORE.get(email)
+            if not entry or time.time() > entry["exp"] or entry["tries"] >= _OTP_MAX_TRIES:
+                _OTP_STORE.pop(email, None)
+                return self.send_json(400, invalid)
+            entry["tries"] += 1
+            if not hmac.compare_digest(entry["hash"], _otp_hash(email, code)):
+                return self.send_json(400, invalid)
+            _OTP_STORE.pop(email, None)
         uid = f"email:{email}"
         _ensure_user(uid, email)
         session = _sign({"uid": uid, "exp": time.time() + 30 * 86400})
         cookie = f"{SESSION_COOKIE}={session}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax{self._secure_flag()}"
+        body = json.dumps({"user_id": uid, "email": email}).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Set-Cookie", cookie)
-        body = json.dumps({"user_id": uid, "email": email}).encode("utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -736,8 +805,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._verify_csrf():
             return self.send_json(403, {"error": "CSRF check failed"})
         path = urlparse(self.path).path
-        if path == "/api/auth/email":
-            return self._email_login()
+        if path == "/api/auth/email/request":
+            return self._email_request_code()
+        if path == "/api/auth/email/verify":
+            return self._email_verify_code()
         if path == "/api/generations":
             return self._handle_generation()
         if path == "/api/script/generate":

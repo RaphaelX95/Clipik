@@ -44,7 +44,14 @@
         <form id="emailForm" class="email-form" novalidate>
           <label for="emailInput" class="email-label">כתובת אימייל</label>
           <input id="emailInput" class="email-input" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
-          <button id="emailBtn" class="btn btn-primary btn-large" type="submit">המשיכו</button>
+          <button id="emailBtn" class="btn btn-primary btn-large" type="submit">שלחו לי קוד</button>
+        </form>
+        <form id="codeForm" class="email-form" novalidate hidden>
+          <p class="login-sub" style="margin:0"><span id="codeTo"></span> שלחנו קוד בן 6 ספרות.</p>
+          <label for="codeInput" class="email-label">קוד ההתחברות</label>
+          <input id="codeInput" class="email-input code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required>
+          <button id="codeBtn" class="btn btn-primary btn-large" type="submit">התחברו</button>
+          <button id="resendBtn" class="btn btn-secondary" type="button">שלחו קוד חדש</button>
         </form>
       </div>
 
@@ -76,6 +83,7 @@
 .email-input{width:100%;padding:14px 16px;border:1px solid #d0d5dd;border-radius:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;background:#fff}
 .email-input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:transparent}
 .email-form .btn{width:100%}
+.code-input{text-align:center;letter-spacing:.4em;font-size:22px;font-weight:700}
 .login-actions .btn{width:100%;text-align:center}
 </style>
 <script>
@@ -92,37 +100,71 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     el.hidden = false;
   }
 
-  const form = document.getElementById('emailForm');
-  form.addEventListener('submit', function (e) {
+  const emailForm = document.getElementById('emailForm');
+  const codeForm = document.getElementById('codeForm');
+  const msg = document.getElementById('loginMsg');
+  let pendingEmail = '';
+
+  function showMsg(text) { msg.textContent = text; msg.hidden = false; }
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(r => r.json().then(d => ({ ok: r.ok, d: d })));
+  }
+
+  function requestCode(email) {
+    return postJson('/api/auth/email/request', { email: email }).then(res => {
+      if (!res.ok) throw new Error(res.d.error || 'שליחת הקוד נכשלה. נסו שוב.');
+      pendingEmail = email;
+      document.getElementById('codeTo').textContent = email;
+      emailForm.hidden = true;
+      codeForm.hidden = false;
+      document.getElementById('codeInput').focus();
+    });
+  }
+
+  emailForm.addEventListener('submit', function (e) {
     e.preventDefault();
     const input = document.getElementById('emailInput');
     const btn = document.getElementById('emailBtn');
-    const msg = document.getElementById('loginMsg');
     const email = input.value.trim();
     msg.hidden = true;
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      msg.textContent = 'נא להזין כתובת אימייל תקינה';
-      msg.hidden = false;
+      showMsg('נא להזין כתובת אימייל תקינה');
       input.focus();
       return;
     }
     btn.disabled = true;
-    fetch('/api/auth/email', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email })
-    })
-      .then(r => r.json().then(d => ({ ok: r.ok, d: d })))
+    requestCode(email)
+      .catch(err => showMsg(err.message))
+      .finally(() => { btn.disabled = false; });
+  });
+
+  document.getElementById('resendBtn').addEventListener('click', function () {
+    msg.hidden = true;
+    requestCode(pendingEmail).catch(err => showMsg(err.message));
+  });
+
+  codeForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const code = document.getElementById('codeInput').value.replace(/\s/g, '');
+    const btn = document.getElementById('codeBtn');
+    msg.hidden = true;
+    if (!/^\d{6}$/.test(code)) {
+      showMsg('הקוד צריך להיות 6 ספרות');
+      return;
+    }
+    btn.disabled = true;
+    postJson('/api/auth/email/verify', { email: pendingEmail, code: code })
       .then(res => {
-        if (!res.ok) throw new Error(res.d.error || 'failed');
+        if (!res.ok) throw new Error(res.d.error || 'ההתחברות נכשלה. נסו שוב.');
         location.href = '/create.html';
       })
-      .catch(err => {
-        msg.textContent = err.message && err.message !== 'failed' ? err.message : msgs.email_failed;
-        msg.hidden = false;
-        btn.disabled = false;
-      });
+      .catch(err => showMsg(err.message))
+      .finally(() => { btn.disabled = false; });
   });
 
   fetch('/api/auth/me', { credentials: 'same-origin' })
