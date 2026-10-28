@@ -162,6 +162,7 @@ function generateProductPage(){
         <div>
           <h1 class="gradient-text">🎟️ חבילות טוקנים</h1>
           <p class="page-subtitle">בוחרים חבילה לפי אורך הסרטון וכמות הסרטונים.</p>
+          <p class="page-subtitle" id="my-balance" style="display:none"></p>
         </div>
       </div>
 
@@ -528,5 +529,17 @@ function generateProductPage(){
     <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
   </div>
 </footer>
+<script>
+(async function () {
+  try {
+    const r = await fetch('/api/users/me', { credentials: 'same-origin' });
+    if (!r.ok) return;
+    const d = await r.json();
+    const el = document.getElementById('my-balance');
+    el.textContent = 'היתרה שלכם: ' + Number((d.user && d.user.tokens) || 0) + ' טוקנים';
+    el.style.display = '';
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

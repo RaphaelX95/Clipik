@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>תשלום בוצע בהצלחה</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #e8f5e9; }
-        h1 { color: #075e54; }
-        p { color: #333; font-size: 18px; }
-        a { color: #25D366; text-decoration: none; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>תשלום בוצע בהצלחה</title>
+  <link rel="stylesheet" href="/styles.css">
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta property="og:image" content="https://clipik.pro/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://clipik.pro/og-image.png">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px 16px; margin: 0; }
+    h1 { color: #075e54; }
+    .balance { font-size: 28px; font-weight: bold; margin: 24px 0; }
+    .status { color: #333; font-size: 18px; }
+    a { color: #25D366; text-decoration: none; font-weight: bold; }
+  </style>
 </head>
 <body>
-    <h1>✓ תשלום בוצע בהצלחה!</h1>
-    <p>הטוקנים יתווספו לחשבונכם בעוד מספר דקות.</p>
-    <p><a href="/">חזרה לאתר הראשי</a></p>
+  <h1>✓ תשלום בוצע בהצלחה!</h1>
+  <p class="status" id="status">מעדכנים את היתרה שלכם...</p>
+  <p class="balance">יתרה: <span id="balance">—</span> טוקנים</p>
+  <p><a href="/packages.html">לחבילות</a> · <a href="/">חזרה לאתר הראשי</a></p>
+<script>
+(async function () {
+  const balanceEl = document.getElementById('balance');
+  const statusEl = document.getElementById('status');
+  let start = null;
+  for (let i = 0; i < 30; i++) {
+    try {
+      const r = await fetch('/api/users/me', { credentials: 'same-origin' });
+      if (r.status === 401) { statusEl.textContent = 'התחברו לאתר כדי לראות את היתרה.'; return; }
+      const d = await r.json();
+      const tokens = Number((d.user && d.user.tokens) || 0);
+      balanceEl.textContent = tokens;
+      if (start === null) start = tokens;
+      if (tokens !== start) { statusEl.textContent = 'הטוקנים נוספו לחשבונכם.'; return; }
+    } catch (e) { /* ננסה שוב */ }
+    await new Promise(res => setTimeout(res, 2000));
+  }
+  statusEl.textContent = 'הטוקנים יתווספו בעוד מספר דקות. רעננו את העמוד מאוחר יותר.';
+})();
+</script>
 </body>
 </html>

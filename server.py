@@ -630,12 +630,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(404, {"error": "User not found"})
             return self.send_json(200, {"user": user})
         if path == "/payment/success":
-            body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>תשלום בוצע בהצלחה!</h1><p>הטוקנים יתווספו לחשבונכם shortly.</p><p><a href='/'>חזרה לאתר</a></p></body></html>"
+            body = (ROOT / "payment_success.html").read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body.encode("utf-8"))))
+            self.send_header("Content-Length", str(len(body)))
             self.end_headers()
-            self.wfile.write(body.encode("utf-8"))
+            self.wfile.write(body)
             return
         if path == "/payment/failure":
             body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>תשלום נכשל</h1><p>לא הצלחנו לבצע את התשלום. נסו שוב או צרו קשר.</p><p><a href='/packages.html'>חזרה לחבילות</a></p></body></html>"
