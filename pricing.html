@@ -236,6 +236,16 @@
     var sel = document.querySelector('.pr-opt[aria-pressed="true"]');
     if (!sel) return;
     var pkg = sel.dataset.pkg, amount = parseFloat(sel.dataset.price || '0');
+    // לא מחוברים: שומרים את הבחירה, שולחים להתחברות, וחוזרים לכאן
+    try {
+      var me = await fetch('/api/users/me', { credentials: 'same-origin' });
+      var md = me.ok ? await me.json() : null;
+      if (!md || !md.user) {
+        sessionStorage.setItem('clipik_after_login', '/pricing.html');
+        window.location.href = '/login.html';
+        return;
+      }
+    } catch (err) { /* ממשיכים לנסות את התשלום */ }
     var label = cta.textContent;
     var email = '';
     try { email = localStorage.getItem('clipic_email') || ''; } catch (err) { /* אין אחסון */ }

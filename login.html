@@ -171,7 +171,13 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     postJson('/api/auth/email/verify', { email: pendingEmail, code: code })
       .then(res => {
         if (!res.ok) throw new Error(res.d.error || 'ההתחברות נכשלה. נסו שוב.');
-        location.href = '/create.html';
+        var back = '/create.html';
+        try {
+          var saved = sessionStorage.getItem('clipik_after_login');
+          if (saved && saved.charAt(0) === '/') back = saved;
+          sessionStorage.removeItem('clipik_after_login');
+        } catch (e) { /* אין אחסון */ }
+        location.href = back;
       })
       .catch(err => showMsg(err.message))
       .finally(() => { btn.disabled = false; });
