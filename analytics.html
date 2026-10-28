@@ -4,37 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>אנליטיקס - קליפיק</title>
-<link rel="stylesheet" href="/styles.css">
-:root{--bg:#e8f5e9;--white:#fff;--ink:#1b3a1f;--muted:#4a6b4f;--line:#c8e6c9;--lime:#25D366;--green:#075e54;--shadow:0 8px 28px #29301b0a}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
-.wrap{max-width:1200px;margin:auto;padding:30px 20px}
-.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.head h1{margin:0;font-size:26px}
-.back{background:var(--green);color:#fff;border:0;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:bold}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
-.stat{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 14px #0000000a}
-.stat .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-.stat .value{font-size:28px;font-weight:800;color:var(--green)}
-.stat .change{font-size:11px;margin-top:4px;color:#666}
-.chart-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 14px #0000000a;margin-bottom:18px}
-.chart-card h3{margin:0 0 12px;font-size:16px}
-.bar-wrap{display:flex;flex-direction:column;gap:8px}
-.bar-row{display:flex;align-items:center;gap:10px}
-.bar-row .name{width:120px;font-size:12px;color:var(--muted);text-align:left}
-.bar-row .track{flex:1;height:10px;background:#eef4ec;border-radius:999px;overflow:hidden}
-.bar-row .fill{height:100%;background:linear-gradient(90deg,#075e54,#25D366);border-radius:999px;transition:width .4s}
-.bar-row .num{width:44px;text-align:left;font-size:12px;font-weight:bold}
-.table{width:100%;border-collapse:collapse;margin-top:10px}
-.table th,.table td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);font-size:13px}
-.table th{color:var(--muted);font-weight:bold;font-size:12px}
-.table td{color:var(--ink)}
-.table tr:hover td{background:#f6faf6}
-.footer{text-align:center;padding:18px;color:var(--muted);font-size:12px}
-@media(max-width:768px){.stats{grid-template-columns:1fr}.head{flex-direction:column;align-items:flex-start}}
-
-</head>
-<body><script>
+<link rel="stylesheet" href="/styles.css"><script>
 (function(){
   const params = new URLSearchParams(location.search);
   const token = params.get('token');
