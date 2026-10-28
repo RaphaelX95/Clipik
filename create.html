@@ -222,6 +222,8 @@ async function createVideo(){
   status.textContent = 'יוצר סרטון...';
   btn.disabled = true;
 
+  const arEffects = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
+
   const buildPayload = (imageDataUrl) => ({
     image_data_url: imageDataUrl,
     product: name,
@@ -286,8 +288,6 @@ async function createVideo(){
     btn.disabled = false;
   };
 
-  const arEffects = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
-
   try{
     if(fileInput.files[0]){
       const reader = new FileReader();
@@ -304,6 +304,80 @@ async function createVideo(){
     btn.disabled = false;
   }
 }
+// Stage navigation
+let stage = 1, selected = -1, openScript = -1, style = 'UGC טבעי', creator = 'דמות AI', productImages = [], scriptData = [], scriptTexts = [];
+
+function toast(m){let t=$('#toast');if(!t)return;t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+function setStage(n){stage=n;document.querySelectorAll('.stage').forEach((e,i)=>e.classList.toggle('active',i===n-1));for(let i=1;i<=3;i++){let e=$('#step'+i);if(!e)continue;e.classList.toggle('current',i===n);e.classList.toggle('complete',i<n);const b=e.querySelector('b');if(b)b.textContent=i<n?'✓':i}$('#stageTitle').textContent=['נתחיל מהמוצר','בוחרים תסריט','עיצוב הסרטון'][n-1];$('#stageCount').textContent='שלב '+n+' מתוך 3';if(n===3)$('#preview').classList.add('mobile-show');window.scrollTo({top:0,behavior:'smooth'})}
+function canGoNext(){if(stage===1){return $('#product').classList.contains('show') || $('#url').value.trim() || $('#file').files.length>0}else if(stage===2){return selected>=0 && currentScript().trim()}return true}
+function nextStage(){if(!canGoNext()){toast('מלאו את השלב הנוכחי לפני שממשיכים');return}if(stage<3)setStage(stage+1);updateNavButtons()}
+function prevStage(){if(stage>1){setStage(stage-1);updateNavButtons()}}
+function updateNavButtons(){const prev=$('#prevBtn'),next=$('#nextBtn');if(prev)prev.style.display=stage>1?'inline-block':'none';if(next){next.style.display=stage<3?'inline-block':'none';next.style.opacity=canGoNext()?'1':'0.5'}}
+const originalSetStage=setStage;setStage=function(n){originalSetStage(n);updateNavButtons()};updateNavButtons();
+
+function addProduct(name='המוצר שלך'){$('#productName').childNodes[0].textContent=name;$('#product').classList.add('show');const note=$('#productName').querySelector('small');if(productImages.length){$('#thumbs').innerHTML=productImages.map((image,i)=>'<span class="thumb"><img src="'+image.src+'" alt="תמונת מוצר '+ (i+1) +'"></span>').join('');note.textContent=productImages.length+' '+(productImages.length===1?'תמונה':'תמונות')+' של אותו מוצר'}else{$('#thumbs').innerHTML='<span class="thumb">✦</span>';note.textContent='נוסף לפרויקט'}}
+$('#addUrl').onclick=()=>{let value=$('#url').value.trim();if(value&&!/^https?:\/\//i.test(value)){toast('הקישור צריך להתחיל ב‑https://');return}let name='הדבקו קישור';if(value){try{name=new URL(value).pathname.split('/').filter(Boolean).pop()?.replace(/[-_]/g,' ')||'המוצר שלכם'}catch(e){toast('בדקו את קישור המוצר');return}}addProduct(name);toast(value?'המוצר נוסף':'הדבקו קישור למוצר')};
+$('#file').onchange=async e=>{let files=[...e.target.files];if(!files.length)return;const slots=3-productImages.length;if(files.length>slots){toast(slots?'אפשר להוסיף עוד '+slots+' תמונות בלבד':'אפשר להעלות עד 3 תמונות');files=files.slice(0,Math.max(0,slots));if(!files.length){e.target.value='';return}}const tooLarge=files.filter(f=>f.size>10*1024*1024);if(tooLarge.length)toast('כל תמונה צריכה להיות עד 10MB');files=files.filter(f=>f.size<=10*1024*1024&&['image/jpeg','image/png'].includes(f.type));if(!files.length){if(!tooLarge.length)toast('אפשר להעלות קובצי JPG או PNG בלבד');e.target.value='';return}try{const loaded=await Promise.all(files.map(f=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve({name:f.name,src:r.result});r.onerror=reject;r.readAsDataURL(f)})));productImages.push(...loaded);if(productImages.length){const name=productImages[0].name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');addProduct(name);toast(productImages.length+' תמונות נוספו למוצר')}else if(!tooLarge.length)toast('אפשר להעלות קובצי JPG או PNG בלבד')}catch(err){toast('לא הצלחנו לקרוא את התמונות')}e.target.value=''};$('#uploadBtn').onclick=()=>$('#file').click();$('#skipAudience').onclick=()=>{$('#audience').value='';toast('אפשר להוסיף קהל יעד מאוחר יותר')};
+const templates=[
+ {title:'פתיחה בשאלה',example:(p,a)=>a?'"'+a+', מחפשים פתרון פשוט יותר?"':'"מחפשים פתרון פשוט יותר ליום-יום?"',make:(p,a)=>a?a+', מחפשים פתרון פשוט יותר?':'מחפשים פתרון פשוט יותר ליום-יום?'+' הכירו את '+p+'. בסרטון נראה אותו מקרוב.'},
+ {title:'בעיה ואז פתרון',example:()=>'"מחפשים דרך פשוטה יותר בשגרה?"',make:(p,a)=>'מחפשים דרך פשוטה יותר בשגרה? הכירו את '+p+'. בסרטון נציג אותו ואת הפרטים שכדאי להכיר.'},
+ {title:'מתחילים בהדגמה',example:p=>'"הנה '+p+' מקרוב."',make:p=>'הנה '+p+' מקרוב. בסרטון נציג את המראה שלו ואת אופן השימוש.'},
+ {title:'פתיח משלי',manual:true,example:()=>'למשל: "רוצים להכיר את [שם המוצר] מקרוב?"',make:()=>''}
+];
+function renderScripts(){const p=$('#productName').childNodes[0].textContent||'המוצר';const aud=$('#audience').value.trim();const previous=scriptTexts;scriptData=templates.map(t=>({...t,example:t.example(p,aud),script:t.make(p,aud)}));scriptTexts=scriptData.map((t,i)=>typeof previous[i]==='string'?previous[i]:t.script);$('#scriptOptions').innerHTML=scriptData.map((t,i)=>'<section class="script-option '+ (i===selected?'selected':'') +' '+ (i===openScript?'open':'') +'"><button type="button" class="script-accordion" data-toggle="'+i+'" aria-expanded="'+ (i===openScript) +'" aria-label="'+ (i===openScript?'סגירת':'פתיחת') +' '+esc(t.title)+'"><span class="script-title"><span>'+esc(t.title)+'</span><small class="accordion-arrow" aria-hidden="true">'+ (i===openScript?'▲':'▼') +'</small></span></button><div class="script-panel '+ (i===openScript?'':'hidden') +'"><div class="script-example"><b>דוגמה:</b> '+esc(t.example)+'</div><p class="script-delivery"><b>בסרטון:</b> הפתיח נאמר בקול ומוצג גם ככתוביות. בהמשך תוכלו לבחור בין דמות AI מדברת לקריינות על צילומי מוצר.</p><label class="script-text-label" for="scriptText-'+i+'">'+ (t.manual?'כתבו את התסריט שלכם כאן':'התסריט של האפשרות הזאת — ערכו כאן') +'</label><textarea class="script-text" id="scriptText-'+i+'" data-script-index="'+i+'" aria-label="עריכת התסריט: '+esc(t.title)+'" placeholder="'+ (t.manual?'כתבו כאן את הפתיח והתסריט שלכם…':'אפשר לערוך את הנוסח כאן…') +'">'+esc(scriptTexts[i])+'</textarea></div></section>').join('');document.querySelectorAll('[data-toggle]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.toggle);if(openScript===i){openScript=-1}else{openScript=i;selected=i}renderScripts()});document.querySelectorAll('.script-text').forEach(el=>el.oninput=()=>{scriptTexts[Number(el.dataset.scriptIndex)]=el.value})}
+function currentScript(){return scriptTexts[selected]||''}
+$('#toScripts').onclick=()=>{if(!$('#product').classList.contains('show'))addProduct('מוצר לדוגמה');selected=-1;openScript=-1;renderScripts();setStage(2)};document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>setStage(+b.dataset.back));$('#toPreview').onclick=()=>{if(selected<0){toast('פתחו ובחרו פתיח לפני שממשיכים');return}if(!currentScript().trim()){toast('כתבו תסריט קצר לפני שממשיכים');return}setStage(3);$('#previewStatus').classList.remove('show');$('#previewCopy').textContent='תצוגה לדוגמה תופיע כאן אחרי יצירת ההדמיה.'};
+$('#styles').onclick=e=>{const b=e.target.closest('[data-style]');if(!b)return;style=b.dataset.style;document.querySelectorAll('.style-item').forEach(item=>{const active=item.contains(b);item.classList.toggle('selected',active);const toggle=item.querySelector('.style-toggle');toggle.setAttribute('aria-expanded',String(active));toggle.querySelector('small').textContent=active?'▲':'▼';item.querySelector('.style-detail').classList.toggle('hidden',!active)})};document.querySelectorAll('[data-creator]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-creator]').forEach(x=>x.classList.toggle('on',x===b));creator=b.dataset.creator});
+$('#platform').onchange=()=>{let v=$('#platform').value;$('#platformName').textContent=v;$('#previewFormat').textContent=v.replace('·','·')};$('#duration').onchange=()=>{const d=Number($('#duration').value);$('#durationName').textContent=d+' שניות';updateTokenCost(d)};function updateTokenCost(duration){
+  const tokens=duration<=5?2:duration<=10?4:duration<=15?6:duration<=20?8:duration<=25?10:12;
+  const cost=(tokens*2.70).toFixed(2);
+  $('#tokenCost').textContent='· עלות: '+tokens+' טוקנים';$('#createTokenCost').textContent='· צריכים '+tokens+' טוקנים';
+}
+$('#create').onclick=async()=>{let b=$('#create');if(b.disabled)return;const duration=Number($('#duration').value);const tokens=duration<=5?2:duration<=10?4:duration<=15?6:duration<=20?8:duration<=25?10:12;const costUsd=(tokens*0.157).toFixed(2);if(!confirm('סרטון '+duration+' שניות\nעלות: '+tokens+' טוקנים (~'+costUsd+')\n\nלחצו OK כדי להמשיך'))return;b.disabled=true;b.innerHTML='<span class="spark">✳</span>יוצר סרטון…';$('#previewStatus').classList.add('show');$('#previewStatus').textContent='שולח בקשה ל-fal.ai…';const imageDataUrl=productImages[0]?productImages[0].src:'';const payload={image_data_url:imageDataUrl,product:$('#productName').childNodes[0].textContent.trim()||'מוצר לדוגמה',product_url:$('#url').value.trim(),audience:$('#audience').value.trim(),language:$('#language').value,platform:$('#platform').value,duration:Number($('#duration').value),script:currentScript().trim(),style,creator};try{const r=await fetch('/api/generations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Generation failed');b.disabled=false;if(d.demo){b.innerHTML='<span class="spark">✓</span>סרטון הדגמה מוכן';$('#previewStatus').textContent=d.message||'סרטון הדגמה מוכן!';$('#previewCopy').textContent='רוצים סרטון אמיתי? קנו טוקנים בחבילות';$('#caption').textContent='סרטון הדגמה - רכשו טוקנים לקבלת סרטון מותאם אישית';toast(d.message||'סרטון הדגמה מוכן!')}else{b.innerHTML='<span class="spark">✓</span>התצוגה מוכנה';$('#previewStatus').textContent='הסרטון נוצר בהצלחה ✨';$('#previewCopy').textContent='סגנון: '+d.project.style+' · '+d.project.creator;$('#caption').textContent=d.project.script?d.project.script.slice(0,70)+(d.project.script.length>70?'…':''):'הפתרון הקטן שמשדרג את היום ✨';toast('הסרטון נוצר בהצלחה')}$('#saveDraft').classList.remove('hidden')}catch(e){b.disabled=false;b.innerHTML='<span class="spark">✳</span>צרו תצוגת סרטון';$('#previewStatus').textContent='שגיאה: '+e.message;toast('שגיאה ביצירת הסרטון')}};
+async function saveDraft(){const product=$('#productName').childNodes[0].textContent.trim()||'מוצר לדוגמה';const payload={product,product_url:$('#url').value.trim(),audience:$('#audience').value.trim(),language:$('#language').value,platform:$('#platform').value,duration:$('#duration').value,script:currentScript().trim(),style,creator};try{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('save failed');const d=await r.json();toast('הטיוטה נשמרה');$('#saveDraft').textContent='✓ הטיוטה נשמרה';$('#saveDraft').dataset.savedId=d.project.id;$('#saveDraft').disabled=true}catch(e){toast('לא הצלחנו לשמור — בדקו שהשרת פועל')}}$('#saveDraft').onclick=saveDraft;$('#closeProjects').onclick=()=>$('#projectsDialog').close();
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+updateTokenCost(Number($('#duration').value));
+window.openProjects=async function(){const box=$('#projectList');box.innerHTML='<p>טוענים טיוטות…</p>';$('#projectsDialog').showModal();try{const r=await fetch('/api/projects');if(!r.ok)throw new Error('load failed');const d=await r.json();if(!d.projects.length){box.innerHTML='<p>אין עדיין טיוטות שמורות.<br>צרו סרטון ושמרו אותו כאן.</p>';return}box.innerHTML=d.projects.map(p=>'<article><strong>'+esc(p.product)+'</strong><small>'+esc(p.style)+' · '+esc(p.platform)+' · '+(p.duration||15)+' שניות · '+new Date(p.created_at).toLocaleDateString('he-IL')+'</small><p>'+esc(p.script.slice(0,160))+'</p></article>').join('')}catch(e){box.innerHTML='<p>אין חיבור לשרת המקומי.</p>'}};
+window.showPackages=function(){window.location.href='/packages.html'};$('#closePackages')
+
+
+function toggleMenu(){
+  const side = document.querySelector('.side');
+  const btn = document.getElementById('menuBtn');
+  if(!side) return;
+  if(side.style.display === 'block'){
+    side.style.display = '';
+    btn.textContent = '☰ תפריט';
+  } else {
+    side.style.display = 'block';
+    side.style.position = 'fixed';
+    side.style.top = '0';
+    side.style.right = '0';
+    side.style.bottom = '0';
+    side.style.zIndex = '999';
+    side.style.width = '260px';
+    side.style.boxShadow = '-4px 0 20px #0003';
+    btn.textContent = '✕ סגירה';
+  }
+}
+window.addEventListener('resize', ()=>{
+  if(window.innerWidth > 680){
+    const side = document.querySelector('.side');
+    if(side){
+      side.style.display = '';
+      side.style.position = '';
+      side.style.top = '';
+      side.style.right = '';
+      side.style.bottom = '';
+      side.style.zIndex = '';
+      side.style.width = '';
+      side.style.boxShadow = '';
+    }
+    const btn = document.getElementById('menuBtn');
+    if(btn) btn.textContent = '☰ תפריט';
+  }
+});
+
 </script>
 </body>
 </html>
