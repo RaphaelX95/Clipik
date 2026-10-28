@@ -46,25 +46,25 @@
     <div class="card" style="max-width:720px;margin:0 auto">
       <!-- Step 1: Product Input -->
       <section class="stage active" id="stageProduct">
+        <input type="hidden" id="productName" value="">
         <div class="field">
-          <div class="label"><label for="productName">שם המוצר</label></div>
-          <input class="input" id="productName" placeholder="לדוגמה: סבון יד טבעי">
-        </div>
-        <div class="field">
-          <div class="label"><label for="url">קישור למוצר</label><small>או העלו תמונה</small></div>
+          <div class="label"><label for="url">קישור למוצר</label></div>
           <div class="inputrow">
-            <input class="input" id="url" type="url" placeholder="https://yourstore.com/products/...">
-            <button class="btn btn-secondary" id="addUrl">🔗 הוספה</button>
-          </div>
-          <div style="text-align:center;color:var(--muted);font-size:13px;margin:10px 0">או</div>
-          <button class="btn btn-secondary" id="uploadBtn" style="width:100%">📤 העלאת תמונה (PNG/JPG)</button>
-          <input id="file" type="file" accept="image/png,image/jpeg" style="display:none">
-          <div id="product" class="product" style="margin-top:12px;display:none">
-            <span class="thumbs" id="thumbs"><span class="thumb">✦</span></span>
-            <span class="meta" id="productNameMeta">המוצר שלך<small>נוסף לפרויקט</small></span>
-            <span class="ok">✓ נוסף</span>
+            <input class="input" id="url" type="url" inputmode="url" placeholder="https://yourstore.com/products/..." aria-describedby="productHint">
+            <button class="btn btn-secondary" id="addUrl" type="button">הוספה</button>
           </div>
         </div>
+        <div class="or-divider" aria-hidden="true"><span>או</span></div>
+        <div class="field">
+          <button class="btn btn-secondary upload-btn" id="uploadBtn" type="button">העלאת תמונה <small>PNG או JPG, עד 10MB</small></button>
+          <input id="file" type="file" accept="image/png,image/jpeg" style="display:none">
+        </div>
+        <div id="product" class="product" style="display:none">
+          <span class="thumbs" id="thumbs"></span>
+          <span class="meta" id="productNameMeta">המוצר שלך<small>נוסף לפרויקט</small></span>
+          <span class="ok">✓ נוסף</span>
+        </div>
+        <p id="productHint" class="product-hint" role="status">הוסיפו קישור למוצר או העלו תמונה כדי להמשיך.</p>
         <div class="field">
           <div class="label"><label for="audience">למי הסרטון מיועד?</label></div>
           <input class="input" id="audience" placeholder="למשל: הורים לילדים קטנים">
@@ -109,7 +109,7 @@
             <input type="hidden" id="resolution" value="720p">
           </div>
         </div>
-        <button class="btn btn-primary btn-large" id="toScripts" style="width:100%;margin-top:18px">
+        <button class="btn btn-primary btn-large" id="toScripts" disabled style="width:100%;margin-top:18px">
           <span>✳</span>המשיכו לרעיונות לתסריט
         </button>
       </section>
@@ -198,32 +198,55 @@
       $("#detailDuration").textContent = $("#duration").value + " שניות";
     }
 
+    let productUrl = "";
+
+    function productNameFromUrl(val) {
+      try {
+        const u = new URL(val);
+        const last = u.pathname.split("/").filter(Boolean).pop() || "";
+        const name = decodeURIComponent(last).replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+        return name || u.hostname.replace(/^www\./, "");
+      } catch (e) { return ""; }
+    }
+
+    function updateProductState() {
+      const has = !!(productUrl || productImages.length);
+      $("#toScripts").disabled = !has;
+      $("#productHint").style.display = has ? "none" : "block";
+      $("#product").style.display = has ? "flex" : "none";
+      const thumbs = $("#thumbs");
+      thumbs.innerHTML = productImages.slice(0, 4).map(src =>
+        `<img class="thumb-img" src="${src}" alt="תמונת מוצר שהועלתה">`).join("")
+        || '<span class="thumb">🔗</span>';
+      const meta = productUrl ? new URL(productUrl).hostname.replace(/^www\./, "") : "תמונה שהועלתה";
+      $("#productNameMeta").innerHTML = escHtml(meta) + "<small>נוסף לפרויקט</small>";
+      $("#productName").value = productNameFromUrl(productUrl) || productName || "";
+    }
+
     $("#addUrl").onclick = () => {
       const val = $("#url").value.trim();
-      if (val && !/^https?:\/\//i.test(val)) { toast("הקישור צריך להתחיל ב-https://"); return; }
-      const name = val ? (() => { try { return new URL(val).pathname.split("/").filter(Boolean).pop()?.replace(/[-_]/g," ") || "המוצר"; } catch(e){ return "המוצר"; }})() : "המוצר";
-      productName = name; $("#productName").value = name;
-      $("#product").style.display = "flex";
-      toast(val ? "המוצר נוסף" : "הזינו שם מוצר");
+      if (!val) { $("#url").focus(); toast("הדביקו קישור למוצר"); return; }
+      if (!/^https:\/\/[^\s]+\.[^\s]+/i.test(val)) { toast("הקישור צריך להתחיל ב-https:// ולהכיל כתובת מלאה"); $("#url").focus(); return; }
+      productUrl = val;
+      productName = productNameFromUrl(val) || productName;
+      updateProductState();
+      toast("הקישור נוסף");
     };
+
+    $("#url").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("#addUrl").click(); } });
 
     $("#uploadBtn").onclick = () => $("#file").click();
     $("#file").onchange = async e => {
       const files = [...e.target.files]; if (!files.length) return;
-      const loaded = [];
       for (const f of files) {
         if (f.size > 10*1024*1024) { toast("תמונה גדולה מדי (מקס 10MB)"); continue; }
         const src = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
-        loaded.push(src);
-      }
-      productImages.push(...loaded);
-      if (loaded.length) {
-        productName = productName || loaded[0].name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
-        $("#productName").value = productName;
-        $("#product").style.display = "flex";
-        toast(loaded.length + " תמונות נוספו");
+        productImages.push(src);
+        if (!productName) productName = f.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
       }
       e.target.value = "";
+      updateProductState();
+      if (productImages.length) toast("התמונה נוספה");
     };
 
     const scriptTemplates = [
@@ -245,7 +268,7 @@
           <button type="button" class="script-accordion" data-toggle="${i}" aria-expanded="${i===openScript}">
             <span class="script-title"><span>${t.title}</span><small class="accordion-arrow">${i===openScript?"▲":"▼"}</small></span>
           </button>
-          <div class="script-panel ${i===openScript?"":"hidden'}">
+          <div class="script-panel ${i===openScript?"":"hidden"}>
             <textarea class="script-text" id="scriptText-${i}" data-script-index="${i}" placeholder="${t.manual?"כתבו כאן את התסריט שלכם…":"אפשר לערוך את הנוסח כאן…"}">${escHtml(scriptTexts[i]||"")}</textarea>
           </div>
         </section>
@@ -260,7 +283,8 @@
     function currentScript() { return scriptTexts[selected] || ""; }
 
     $("#toScripts").onclick = () => {
-      productName = $("#productName").value.trim() || productName || "מוצר לדוגמה";
+      if (!productUrl && !productImages.length) { $("#productHint").style.display = "block"; toast("הוסיפו קישור או תמונה כדי להמשיך"); return; }
+      productName = productName || productNameFromUrl(productUrl) || "המוצר";
       selected = -1; openScript = -1; renderScripts(); setStep(2);
     };
     $("#prevStep2").onclick = () => setStep(1);
@@ -280,7 +304,6 @@
 
     $("#platform").onchange = updateDetails;
     $("#duration").onchange = updateDetails;
-    $("#productName").oninput = updateDetails;
 
     $("#createBtn").onclick = async () => {
       const btn = $("#createBtn"); if (btn.disabled) return;
