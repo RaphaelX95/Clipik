@@ -11,6 +11,9 @@
 <meta property="og:description" content="חבילות טוקנים ליצירת סרטוני AI. סרטון ראשון במבצע 9.99 ש״ח!">
 <meta property="og:type" content="website">
 <meta property="og:url" content="/packages.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css"><script>
 document.querySelectorAll('.buy-btn').forEach(btn => {
     btn.onclick = async () => {
@@ -87,5 +90,126 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
     };
 });
 </script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="/logo-source.jpg" alt="קליפיק" width="32" height="32">
+        </div>
+        <div class="brand-name">קליפיק</div>
+      </div>
+      <nav class="nav">
+        <div class="nav-title">עריכה</div>
+        <button onclick="window.location.href='/'"><span class="ico">✨</span> יצירת סרטון</button>
+        <button onclick="window.location.href='/templates.html'"><span class="ico">📋</span> תבניות מוכנות</button>
+        <button class="active"><span class="ico">🎟️</span> חבילות טוקנים</button>
+        <div class="nav-title">ניהול</div>
+        <button onclick="window.location.href='/analytics.html'"><span class="ico">📊</span> אנליטיקס</button>
+        <button onclick="window.location.href='/product-page.html'"><span class="ico">📦</span> ניהול מוצרים</button>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1 class="gradient-text">🎟️ חבילות טוקנים</h1>
+          <p class="page-subtitle">סרטון ראשון במבצע 9.99 ש"ח — 15 שניות!</p>
+        </div>
+      </div>
+
+      <div class="trial-banner ai-glow">
+        <div class="trial-content">
+          <div class="trial-badge">🎁 מבצע מיוחד</div>
+          <h2 class="gradient-text">סרטון ראשון ב-9.99 ש"ח</h2>
+          <p class="trial-desc">6 טוקנים · עד 15 שניות · ללא התחייבות</p>
+          <button class="btn btn-large btn-primary buy-btn" data-package="trial" data-amount="9.99">התחילו עכשיו</button>
+        </div>
+      </div>
+
+      <div class="packages-grid">
+        <div class="package-card">
+          <div class="package-header">
+            <h3>סטארטאפ</h3>
+            <div class="package-price">₪16.20</div>
+            <div class="package-duration">3 סרטונים</div>
+          </div>
+          <div class="package-features">
+            <div class="feature">✓ 6 טוקנים</div>
+            <div class="feature">✓ עד 15 שניות</div>
+            <div class="feature">✓ 3 סרטוני 5 שניות</div>
+          </div>
+          <button class="btn btn-primary buy-btn" data-package="3" data-amount="16.20">קנו עכשיו</button>
+        </div>
+
+        <div class="package-card popular ai-glow">
+          <div class="popular-badge">🔥 הכי פופולרי</div>
+          <div class="package-header">
+            <h3>סטנדרט</h3>
+            <div class="package-price">₪24.90</div>
+            <div class="package-duration">5 סרטונים</div>
+          </div>
+          <div class="package-features">
+            <div class="feature">✓ 10 טוקנים</div>
+            <div class="feature">✓ עד 20 שניות</div>
+            <div class="feature">✓ גיוון בסגנונות</div>
+          </div>
+          <button class="btn btn-primary buy-btn" data-package="5" data-amount="24.90">קנו עכשיו</button>
+        </div>
+
+        <div class="package-card">
+          <div class="package-header">
+            <h3>פרימיום</h3>
+            <div class="package-price">₪49.90</div>
+            <div class="package-duration">10 סרטונים</div>
+          </div>
+          <div class="package-features">
+            <div class="feature">✓ 20 טוקנים</div>
+            <div class="feature">✓ עד 30 שניות</div>
+            <div class="feature">✓ תמיכה מועדפת</div>
+          </div>
+          <button class="btn btn-primary buy-btn" data-package="10" data-amount="49.90">קנו עכשיו</button>
+        </div>
+
+        <div class="package-card">
+          <div class="package-header">
+            <h3>אולטרה</h3>
+            <div class="package-price">₪89.90</div>
+            <div class="package-duration">25 סרטונים</div>
+          </div>
+          <div class="package-features">
+            <div class="feature">✓ 50 טוקנים</div>
+            <div class="feature">✓ עד 30 שניות</div>
+            <div class="feature">✓ API access</div>
+          </div>
+          <button class="btn btn-primary buy-btn" data-package="25" data-amount="89.90">קנו עכשיו</button>
+        </div>
+      </div>
+
+      <div class="trust-badges">
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <div class="trust-text">
+            <strong>תשלום מאובטח</strong>
+            <small>העברות מוצפנות</small>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⚡</div>
+          <div class="trust-text">
+            <strong>סרטון תוך שניות</strong>
+            <small>יצירה מיידית</small>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">💎</div>
+          <div class="trust-text">
+            <strong>איכות 4K</strong>
+            <small>פלט עדכני</small>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

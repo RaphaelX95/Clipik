@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>אנליטיקס - קליפיק</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css"><script>
 (function(){
   const params = new URLSearchParams(location.search);
@@ -15,10 +18,125 @@
 })();
 </script>
 
-  <div class="wrap">
-    <div class="head">
+  <div class="layout">
+    <div class="page-header">
       <div><h1>📊 אנליטיקס</h1></div>
-      <button class="back" onclick="window.location.href='/'">← חזור לסטודיו</button>
+      <button class="btn btn-secondary" onclick="window.location.href='/'">← חזור לסטודיו</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="label">סה"כ צפיות</div>
+        <div class="value" id="totalViews">0</div>
+        <div class="change">+12% מהשבוע שעבר</div>
+      </div>
+      <div class="stat">
+        <div class="label">סרטונים שנוצרו</div>
+        <div class="value" id="totalVideos">0</div>
+        <div class="change">+3 השבוע</div>
+      </div>
+      <div class="stat">
+        <div class="label">הורדות דף מוצר</div>
+        <div class="value" id="totalDownloads">0</div>
+        <div class="change">+5 השבוע</div>
+      </div>
+      <div class="stat">
+        <div class="label">קליקים לסרטונים</div>
+        <div class="value" id="totalClicks">0</div>
+        <div class="change">CTR מדומה: 4.2%</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>📈 ביצועי השבוע</h3>
+      <div class="bar-wrap" id="weeklyChart"></div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🎥 סרטונים אחרונים</h3>
+      <table class="table">
+        <thead><tr><th>שם</th><th>תאריך</th><th>מצב</th><th>צפיות</th></tr></thead>
+        <tbody id="recentVideos"></tbody>
+      </table>
+    </div>
+
+    <div class="chart-card">
+      <h3>✨ דפי מוצר אחרונים</h3>
+      <table class="table">
+        <thead><tr><th>שם מוצר</th><th>תאריך</th><th>מחיר</th><th>הורדות</th></tr></thead>
+        <tbody id="recentProducts"></tbody>
+      </table>
+    </div>
+
+    <div class="footer">Klipik Analytics • אבטיפוס • נתונים מדומים</div>
+  </div>
+
+<script>
+function loadAnalytics(){
+  // Demo data - in production this comes from /api/analytics/summary
+  const demo = {
+    totalViews: 1247,
+    totalVideos: 18,
+    totalDownloads: 32,
+    totalClicks: 486,
+    weekly: [
+      {day:'א',views:120,videos:2},
+      {day:'ב',views:98,videos:1},
+      {day:'ג',views:156,videos:3},
+      {day:'ד',views:134,videos:2},
+      {day:'ה',views:210,videos:4},
+      {day:'ו',views:89,videos:1},
+      {day:'ש',views:440,videos:5}
+    ],
+    recentVideos: [
+      {name:'סרטון מוצר A', date:'27/10/2026', status:'הושלם', views:124},
+      {name:'סרטון מוצר B', date:'26/10/2026', status:'הושלם', views:89},
+      {name:'סרטון מוצר C', date:'25/10/2026', status:'מעובד', views:45}
+    ],
+    recentProducts: [
+      {name:'מוצר אלפא', price:'₪199', date:'27/10/2026', downloads:12},
+      {name:'מוצר בטא', price:'₪149', date:'26/10/2026', downloads:8},
+      {name:'מוצר גאמה', price:'₪249', date:'25/10/2026', downloads:7}
+    ]
+  };
+
+  document.getElementById('totalViews').textContent = demo.totalViews.toLocaleString('he-IL');
+  document.getElementById('totalVideos').textContent = demo.totalVideos;
+  document.getElementById('totalDownloads').textContent = demo.totalDownloads;
+  document.getElementById('totalClicks').textContent = demo.totalClicks.toLocaleString('he-IL');
+
+  const maxViews = Math.max(...demo.weekly.map(d => d.views));
+  const chart = document.getElementById('weeklyChart');
+  chart.innerHTML = demo.weekly.map(d => {
+    const pct = Math.round((d.views / maxViews) * 100);
+    return `<div class="bar-row"><div class="name">${d.day}</div><div class="track"><div class="fill"></div></div><div class="num">${d.views}</div></div>`
+  }).join('');
+
+  const tbody1 = document.getElementById('recentVideos');
+  tbody1.innerHTML = demo.recentVideos.map(v => `<tr><td>${v.name}</td><td>${v.date}</td><td>${v.status}</td><td>${v.views}</td></tr>`).join('');
+
+  const tbody2 = document.getElementById('recentProducts');
+  tbody2.innerHTML = demo.recentProducts.map(p => `<tr><td>${p.name}</td><td>${p.date}</td><td>${p.price}</td><td>${p.downloads}</td></tr>`).join('');
+}
+
+loadAnalytics();
+</script>
+<body>
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+  if(!token || token !== 'YO4DfXieWO5axgFYUleauA'){
+    document.body.innerHTML = '<div><div><h1>🔒 גישה מוגבלת</h1><p>הדף הזה נגיש למנהלי האתר בלבד.</p></div></div>';
+    throw new Error('Unauthorized');
+  }
+})();
+</script>
+
+  <div class="layout">
+    <div class="page-header">
+      <div><h1>📊 אנליטיקס</h1></div>
+      <button class="btn btn-secondary" onclick="window.location.href='/'">← חזור לסטודיו</button>
     </div>
 
     <div class="stats">

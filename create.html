@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יצירת סרטון - קליפיק</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css"><script>
 const params = new URLSearchParams(location.search);
 const template = {
@@ -186,6 +189,275 @@ async function createVideo(){
     }else{
       await submit(buildPayload(''));
     }
+  }catch(err){
+    status.textContent = 'שגיאה: ' + err.message;
+    btn.disabled = false;
+  }
+}
+</script>
+<body>
+<div class="layout">
+    <a class="btn btn-secondary" href="/templates.html">← חזור לתבניות</a>
+    <div class="tpl-banner" id="tplBanner">
+      <div>
+        <h2 id="tplTitle">תבנית</h2>
+        <p id="tplDesc">הגדירו את פרטי הסרטון לפי התבנית שבחרתם.</p>
+      </div>
+      <button class="btn" onclick="document.getElementById('createForm').scrollIntoView({behavior:'smooth'})">התחילו עכשיו</button>
+    </div>
+
+    <div class="card" id="createForm">
+      <div class="field">
+        <label for="productName">שם המוצר / נושא</label>
+        <input id="productName" type="text" placeholder="למשל: סטארטאפ טקטוני, מכנסי גברים, שתיית קלים">
+      </div>
+      <div class="field">
+        <label for="productUrl">קישור למוצר <small>(אופציונלי)</small></label>
+        <input id="productUrl" type="url" placeholder="https://yourstore.com/products/...">
+      </div>
+      <div class="field">
+        <label for="productImage">תמונת מוצר <small>(PNG/JPG)</small></label>
+        <input id="productImage" type="file" accept="image/png,image/jpeg">
+        <div id="previewThumb"><img id="thumbImg"></div>
+      </div>
+      <div class="field">
+        <label for="avatarSelect">דמות מדברת</label>
+        <select id="avatarSelect">
+          <option value="דמות AI">דמות AI כללית</option>
+          <option value="קריינות">קריין חיצוני (ללא דמות)</option>
+          <option value="אדם/ה">אדם/ה מקומי</option>
+          <option value="צעיר/ה">צעיר/ה YG</option>
+          <option value="מבוגר/ה">מבוגר/ה מנוסה</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="captions">כתוביות בסוף הסרטון <small>(אופציונלי, עד 50 תווים)</small></label>
+        <input id="captions" type="text" maxlength="50" placeholder="למשל: קליפיק - צרו סרטונים בעברית">
+        <div id="captionCount">0 / 50 תווים</div>
+      </div>
+      <div class="field">
+        <label for="musicSelect">מוזיקת רקע</label>
+        <select id="musicSelect">
+          <option value="ללא מוזיקה">ללא מוזיקה</option>
+          <option value="אופטימי וקל">אופטימי וקל</option>
+          <option value="מודרני וטכנולוגי">מודרני וטכנולוגי</option>
+          <option value="רגוע ומרגיע">רגוע ומרגיע</option>
+          <option value="מרוצה ואנרגטי">מרוצה ואנרגטי</option>
+          <option value="לועזי וקלאסי">לועזי וקלאסי</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>אפקטים AR <small>(אופציונלי)</small></label>
+        <div>
+          <label>
+            <input type="checkbox" name="ar_effects" value="sparkles"> ✨ נצוצות
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="hearts"> ❤️ לבבות
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="glow"> 💫 זוהר
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="stars"> ⭐ כוכבים
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="particles"> 🎊 קונפטי
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="border"> 🎀 מסגרת
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="rainbow"> 🌈 קשת בענן
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="snow"> ❄️ שלג
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="fire"> 🔥 להבות
+          </label>
+          <label>
+            <input type="checkbox" name="ar_effects" value="bokeh"> 🌟 בוקח
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="instructions">הנחיות למחולל <small>(עד 750 תווים)</small></label>
+        <textarea id="instructions" maxlength="750" placeholder="תארו בפירוט מה אתם רוצים שיהיה בסרטון: סביבה, תאורה, אפקטים, אנימציות, קריאה לפעולה וכו'"></textarea>
+        <div class="hint" id="templateHint"></div>
+        <div id="charCount">0 / 750 תווים</div>
+      </div>
+      <button class="btn" onclick="generateScript()">✨ צור תסריט אוטומטי</button>
+      <button class="btn primary" id="createBtn" onclick="createVideo()">✳ צרו תצוגת סרטון</button>
+      <div id="arPreview" class="ar-preview"></div>
+      <p id="status"></p>
+    </div>
+  </div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const template = {
+  name: params.get('name') || 'סרטון מותאם',
+  style: params.get('style') || 'UGC טבעי',
+  duration: params.get('duration') || '15',
+  hint: params.get('hint') || ''
+};
+
+document.getElementById('tplTitle').textContent = 'תבנית: ' + template.name;
+document.getElementById('tplDesc').textContent = 'סגנון: ' + template.style + ' · ' + template.duration + ' שניות';
+if(template.hint){
+  const el = document.getElementById('templateHint');
+  el.innerHTML = '<strong>💡 טיפ לפי התבנית</strong>' + template.hint;
+}
+
+document.getElementById('productImage').onchange = function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('thumbImg').src = ev.target.result;
+    document.getElementById('previewThumb').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+};
+
+// Character counter for script textarea
+const instructionsEl = document.getElementById('instructions');
+const charCountEl = document.getElementById('charCount');
+if(instructionsEl && charCountEl){
+  const updateCount = () => {
+    const len = instructionsEl.value.length;
+    charCountEl.textContent = len + ' / 750 תווים';
+    if(len > 700){
+      charCountEl.style.color = '#d32f2f';
+    } else if(len > 600){
+      charCountEl.style.color = '#f57c00';
+    } else {
+      charCountEl.style.color = 'var(--muted)';
+    }
+  };
+  instructionsEl.addEventListener('input', updateCount);
+  updateCount();
+}
+
+// Caption counter
+const captionEl = document.getElementById('captions');
+const captionCountEl = document.getElementById('captionCount');
+if(captionEl && captionCountEl){
+  const updateCaptionCount = () => {
+    const len = captionEl.value.length;
+    captionCountEl.textContent = len + ' / 50 תווים';
+    if(len > 45){
+      captionCountEl.style.color = '#d32f2f';
+    } else {
+      captionCountEl.style.color = 'var(--muted)';
+    }
+  };
+  captionEl.addEventListener('input', updateCaptionCount);
+  updateCaptionCount();
+}
+
+async function generateScript(){
+  const product = document.getElementById('productName').value.trim();
+  if(!product){
+    alert('נא להזין שם מוצר/נושא כדי ליצור תסריט');
+    return;
+  }
+  const audience = document.getElementById('productUrl').value.trim();
+  const style = template.style;
+  const duration = template.duration;
+  const status = document.getElementById('status');
+  status.textContent = 'יוצר תסריט אוטומטי...';
+  try{
+    const r = await fetch('/api/script/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({product, audience, style, duration, language: 'he'})
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'שגיאה');
+    document.getElementById('instructions').value = d.script || '';
+    status.textContent = '✓ תסריט נוצר! '+ (d.concept_name || '') + ' · ' + Math.round(d.estimated_duration || duration) + ' שניות · ' + (d.scenes || 3) + ' סצנות';
+  }catch(err){
+    status.textContent = 'שגיאה: ' + err.message;
+  }
+}
+
+async function createVideo(){
+  const name = document.getElementById('productName').value.trim() || 'מוצר לדוגמה';
+  const instructions = document.getElementById('instructions').value.trim();
+  const fileInput = document.getElementById('productImage');
+  const status = document.getElementById('status');
+  const btn = document.getElementById('createBtn');
+  status.textContent = 'יוצר סרטון...';
+  btn.disabled = true;
+
+  const form = new FormData();
+  form.append('product', name);
+  form.append('style', template.style);
+  form.append('duration', template.duration);
+  form.append('script', instructions);
+  form.append('creator', document.getElementById('avatarSelect').value);
+  form.append('captions', document.getElementById('captions').value.trim());
+  form.append('music', document.getElementById('musicSelect').value);
+  
+  // Collect AR effects
+  const arEffects = Array.from(document.querySelectorAll('input[name="ar_effects"]:checked')).map(cb => cb.value);
+  form.append('ar_effects', JSON.stringify(arEffects));
+  
+  if(fileInput.files[0]) form.append('image', fileInput.files[0]);
+
+  try{
+    const r = await fetch('/api/generations', {method:'POST', body: form});
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'שגיאה ביצירה');
+    status.innerHTML = '✓ הסרטון נוצר בהצלחה! <a href="' + (d.video_url || '#') + '" target="_blank">צפו בסרטון</a>';
+    
+    // Live AR preview
+const arCheckboxes = document.querySelectorAll('input[name="ar_effects"]');
+const preview = document.getElementById('arPreview');
+function updateArPreview(){
+  if(!preview) return;
+  preview.innerHTML = '';
+  const active = Array.from(arCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+  if(active.length === 0){
+    preview.style.display = 'none';
+    return;
+  }
+  preview.style.display = 'block';
+  const overlay = document.createElement('div');
+  overlay.className = 'ar-overlay';
+  active.forEach(effect => {
+    const d = document.createElement('div');
+    d.className = 'ar-' + effect + ' float';
+    overlay.appendChild(d);
+  });
+  preview.appendChild(overlay);
+}
+if(arCheckboxes.length){
+  arCheckboxes.forEach(cb => cb.addEventListener('change', updateArPreview));
+  updateArPreview();
+}
+
+// Apply AR effects to video
+    const arEffects = JSON.parse(payload.get('ar_effects') || '[]');
+    if(arEffects.length > 0 && d.video_url){
+      const videoContainer = document.createElement('div');
+      videoContainer.style.cssText = 'position:relative;display:inline-block;margin-top:12px;border-radius:12px;overflow:hidden';
+      videoContainer.innerHTML = '<video src="' + d.video_url + '" controls autoplay loop></video>';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'ar-overlay';
+      arEffects.forEach(effect => {
+        const div = document.createElement('div');
+        div.className = 'ar-' + effect;
+        overlay.appendChild(div);
+      });
+      
+      videoContainer.appendChild(overlay);
+      status.appendChild(videoContainer);
+    }
+    btn.disabled = false;
   }catch(err){
     status.textContent = 'שגיאה: ' + err.message;
     btn.disabled = false;

@@ -4,7 +4,210 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יצירת דף מוצר - קליפיק</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css"><script>
+let selectedTemplate = 'ecommerce';
+let benefits = [];
+let faqs = [];
+
+function selectTemplate(el, tpl){
+  document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTemplate = tpl;
+  updatePreview();
+}
+
+function previewImage(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('thumbImg').src = ev.target.result;
+    document.getElementById('thumbPreview').style.display = 'block';
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function addBenefit(){
+  const id = Date.now();
+  const container = document.getElementById('benefitsList');
+  const row = document.createElement('div');
+  row.className = 'section-row';
+  row.innerHTML = `<input placeholder="יתרון מרתק..." oninput="updatePreview()"><button onclick="this.parentElement.remove();updatePreview()">✕</button>`;
+  container.appendChild(row);
+}
+
+function addFaq(){
+  const container = document.getElementById('faqList');
+  const row = document.createElement('div');
+  row.className = 'section-row';
+  row.innerHTML = `<input placeholder="שאלה..." oninput="updatePreview()"><button onclick="this.parentElement.remove();updatePreview()">✕</button>`;
+  container.appendChild(row);
+}
+
+function updatePreview(){
+  const title = document.getElementById('productTitle').value || 'שם המוצר';
+  const price = document.getElementById('productPrice').value || '₪0';
+  const desc = document.getElementById('productDesc').value || 'תיאור קצר של המוצר יופיע כאן...';
+  const img = document.getElementById('thumbImg').src;
+
+  document.getElementById('prevTitle').textContent = title;
+  document.getElementById('prevPrice').textContent = price;
+  document.getElementById('prevDesc').textContent = desc;
+
+  const prevImg = document.getElementById('prevImage');
+  if(img && img.includes('data:')){
+    document.getElementById('prevImg').src = img;
+    prevImg.style.display = 'block';
+  }
+
+  // Benefits
+  const benefits = Array.from(document.querySelectorAll('#benefitsList input')).map(i => i.value).filter(Boolean);
+  const benefitsHtml = benefits.length ? '<strong>יתרונות:</strong><ul>' + benefits.map(b => `<li>${b}</li>`).join('') + '</ul>' : '';
+  document.getElementById('prevBenefits').innerHTML = benefitsHtml;
+
+  // FAQ
+  const faqs = Array.from(document.querySelectorAll('#faqList input')).map(i => i.value).filter(Boolean);
+  const faqHtml = faqs.length ? '<strong>שאלות נפוצות:</strong><ul>' + faqs.map(f => `<li>${f}</li>`).join('') + '</ul>' : '';
+  document.getElementById('prevFaq').innerHTML = faqHtml;
+
+  // Char counts
+  const descEl = document.getElementById('productDesc');
+  const fullEl = document.getElementById('productFull');
+  if(descEl){
+    document.getElementById('descCount').textContent = descEl.value.length + ' / 300 תווים';
+  }
+  if(fullEl){
+    document.getElementById('fullCount').textContent = fullEl.value.length + ' / 1500 תווים';
+  }
+}
+
+function generatePage(){
+  const title = document.getElementById('productTitle').value.trim();
+  const price = document.getElementById('productPrice').value.trim();
+  const desc = document.getElementById('productDesc').value.trim();
+  const full = document.getElementById('productFull').value.trim();
+  const imgData = document.getElementById('thumbImg').src;
+
+  if(!title || !price || !desc){
+    alert('נא למלא שם מוצר, מחיר ותיאור קצר');
+    return;
+  }
+
+  const benefits = Array.from(document.querySelectorAll('#benefitsList input')).map(i => i.value).filter(Boolean);
+  const faqs = Array.from(document.querySelectorAll('#faqList input')).map(i => i.value).filter(Boolean);
+
+  const payload = {
+    title, price, desc, full, benefits, faqs,
+    template: selectedTemplate,
+    image: imgData.includes('data:') ? imgData : null
+  };
+
+  fetch('/api/product-page', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(r => r.json()).then(d => {
+    if(d.html){
+      const blob = new Blob([d.html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (title || 'product') + '.html';
+      a.click();
+      document.getElementById('status').textContent = '✓ דף המוצר נוצר! קובץ הורד אוטומטית.';
+    } else {
+      document.getElementById('status').textContent = 'שגיאה: ' + (d.error || 'לא ידוע');
+    }
+  }).catch(err => {
+    document.getElementById('status').textContent = 'שגיאה: ' + err.message;
+  });
+}
+
+// Init counts
+updatePreview();
+</script>
+<body>
+<div class="layout">
+    <div class="page-header">
+      <div><h1>✨ יצירת דף מוצר</h1></div>
+      <button class="btn btn-secondary" onclick="window.location.href='/'">← חזור לסטודיו</button>
+    </div>
+
+    <div class="template-selector">
+      <div class="tpl-card selected" onclick="selectTemplate(this, 'ecommerce')">
+        <div class="icon">🛍️</div>
+        <div class="name">חנות סטנדרט</div>
+      </div>
+      <div class="tpl-card" onclick="selectTemplate(this, 'landing')">
+        <div class="icon">🎯</div>
+        <div class="name">דף נחיתה</div>
+      </div>
+      <div class="tpl-card" onclick="selectTemplate(this, 'minimal')">
+        <div class="icon">✨</div>
+        <div class="name">מינימליסט</div>
+      </div>
+      <div class="tpl-card" onclick="selectTemplate(this, 'social')">
+        <div class="icon">📱</div>
+        <div class="name">שיווק ברשתות</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card ai-glow">
+        <h3>📝 פרטי המוצר</h3>
+        <div class="field">
+          <label for="productTitle">שם המוצר *</label>
+          <input id="productTitle" type="text" placeholder="למשל: מכנסי גברים אופנתיים" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label for="productPrice">מחיר *</label>
+          <input id="productPrice" type="text" placeholder="₪199" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label for="productDesc">תיאור קצר *</label>
+          <textarea id="productDesc" maxlength="300" placeholder="תארו את המוצר ב-2-3 שורות..." oninput="updatePreview()"></textarea>
+          <div class="char-count" id="descCount">0 / 300 תווים</div>
+        </div>
+        <div class="field">
+          <label for="productFull">תיאור מלא</label>
+          <textarea id="productFull" maxlength="1500" placeholder="תיאור מפורט: משתני מוצר, יתרונות, איך משתמשים..." oninput="updatePreview()"></textarea>
+          <div class="char-count" id="fullCount">0 / 1500 תווים</div>
+        </div>
+        <div class="field">
+          <label for="productImage">תמונת מוצר</label>
+          <input id="productImage" type="file" accept="image/png,image/jpeg" onchange="previewImage(event)">
+          <div id="thumbPreview"><img id="thumbImg"></div>
+        </div>
+
+        <h3>🎯 יתרונות מרכזיים</h3>
+        <div id="benefitsList"></div>
+        <button class="btn" onclick="addBenefit()">+ הוסף יתרון</button>
+
+        <h3>❓ שאלות נפוצות</h3>
+        <div id="faqList"></div>
+        <button class="btn" onclick="addFaq()">+ הוסף שאלה</button>
+
+        <button class="btn primary" onclick="generatePage()">✨ צרו דף מוצר</button>
+        <p id="status"></p>
+      </div>
+
+      <div class="preview" id="preview">
+        <h2 id="prevTitle">שם המוצר</h2>
+        <div class="price" id="prevPrice">₪0</div>
+        <div class="desc" id="prevDesc">תיאור קצר של המוצר יופיע כאן...</div>
+        <div id="prevImage"><img id="prevImg"></div>
+        <div id="prevBenefits"></div>
+        <div id="prevFaq"></div>
+        <div class="meta">תצוגה מקדימה • עדכון אוטומטי</div>
+      </div>
+    </div>
+  </div>
+
+<script>
 let selectedTemplate = 'ecommerce';
 let benefits = [];
 let faqs = [];
