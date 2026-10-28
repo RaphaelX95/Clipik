@@ -54,7 +54,10 @@
     <div class="card" style="max-width:720px;margin:0 auto">
       <!-- Step 1: Product Input -->
       <section class="stage active" id="stageProduct">
-        <input type="hidden" id="productName" value="">
+        <div class="field">
+          <div class="label"><label for="productName">שם המוצר (חובה)</label></div>
+          <input class="input" id="productName" placeholder="למשל: מכשיר ניקוי אלחוטי">
+        </div>
         <div class="field">
           <div class="label"><label for="url">קישור למוצר</label></div>
           <div class="inputrow">
@@ -228,7 +231,7 @@
         || '<span class="thumb">🔗</span>';
       const meta = productUrl ? new URL(productUrl).hostname.replace(/^www\./, "") : "תמונה שהועלתה";
       $("#productNameMeta").innerHTML = escHtml(meta) + "<small>נוסף לפרויקט</small>";
-      $("#productName").value = productNameFromUrl(productUrl) || productName || "";
+      if (!$("#productName").value.trim()) $("#productName").value = productNameFromUrl(productUrl) || productName || "";
     }
 
     $("#addUrl").onclick = () => {
@@ -321,6 +324,7 @@
       const SOLD_RESOLUTIONS = ["720p", "1080p"];
       let problem = "";
       if (!productImages[0]) problem = "כדי ליצור סרטון צריך להעלות תמונה של המוצר";
+      else if (!$("#productName").value.trim()) problem = "כדי ליצור סרטון צריך לכתוב שם למוצר";
       else if (!SOLD_DURATIONS.includes(duration)) problem = "בחרו אורך סרטון מהאפשרויות (5, 10, 15, 20 או 30 שניות)";
       else if (!SOLD_RESOLUTIONS.includes($("#resolution").value)) problem = "בחרו רזולוציה: 720p או 1080p";
       if (problem) {
