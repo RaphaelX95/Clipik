@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css"><script>
-document.querySelectorAll('.buy-btn').forEach(btn => {
+document.addEventListener('DOMContentLoaded', () => document.querySelectorAll('.buy-btn').forEach(btn => {
     btn.onclick = async () => {
         const originalText = btn.textContent;
         const packageId = btn.dataset.package;
@@ -89,7 +89,7 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
             btn.textContent = originalText;
         }
     };
-});
+}));
 
 function switchTab(tab){
   document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
@@ -137,7 +137,7 @@ function generateProductPage(){
 <div style="grid-column:1/-1;padding:16px 24px 0">
   <div class="page-tabs">
     <button class="page-tab active" onclick="switchTab('packages')">🎟️ חבילות טוקנים</button>
-    <button class="page-tab" onclick="switchTab('product')">📦 יצירת דף מוצר</button>
+    <a class="page-tab" href="/product-builder.html">📦 יצירת דף מוצר</a>
   </div>
 </div>
 <aside class="side">
@@ -474,29 +474,6 @@ function generateProductPage(){
         </div>
       </div>
     </div>
-<div id="tab-product" class="page-section">
-  <div class="page-header">
-    <div>
-      <h1 class="gradient-text">📦 יצירת דף מוצר</h1>
-      <p class="page-subtitle">צרו דף מוצר AI מודרני לחנויות שלכם</p>
-    </div>
-  </div>
-  <div class="workspace">
-    <section class="panel editor">
-      <div class="field"><div class="label"><label>שם המוצר</label></div><input class="input" id="productTitle" placeholder="לדוגמה: פלאנר טבעול�יני"></div>
-      <div class="field"><div class="label"><label>מחיר</label></div><input class="input" id="productPrice" placeholder="₪99.90"></div>
-      <div class="field"><div class="label"><label>תיאור קצר</label></div><textarea id="productDesc" rows="3" placeholder="תיאור קצר של המוצר..."></textarea></div>
-      <div class="field"><div class="label"><label>תיאור מלא</label></div><textarea id="productFull" rows="5" placeholder="תיאור מפורט..."></textarea></div>
-      <button class="btn btn-primary" onclick="generateProductPage()">✨ צרו דף מוצר</button>
-    </section>
-    <aside class="panel preview">
-      <div class="prevhead"><span>תצוגה מקדימה</span></div>
-      <div class="prevbody" id="productPreview">
-        <p>תצוגת דף המוצר תופיע כאן</p>
-      </div>
-    </aside>
-  </div>
-</div>
 </main>
 <style>.old-price{font-size:.7em;font-weight:500;opacity:.75;text-decoration:line-through;margin-inline-end:4px}</style>
 <script>
