@@ -598,9 +598,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlparse(self.path).path
-        if path in REDIRECTS:
+        if path in self.REDIRECTS:
             self.send_response(301)
-            self.send_header('Location', REDIRECTS[path])
+            self.send_header("Location", self.REDIRECTS[path])
             self.end_headers()
             return
         if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
