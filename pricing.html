@@ -41,97 +41,158 @@
       <p>משלמים רק על סרטונים שיוצאים. הסרטון הראשון ב-₪9.99, ואחריו בוחרים סרטון בודד או חבילה.</p>
     </header>
 
-    <section class="pr-res" aria-labelledby="res-720">
-      <div class="pr-res-head">
-        <h2 id="res-720">720p</h2>
-        <span class="pr-pill">סטנדרטי</span>
-      </div>
-      <div class="pr-grid">
-        <article class="pr-card">
-          <div class="pr-card-top"><h3>15 שניות</h3></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">6 טוקנים</span></div><span class="pr-price">₪8.80</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">30 טוקנים</span></div><span class="pr-price">₪44.01</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">60 טוקנים</span></div><span class="pr-price">₪88.03</span></div>
-        </article>
-        <article class="pr-card">
-          <div class="pr-card-top"><h3>20 שניות</h3></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">8 טוקנים</span></div><span class="pr-price">₪11.74</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">40 טוקנים</span></div><span class="pr-price">₪58.68</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">80 טוקנים</span></div><span class="pr-price">₪117.37</span></div>
-        </article>
-        <article class="pr-card">
-          <div class="pr-card-top"><h3>30 שניות</h3></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">12 טוקנים</span></div><span class="pr-price">₪17.61</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">60 טוקנים</span></div><span class="pr-price">₪88.03</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">120 טוקנים</span></div><span class="pr-price">₪176.05</span></div>
-        </article>
-      </div>
-    </section>
+    <div class="pr-board">
 
-    <section class="pr-res" aria-labelledby="res-1080">
-      <div class="pr-res-head">
-        <h2 id="res-1080">1080p</h2>
-        <span class="pr-pill">איכות גבוהה</span>
-      </div>
-      <div class="pr-grid">
-        <article class="pr-card">
-          <div class="pr-card-top"><h3>15 שניות</h3></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">9 טוקנים</span></div><span class="pr-price">₪13.20</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">45 טוקנים</span></div><span class="pr-price">₪66.02</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">90 טוקנים</span></div><span class="pr-price">₪132.04</span></div>
-        </article>
-        <article class="pr-card">
-          <div class="pr-card-top"><h3>20 שניות</h3></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">12 טוקנים</span></div><span class="pr-price">₪17.61</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">60 טוקנים</span></div><span class="pr-price">₪88.03</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">120 טוקנים</span></div><span class="pr-price">₪176.05</span></div>
-        </article>
-        <article class="pr-card pr-card-promo">
-          <div class="pr-card-top"><h3>30 שניות</h3><span class="pr-banner">מבצע 15%</span></div>
-          <div class="pr-opt"><div><span class="pr-name">סרטון בודד</span><span class="pr-tok">18 טוקנים</span></div><span class="pr-price">₪22.45</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 5</span><span class="pr-tok">90 טוקנים</span></div><span class="pr-price">₪112.23</span></div>
-          <div class="pr-opt"><div><span class="pr-name">חבילה של 10</span><span class="pr-tok">180 טוקנים</span></div><span class="pr-price">₪224.47</span></div>
-        </article>
-      </div>
-    </section>
+      <section class="pr-group" aria-labelledby="g-720">
+        <div class="pr-group-head">
+          <h2 id="g-720">720p</h2>
+          <span class="pr-pill">סטנדרטי</span>
+        </div>
+        <div class="pr-cols">
+          <article class="pr-col">
+            <h3 class="pr-dur">15 <span>שניות</span></h3>
+            <div class="pr-choices" role="group" aria-label="720p 15 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-15-1" data-label="סרטון בודד" data-price="8.80" data-res="720p" data-dur="15"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪8.80</span><span class="pr-opt-tok">6 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-15-5" data-label="חבילה של 5" data-price="44.01" data-res="720p" data-dur="15"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪44.01</span><span class="pr-opt-tok">30 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-15-10" data-label="חבילה של 10" data-price="88.03" data-res="720p" data-dur="15"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪88.03</span><span class="pr-opt-tok">60 טוקנים</span></button>
+            </div>
+          </article>
+          <article class="pr-col">
+            <h3 class="pr-dur">20 <span>שניות</span></h3>
+            <div class="pr-choices" role="group" aria-label="720p 20 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-20-1" data-label="סרטון בודד" data-price="11.74" data-res="720p" data-dur="20"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪11.74</span><span class="pr-opt-tok">8 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-20-5" data-label="חבילה של 5" data-price="58.68" data-res="720p" data-dur="20"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪58.68</span><span class="pr-opt-tok">40 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-20-10" data-label="חבילה של 10" data-price="117.37" data-res="720p" data-dur="20"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪117.37</span><span class="pr-opt-tok">80 טוקנים</span></button>
+            </div>
+          </article>
+          <article class="pr-col">
+            <h3 class="pr-dur">30 <span>שניות</span></h3>
+            <div class="pr-choices" role="group" aria-label="720p 30 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-30-1" data-label="סרטון בודד" data-price="17.61" data-res="720p" data-dur="30"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪17.61</span><span class="pr-opt-tok">12 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-30-5" data-label="חבילה של 5" data-price="88.03" data-res="720p" data-dur="30"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪88.03</span><span class="pr-opt-tok">60 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="720p-30-10" data-label="חבילה של 10" data-price="176.05" data-res="720p" data-dur="30"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪176.05</span><span class="pr-opt-tok">120 טוקנים</span></button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="pr-group" aria-labelledby="g-1080">
+        <div class="pr-group-head">
+          <h2 id="g-1080">1080p</h2>
+          <span class="pr-pill">איכות גבוהה</span>
+        </div>
+        <div class="pr-cols">
+          <article class="pr-col">
+            <h3 class="pr-dur">15 <span>שניות</span></h3>
+            <div class="pr-choices" role="group" aria-label="1080p 15 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-15-1" data-label="סרטון בודד" data-price="13.20" data-res="1080p" data-dur="15"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪13.20</span><span class="pr-opt-tok">9 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-15-5" data-label="חבילה של 5" data-price="66.02" data-res="1080p" data-dur="15"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪66.02</span><span class="pr-opt-tok">45 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-15-10" data-label="חבילה של 10" data-price="132.04" data-res="1080p" data-dur="15"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪132.04</span><span class="pr-opt-tok">90 טוקנים</span></button>
+            </div>
+          </article>
+          <article class="pr-col">
+            <h3 class="pr-dur">20 <span>שניות</span></h3>
+            <div class="pr-choices" role="group" aria-label="1080p 20 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-20-1" data-label="סרטון בודד" data-price="17.61" data-res="1080p" data-dur="20"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪17.61</span><span class="pr-opt-tok">12 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-20-5" data-label="חבילה של 5" data-price="88.03" data-res="1080p" data-dur="20"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪88.03</span><span class="pr-opt-tok">60 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-20-10" data-label="חבילה של 10" data-price="176.05" data-res="1080p" data-dur="20"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪176.05</span><span class="pr-opt-tok">120 טוקנים</span></button>
+            </div>
+          </article>
+          <article class="pr-col pr-col-promo">
+            <h3 class="pr-dur">30 <span>שניות</span> <span class="pr-promo">מבצע 15%</span></h3>
+            <div class="pr-choices" role="group" aria-label="1080p 30 שניות">
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-30-1" data-label="סרטון בודד" data-price="22.45" data-res="1080p" data-dur="30"><span class="pr-opt-name">סרטון בודד</span><span class="pr-opt-price">₪22.45</span><span class="pr-opt-tok">18 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-30-5" data-label="חבילה של 5" data-price="112.23" data-res="1080p" data-dur="30"><span class="pr-opt-name">חבילה של 5</span><span class="pr-opt-price">₪112.23</span><span class="pr-opt-tok">90 טוקנים</span></button>
+              <button type="button" class="pr-opt" aria-pressed="false" data-pkg="1080p-30-10" data-label="חבילה של 10" data-price="224.47" data-res="1080p" data-dur="30"><span class="pr-opt-name">חבילה של 10</span><span class="pr-opt-price">₪224.47</span><span class="pr-opt-tok">180 טוקנים</span></button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="pr-summary" id="prSummary" role="status" aria-live="polite">
+      <div class="pr-summary-text" id="prSummaryText">בחרו סרטון בודד או חבילה כדי להמשיך</div>
+      <a class="btn btn-primary pr-summary-cta is-disabled" id="prCta" href="/packages.html" aria-disabled="true">המשיכו לרכישה</a>
+    </div>
 
     <p class="pr-fine">טוקן אחד שווה כ-₪1.47. יתרת הטוקנים מתעדכנת אוטומטית אחרי כל רכישה, ואפשר לערבב סוגי סרטונים באותה יתרה.</p>
-
-    <div class="pr-cta">
-      <a class="btn btn-primary btn-large" href="/packages.html">רכשו טוקנים</a>
-      <a class="btn btn-secondary btn-large" href="/faq.html">שאלות נפוצות</a>
-    </div>
   </div>
 </main>
 
 <style>
-.pr-page{max-width:1040px;padding:8px 0 56px}
+.pr-page{max-width:1120px;padding:8px 0 56px}
 .pr-head h1{font-family:var(--display);font-size:clamp(36px,5vw,52px);font-weight:600;line-height:1.1;margin:0}
 .pr-head p{color:var(--muted);margin:12px 0 0;font-size:17px;max-width:640px;line-height:1.6}
 
-.pr-res{margin-top:44px}
-.pr-res-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line)}
-.pr-res-head h2{font-family:var(--display);font-size:30px;font-weight:600;margin:0;line-height:1}
-.pr-pill{font-size:13px;font-weight:700;color:var(--muted);background:var(--surface-2,#f4f5f7);border:1px solid var(--line);padding:5px 12px;border-radius:999px}
+.pr-board{display:flex;flex-direction:column;gap:44px;margin-top:40px}
+.pr-group-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.pr-group-head h2{font-family:var(--display);font-size:30px;font-weight:600;margin:0;line-height:1}
+.pr-pill{font-size:13px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);padding:5px 12px;border-radius:999px}
+.pr-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 
-.pr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.pr-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 1px 2px rgba(20,22,26,.04);display:flex;flex-direction:column}
-.pr-card-top{padding:22px 22px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pr-card-top h3{font-size:24px;font-weight:800;margin:0;color:var(--ink);line-height:1.2}
+.pr-col{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 1px 2px rgba(20,22,26,.04);display:flex;flex-direction:column;gap:12px}
+.pr-col-promo{border:2px solid var(--accent-2)}
+.pr-dur{font-size:22px;font-weight:800;margin:0 0 4px;color:var(--ink);line-height:1.2;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pr-dur span{font-size:15px;font-weight:600;color:var(--muted)}
+.pr-promo{background:var(--accent-2);color:#fff !important;font-size:13px !important;font-weight:800 !important;padding:4px 10px;border-radius:999px;margin-inline-start:auto}
 
-.pr-opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 22px;border-top:1px solid var(--line)}
-.pr-name{display:block;font-size:17px;font-weight:700;color:var(--ink);line-height:1.3}
-.pr-tok{display:block;font-size:13px;color:var(--muted);margin-top:3px}
-.pr-price{font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
-.pr-opt:last-child{padding-bottom:24px}
+.pr-choices{display:flex;flex-direction:column;gap:10px}
+.pr-opt{appearance:none;display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:start;cursor:pointer;font:inherit;color:var(--ink);background:var(--surface-2,#f7f8fa);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;transition:border-color .15s ease,background-color .15s ease,transform .15s ease}
+.pr-opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.pr-opt:active{transform:translateY(0)}
+.pr-opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.pr-opt-name{font-size:15px;font-weight:700;color:var(--ink)}
+.pr-opt-price{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink);line-height:1.2}
+.pr-opt-tok{font-size:12px;color:var(--muted)}
+.pr-opt[aria-pressed="true"]{border:2px solid var(--accent-2);background:var(--accent-soft);padding:13.5px 15.5px}
 
-.pr-card-promo{border:2px solid var(--accent-2)}
-.pr-banner{background:var(--accent-2);color:#fff;font-size:15px;font-weight:800;padding:6px 14px;border-radius:999px;white-space:nowrap}
+.pr-summary{position:sticky;bottom:16px;margin-top:36px;background:var(--ink);color:#fff;border-radius:18px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 12px 30px rgba(20,22,26,.25)}
+.pr-summary-text{font-size:16px;font-weight:600}
+.pr-summary-cta.is-disabled{opacity:.45;pointer-events:none}
+.pr-fine{color:var(--muted);font-size:13px;margin-top:20px;line-height:1.6}
 
-.pr-fine{color:var(--muted);font-size:13px;margin-top:32px;line-height:1.6}
-.pr-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
-
-@media (max-width:900px){.pr-grid{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .pr-cols{grid-template-columns:1fr}
+}
 </style>
+
+<script>
+(function () {
+  var cta = document.getElementById('prCta');
+  var text = document.getElementById('prSummaryText');
+  var buttons = document.querySelectorAll('.pr-opt');
+  var KEY = 'clipik_selected_package';
+
+  function show(btn) {
+    var res = btn.dataset.res, dur = btn.dataset.dur, label = btn.dataset.label, price = btn.dataset.price;
+    text.textContent = 'נבחר: ' + res + ' · ' + dur + ' שניות · ' + label + ' · ₪' + price;
+    cta.classList.remove('is-disabled');
+    cta.removeAttribute('aria-disabled');
+  }
+
+  function select(btn) {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+    show(btn);
+    try { sessionStorage.setItem(KEY, btn.dataset.pkg); } catch (e) { /* אין אחסון זמין */ }
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () { select(btn); });
+  });
+
+  // שחזור בחירה קודמת באותו דפדפן
+  try {
+    var saved = sessionStorage.getItem(KEY);
+    if (saved) {
+      var match = document.querySelector('.pr-opt[data-pkg="' + saved + '"]');
+      if (match) select(match);
+    }
+  } catch (e) { /* אם האחסון לא זמין, אין שחזור */ }
+
+  cta.addEventListener('click', function (e) {
+    if (cta.getAttribute('aria-disabled') === 'true') e.preventDefault();
+  });
+})();
+</script>
 </body>
 </html>
