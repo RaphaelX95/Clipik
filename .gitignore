@@ -26,3 +26,8 @@ server.log
 Thumbs.db
 .DS_Store
 temp_uploads/
+users.json
+transactions.json
+pending_payments.json
+projects.json
+product_pages.json
