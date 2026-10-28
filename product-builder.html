@@ -291,5 +291,20 @@ renderPreview();
     <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
   </div>
 </footer>
+<script>
+(function () {
+  var cta = document.querySelector('.sidebar-login-cta');
+  if (!cta) return;
+  var box = document.createElement('div');
+  box.id = 'sidebar-balance';
+  box.style.cssText = 'text-align:center;margin:-8px 16px 18px;font-size:15px;font-weight:700;color:#444';
+  box.textContent = 'טוקנים: 0';
+  cta.insertAdjacentElement('afterend', box);
+  fetch('/api/users/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); })
+    .catch(function () {});
+})();
+</script>
 </body>
 </html>
