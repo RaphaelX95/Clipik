@@ -516,6 +516,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(503, {"error": "שליחת הקוד נכשלה. נסו שוב מאוחר יותר."})
             _OTP_STORE[email] = {"hash": _otp_hash(email, code), "exp": now + _OTP_TTL,
                                  "tries": 0, "sent_at": now}
+            print(f"[otp] request: code stored for {email} (store size={len(_OTP_STORE)})", flush=True)
         return self.send_json(200, {"sent": True})
 
     def _email_verify_code(self):
@@ -530,12 +531,18 @@ class Handler(BaseHTTPRequestHandler):
         invalid = {"error": "הקוד לא תקין או שפג תוקפו. בקשו קוד חדש."}
         with _OTP_LOCK:
             entry = _OTP_STORE.get(email)
-            if not entry or time.time() > entry["exp"] or entry["tries"] >= _OTP_MAX_TRIES:
+            if not entry:
+                print(f"[otp] verify: no code stored for {email} (store size={len(_OTP_STORE)})", flush=True)
+                return self.send_json(400, invalid)
+            if time.time() > entry["exp"] or entry["tries"] >= _OTP_MAX_TRIES:
+                print(f"[otp] verify: expired or too many tries for {email} (tries={entry['tries']})", flush=True)
                 _OTP_STORE.pop(email, None)
                 return self.send_json(400, invalid)
             entry["tries"] += 1
             if not hmac.compare_digest(entry["hash"], _otp_hash(email, code)):
+                print(f"[otp] verify: code mismatch for {email} (try {entry['tries']}, code length {len(code)})", flush=True)
                 return self.send_json(400, invalid)
+            print(f"[otp] verify: ok for {email}", flush=True)
             _OTP_STORE.pop(email, None)
         uid = f"email:{email}"
         _ensure_user(uid, email)
