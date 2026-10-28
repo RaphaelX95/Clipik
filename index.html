@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>קליפיק | יוצרים סרטוני AI למוצרים - UGC ויראלי</title>
+  <title>קליפיק - יוצרים סרטוני AI למוצרים</title>
   <meta name="description" content="יצירת סרטונים ויראליים למוצרים באמצעות AI. סרטון ראשון במבצע 9.99 ש״ח!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,28 +11,28 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="header">
-    <div class="header-inner">
-      <a href="/" class="logo">
-        <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
-        Clipik
-      </a>
-      <nav class="nav desktop">
-        <a href="/templates.html">תבניות</a>
-        <a href="/create.html">צור סרטון</a>
-        <a href="/my-videos.html">הסרטונים שלי</a>
-        <a href="/pricing.html">מחירון</a>
-        <a href="/examples.html">דוגמאות</a>
-        <a href="/faq.html">שאלות נפוצות</a>
-        <a href="/contact.html">צור קשר</a>
-      </nav>
-      <div class="header-actions">
-        <a href="/login.html"><button class="btn btn-secondary">התחברות</button></a>
-        <a href="/create.html"><button class="btn btn-primary">התחל עכשיו</button></a>
-      </div>
-    </div>
-  </header>
-  <main>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+    קליפיק
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">עריכה</div>
+    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
+    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <div class="sidebar-section">ניווט</div>
+    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
+    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">🌟</span>דוגמאות</a>
+    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
+    <a href="/contact.html" class="sidebar-link"><span class="sidebar-icon">📧</span>צור קשר</a>
+    <a href="/login.html" class="sidebar-link"><span class="sidebar-icon">👤</span>התחברות</a>
+  </nav>
+  <div class="sidebar-footer">© 2026 קליפיק</div>
+</aside>
+  
+  <main class="main-content">
     <section class="hero">
       <div class="container">
         <span class="badge">AI Video Generator</span>

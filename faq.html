@@ -14,27 +14,27 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<header class="header">
-  <div class="header-inner">
-    <a href="/" class="logo">
-      <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
-      Clipik
-    </a>
-    <nav class="nav desktop">
-      <a href="/templates.html">תבניות</a>
-      <a href="/create.html">צור סרטון</a>
-      <a href="/my-videos.html">הסרטונים שלי</a>
-      <a href="/pricing.html">מחירון</a>
-      <a href="/examples.html">דוגמאות</a>
-      <a href="/faq.html">שאלות נפוצות</a>
-      <a href="/contact.html">צור קשר</a>
-    </nav>
-    <div class="header-actions">
-      <a href="/login.html"><button class="btn btn-secondary">התחברות</button></a>
-      <a href="/create.html"><button class="btn btn-primary">התחל עכשיו</button></a>
-    </div>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs></svg>
+    קליפיק
   </div>
-</header>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">עריכה</div>
+    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
+    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <div class="sidebar-section">ניווט</div>
+    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
+    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">🌟</span>דוגמאות</a>
+    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
+    <a href="/contact.html" class="sidebar-link"><span class="sidebar-icon">📧</span>צור קשר</a>
+    <a href="/login.html" class="sidebar-link"><span class="sidebar-icon">👤</span>התחברות</a>
+  </nav>
+  <div class="sidebar-footer">© 2026 קליפיק</div>
+</aside>
+
 <div class="layout">
 <div style="grid-column:1/-1;padding:16px 24px 0">
   <div class="page-header">
@@ -54,15 +54,15 @@
   <nav class="nav">
     <div class="nav-title">ניווט</div>
     <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
-    <button onclick="window.location.href='/create.html'"><span class="ico">✨</span> יצירת סרטון</button>
-    <button onclick="window.location.href='/packages.html'"><span class="ico">🎟️</span> חבילות טוקנים</button>
+    <button onclick="window.location.href='/'"><span class="ico">✨</span> יצירת סרטון</button>
+    <button onclick="window.location.href='/pricing.html'"><span class="ico">🎟️</span> חבילות טוקנים</button>
     <button onclick="window.location.href='/examples.html'"><span class="ico">🎬</span> דוגמאות</button>
     <button class="active"><span class="ico">❓</span> שאלות נפוצות</button>
     <div class="nav-title">תמיכה</div>
     <button onclick="window.location.href='/contact.html'"><span class="ico">📧</span> צור קשר</button>
   </nav>
 </aside>
-<main class="main">
+<main class="main-content" class="main">
 <div class="faq-category">
   <h2 class="section-title">🌟 כללי</h2>
   <details>

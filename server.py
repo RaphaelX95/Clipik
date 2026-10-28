@@ -369,7 +369,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         body = b''
         if path in ('/', '/index.html', '/home.html'):
-            body = (ROOT / 'index.html').read_bytes()
+            body = (ROOT / 'create.html').read_bytes()
         elif path == '/create.html':
             body = (ROOT / 'create.html').read_bytes()
         elif path == '/templates.html':
@@ -494,6 +494,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "login.html").read_bytes()
         if path == "/create.html":
             body = (ROOT / "create.html").read_bytes()
+        if path == "/index.html":
+            body = (ROOT / "index.html").read_bytes()
         if path == "/google7cfae0c73b4d1768.html":
             body = (ROOT / "google7cfae0c73b4d1768.html").read_bytes()
         if path == "/logo.svg":
