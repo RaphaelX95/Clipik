@@ -55,6 +55,7 @@ def quote(resolution: str, duration: int, count: int) -> dict:
     cost_ils = cost_usd * _uni.USD_TO_ILS
     discount = PROMOS.get((resolution, duration), Decimal("0"))
     pack_discount = PACK_DISCOUNTS[count]
+    list_price = _money(cost_ils * MARKUP * (Decimal("1") - discount))
     price = _money(cost_ils * MARKUP * (Decimal("1") - discount) * (Decimal("1") - pack_discount))
     return {
         "package_id": package_id(resolution, duration, count),
@@ -66,6 +67,7 @@ def quote(resolution: str, duration: int, count: int) -> dict:
         "cost_ils": _money(cost_ils),
         "promo_discount": discount,
         "pack_discount": pack_discount,
+        "list_price_ils": list_price,
     }
 
 
