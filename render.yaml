@@ -12,3 +12,7 @@ services:
         sync: false
       - key: BASE_URL
         value: https://clipik.pro
+    disk:
+      name: data
+      mountPath: /opt/render/project/src
+      sizeGB: 1
