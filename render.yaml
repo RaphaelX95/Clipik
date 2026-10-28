@@ -2,7 +2,7 @@ services:
   - type: web
     name: clipik
     runtime: python
-    plan: free
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
     envVars:
@@ -10,9 +10,11 @@ services:
         value: 10000
       - key: FAL_KEY
         sync: false
+      - key: DATA_DIR
+        value: /opt/render/project/data
       - key: BASE_URL
         value: https://clipik.pro
     disk:
       name: data
-      mountPath: /opt/render/project/src
+      mountPath: /opt/render/project/data
       sizeGB: 1
