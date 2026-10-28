@@ -396,6 +396,24 @@ function generateProductPage(){
   </div>
 </div>
 </main>
+<script>
+// אם הלקוח בחר חבילה במחירון, מסמנים אותה כאן ומגללים אליה
+(function () {
+  try {
+    var id = sessionStorage.getItem('clipik_selected_package');
+    if (!id) return;
+    var btn = document.querySelector('.buy-btn[data-package="' + id + '"]');
+    if (!btn) return;
+    var row = btn.closest('.feature');
+    var card = btn.closest('.package-card');
+    if (row) {
+      row.style.outline = '2px solid var(--accent-2)';
+      row.style.borderRadius = '12px';
+    }
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) { /* אם האחסון לא זמין, הדף נשאר כרגיל */ }
+})();
+</script>
   </div>
 <footer class="footer">
   <div class="container">
