@@ -782,9 +782,11 @@ class Handler(BaseHTTPRequestHandler):
         if not _check_rate_limit(ip):
             self.send_json(429, {"error": "Too many requests"})
             return
-        if not self._verify_csrf():
-            return self.send_json(403, {"error": "CSRF check failed"})
         path = urlparse(self.path).path
+        # ה-IPN של iCount נשלח כטופס (form-urlencoded) משרת לשרת, ולכן לא עובר את בדיקת ה-JSON.
+        # הוא מאומת בשרת מול iCount לפני זיכוי טוקנים.
+        if path != "/api/icount/ipn" and not self._verify_csrf():
+            return self.send_json(403, {"error": "CSRF check failed"})
         if path == "/api/auth/email/request":
             return self._email_request_code()
         if path == "/api/auth/email/verify":
