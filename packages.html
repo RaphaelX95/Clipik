@@ -89,28 +89,46 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
         }
     };
 });
+
+function switchTab(tab){
+  document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+function generateProductPage(){
+  alert('יצירת דף מוצר -PISC כאן');
+}
+
 </script>
 </head>
 <body>
-  <div class="layout">
-    <aside class="side">
-      <div class="brand">
-        <div class="brand-logo">
-          <img src="/logo-source.jpg" alt="קליפיק" width="32" height="32">
-        </div>
-        <div class="brand-name">קליפיק</div>
-      </div>
-      <nav class="nav">
-        <div class="nav-title">עריכה</div>
-        <button onclick="window.location.href='/'"><span class="ico">✨</span> יצירת סרטון</button>
-        <button onclick="window.location.href='/templates.html'"><span class="ico">📋</span> תבניות מוכנות</button>
-        <button class="active"><span class="ico">🎟️</span> חבילות טוקנים</button>
-        <div class="nav-title">ניהול</div>
-        <button onclick="window.location.href='/analytics.html'"><span class="ico">📊</span> אנליטיקס</button>
-        <button onclick="window.location.href='/product-page.html'"><span class="ico">📦</span> ניהול מוצרים</button>
-      </nav>
-    </aside>
-    <main class="main">
+<div class="layout">
+<div style="grid-column:1/-1;padding:16px 24px 0">
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="switchTab('packages')">🎟️ חבילות טוקנים</button>
+    <button class="page-tab" onclick="switchTab('product')">📦 יצירת דף מוצר</button>
+    <button class="page-tab" onclick="switchTab('analytics')">📊 אנליטיקס</button>
+  </div>
+</div>
+<aside class="side">
+  <div class="brand">
+    <div class="brand-logo">
+      <img src="/logo-source.jpg" alt="קליפיק" width="32" height="32">
+    </div>
+    <div class="brand-name">קליפיק</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-title">עריכה</div>
+    <button onclick="window.location.href='/create.html'"><span class="ico">✨</span> יצירת סרטון</button>
+    <button onclick="window.location.href='/create.html'"><span class="ico">📋</span> תבניות</button>
+    <button class="active"><span class="ico">🎟️</span> חבילות וניהול</button>
+    <div class="nav-title">ניווט</div>
+    <button onclick="window.location.href='/'"><span class="ico">🏠</span> דף הבית</button>
+  </nav>
+</aside>
+<main class="main">
+<div id="tab-packages" class="page-section active scroll-section">
       <div class="page-header">
         <div>
           <h1 class="gradient-text">🎟️ חבילות טוקנים</h1>
@@ -209,7 +227,64 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
           </div>
         </div>
       </div>
-    </main>
+    </div>
+<div id="tab-product" class="page-section">
+  <div class="page-header">
+    <div>
+      <h1 class="gradient-text">📦 יצירת דף מוצר</h1>
+      <p class="page-subtitle">צרו דף מוצר AI מודרני לחנויות שלכם</p>
+    </div>
+  </div>
+  <div class="workspace">
+    <section class="panel editor">
+      <div class="field"><div class="label"><label>שם המוצר</label></div><input class="input" id="productTitle" placeholder="לדוגמה: פלאנר טבעול�יני"></div>
+      <div class="field"><div class="label"><label>מחיר</label></div><input class="input" id="productPrice" placeholder="₪99.90"></div>
+      <div class="field"><div class="label"><label>תיאור קצר</label></div><textarea id="productDesc" rows="3" placeholder="תיאור קצר של המוצר..."></textarea></div>
+      <div class="field"><div class="label"><label>תיאור מלא</label></div><textarea id="productFull" rows="5" placeholder="תיאור מפורט..."></textarea></div>
+      <button class="btn btn-primary" onclick="generateProductPage()">✨ צרו דף מוצר</button>
+    </section>
+    <aside class="panel preview">
+      <div class="prevhead"><span>תצוגה מקדימה</span></div>
+      <div class="prevbody" id="productPreview">
+        <p>תצוגת דף המוצר תופיע כאן</p>
+      </div>
+    </aside>
+  </div>
+</div>
+<div id="tab-analytics" class="page-section">
+  <div class="page-header">
+    <div>
+      <h1 class="gradient-text">📊 אנליטיקס</h1>
+      <p class="page-subtitle">מעקב אחר ביצועי הסרטונים והמרות</p>
+    </div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-card ai-glow">
+      <div class="analytics-icon">👁️</div>
+      <div class="analytics-value">1,234</div>
+      <div class="analytics-label">צפיות סה"כ</div>
+    </div>
+    <div class="analytics-card ai-glow">
+      <div class="analytics-icon">🎬</div>
+      <div class="analytics-value">45</div>
+      <div class="analytics-label">סרטונים שנוצרו</div>
+    </div>
+    <div class="analytics-card ai-glow">
+      <div class="analytics-icon">💰</div>
+      <div class="analytics-value">₪2,340</div>
+      <div class="analytics-label">הכנסה מהמרות</div>
+    </div>
+    <div class="analytics-card ai-glow">
+      <div class="analytics-icon">📈</div>
+      <div class="analytics-value">12.5%</div>
+      <div class="analytics-label">שיעור המרה</div>
+    </div>
+  </div>
+  <div class="recent-activity">
+    <h3 class="gradient-text">פעילות אחרונה</h3>
+    <div class="activity-list" id="activityList"></div>
+  </div>
+</div></main>
   </div>
 </body>
 </html>

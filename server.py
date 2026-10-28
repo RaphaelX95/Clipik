@@ -350,9 +350,20 @@ class Handler(BaseHTTPRequestHandler):
         write_projects(items[:100])
         return self.send_json(201, {"project": project, "video_url": video_url, "tokens_remaining": new_tokens if user else 0, "tokens_spent": tokens_required})
 
+REDIRECTS = {
+    '/templates.html': '/create.html',
+    '/tips.html': '/create.html',
+    '/product-page.html': '/packages.html',
+    '/analytics.html': '/packages.html',
+}
     def do_HEAD(self):
         path = urlparse(self.path).path
-        if path not in ('/', '/index.html', '/packages.html', '/tips.html', '/templates.html', '/create.html', '/product-page.html', '/analytics.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css'):
+        if path in REDIRECTS:
+            self.send_response(301)
+            self.send_header('Location', REDIRECTS[path])
+            self.end_headers()
+            return
+        if path not in ('/', '/index.html', '/create.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css'):
             self.send_error(404, 'Not found')
             return
         body = b''
