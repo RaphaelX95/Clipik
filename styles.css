@@ -101,6 +101,8 @@ a:hover{color:var(--accent-2);text-decoration:underline}
 
 /* Forms */
 .field{margin-top:16px}
+.stage{display:none}
+.stage.active{display:block}
 .label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-weight:700;font-size:14px}
 .input,.select,.textarea{
   width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;
