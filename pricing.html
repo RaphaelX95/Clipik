@@ -230,32 +230,83 @@
     }
   } catch (e) { /* אם האחסון לא זמין, אין שחזור */ }
 
+
+  function email0() {
+    try { return localStorage.getItem('clipic_email') || ''; } catch (e) { return ''; }
+  }
+
+  function ensureLogin(knownEmail) {
+    return fetch('/api/users/me', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && d.user) return true;
+        return showLoginModal(knownEmail);
+      })
+      .catch(function () { return showLoginModal(knownEmail); });
+  }
+
+  function showLoginModal(prefill) {
+    return new Promise(function (resolve) {
+      var wrap = document.getElementById('loginPop');
+      var step1 = document.getElementById('lpStep1');
+      var step2 = document.getElementById('lpStep2');
+      var emailIn = document.getElementById('lpEmail');
+      var codeIn = document.getElementById('lpCode');
+      var msg = document.getElementById('lpMsg');
+      var sentTo = '';
+      emailIn.value = prefill || '';
+      codeIn.value = '';
+      msg.textContent = '';
+      step1.style.display = 'block'; step2.style.display = 'none';
+      document.getElementById('lpSend').style.display = 'inline-block';
+      var vb = document.getElementById('lpVerify'); vb.style.display = 'none'; vb.textContent = 'אישור והמשך';
+      wrap.style.display = 'flex';
+
+      function close(ok) { wrap.style.display = 'none'; resolve(ok); }
+      function post(url, body) {
+        return fetch(url, { method: 'POST', credentials: 'same-origin',
+          headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; }); });
+      }
+
+      document.getElementById('lpCancel').onclick = function () { close(false); };
+      document.getElementById('lpSend').onclick = function () {
+        var em = emailIn.value.trim();
+        if (!em || em.indexOf('@') < 0) { msg.textContent = 'נא להכניס אימייל תקין'; return; }
+        msg.textContent = 'שולחים קוד...';
+        post('/api/auth/email/request', { email: em }).then(function (res) {
+          if (!res.ok) { msg.textContent = res.d.error || 'שליחת הקוד נכשלה'; return; }
+          sentTo = em;
+          document.getElementById('lpTo').textContent = em;
+          step1.style.display = 'none'; step2.style.display = 'block';
+          document.getElementById('lpSend').style.display = 'none';
+          var vb2 = document.getElementById('lpVerify'); vb2.style.display = 'inline-block'; vb2.textContent = 'אישור והמשך';
+          msg.textContent = 'הקוד נשלח לאימייל שלכם';
+          codeIn.focus();
+        });
+      };
+      document.getElementById('lpVerify').onclick = function () {
+        var code = codeIn.value.trim();
+        if (!code) { msg.textContent = 'נא להכניס את הקוד'; return; }
+        post('/api/auth/email/verify', { email: sentTo, code: code }).then(function (res) {
+          if (!res.ok) { msg.textContent = res.d.error || 'הקוד לא תקין'; return; }
+          try { localStorage.setItem('clipic_email', sentTo); } catch (e) {}
+          close(true);
+        });
+      };
+    });
+  }
+
   cta.addEventListener('click', async function (e) {
     e.preventDefault();
     if (cta.getAttribute('aria-disabled') === 'true') return;
     var sel = document.querySelector('.pr-opt[aria-pressed="true"]');
     if (!sel) return;
     var pkg = sel.dataset.pkg, amount = parseFloat(sel.dataset.price || '0');
-    // לא מחוברים: שומרים את הבחירה, שולחים להתחברות, וחוזרים לכאן
-    try {
-      var me = await fetch('/api/users/me', { credentials: 'same-origin' });
-      var md = me.ok ? await me.json() : null;
-      if (!md || !md.user) {
-        sessionStorage.setItem('clipik_after_login', '/pricing.html');
-        window.location.href = '/login.html';
-        return;
-      }
-    } catch (err) { /* ממשיכים לנסות את התשלום */ }
+    var loggedIn = await ensureLogin(email0());
+    if (!loggedIn) return;
     var label = cta.textContent;
-    var email = '';
-    try { email = localStorage.getItem('clipic_email') || ''; } catch (err) { /* אין אחסון */ }
-    if (!email) {
-      email = prompt('הכניסו כתובת אימייל לקבל קבלה ולעדכן טוקנים:\n(האימייל יישמר עבור קניות עתידיות)');
-      if (email === null) return;
-      email = email.trim();
-      if (!email || email.indexOf('@') < 0) { alert('נא להכניס כתובת אימייל תקינה'); return; }
-      try { localStorage.setItem('clipic_email', email); } catch (err) { /* אין אחסון */ }
-    }
+    var email = email0();
     cta.textContent = 'מעביר לתשלום...';
     cta.classList.add('is-disabled');
     try {
@@ -290,5 +341,25 @@
     .catch(function () {});
 })();
 </script>
+
+<div id="loginPop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;color:#1d1d2b;max-width:380px;width:100%;border-radius:16px;padding:24px;direction:rtl;font-family:Arial,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.3)">
+    <h3 style="margin:0 0 8px;font-size:20px">כדי לרכוש צריך להתחבר</h3>
+    <div id="lpStep1">
+      <p style="margin:0 0 12px;font-size:15px">הכניסו את האימייל שלכם ונשלח קוד התחברות:</p>
+      <input id="lpEmail" type="email" placeholder="you@example.com" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:16px">
+    </div>
+    <div id="lpStep2" style="display:none">
+      <p style="margin:0 0 12px;font-size:15px">שלחנו קוד ל-<strong id="lpTo"></strong>. הכניסו אותו כאן:</p>
+      <input id="lpCode" inputmode="numeric" placeholder="קוד" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:16px;letter-spacing:4px;text-align:center">
+    </div>
+    <p id="lpMsg" style="min-height:20px;margin:10px 0;font-size:14px;color:#c0392b"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-start;margin-top:8px">
+      <button id="lpSend" type="button" class="btn btn-primary" style="display:inline-block">שליחת קוד</button>
+      <button id="lpVerify" type="button" class="btn btn-primary" style="display:none"></button>
+      <button id="lpCancel" type="button" style="background:none;border:none;color:#666;cursor:pointer;font-size:15px">ביטול</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
