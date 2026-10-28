@@ -845,3 +845,7 @@ button:disabled{cursor:not-allowed}
 /* תפריט צד ישן שנשאר בחלק מהעמודים: מוסתר, כי הסיידבר החדש הוא היחיד */
 aside.side{display:none !important}
 .main-content .container{padding:0 !important}
+
+/* בוררי מקטעים: מתפצלים בשורות כשיש הרבה אפשרויות (שפה, פורמט, אורך) */
+.segmented{display:flex;flex-wrap:wrap;gap:4px}
+.segmented .seg{flex:1 1 auto;min-width:72px}
