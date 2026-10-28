@@ -14,7 +14,7 @@ from decimal import ROUND_HALF_UP, Decimal
 import unifically_provider as _uni
 
 MARKUP = Decimal("1.5")
-VIDEO_COUNTS = (1, 5, 10, 15, 20)
+VIDEO_COUNTS = (1,)
 VIDEO_TYPES = (("720p", 15), ("1080p", 15), ("720p", 20), ("1080p", 20), ("720p", 30), ("1080p", 30))
 
 # מבצעים לפי סוג סרטון: אחוז הנחה מהמחיר הרגיל
