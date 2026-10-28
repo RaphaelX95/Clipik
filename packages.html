@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>חבילות טוקנים - קליפיק | מחירון סרטוני AI</title>
-<meta name="description" content="סרטון ראשון במבצע 9.99 ש״ח. חבילות 3/5/10 סרטונים, סטארטאפ, סטנדרט, פרימיום ואולטרה.">
+<meta name="description" content="חבילות טוקנים ליצירת סרטוני מוצר עם AI, לפי אורך הסרטון וכמות הסרטונים.">
 <meta name="keywords" content="חבילות טוקנים, מחירון, סרטוני מוצרים, UGC, AI, בינה מלאכותית, קליפיק, Shopify, טיקטוק, רילס">
 <link rel="canonical" href="/packages.html">
 <meta property="og:title" content="חבילות טוקנים - קליפיק">
-<meta property="og:description" content="חבילות טוקנים ליצירת סרטוני AI. סרטון ראשון במבצע 9.99 ש״ח!">
+<meta property="og:description" content="חבילות טוקנים ליצירת סרטוני מוצר עם AI.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="/packages.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
                 });
                 const d = await r.json();
                 if (d.ok) {
-                    alert('סרטון ראשון במבצע 9.99 ש״ח! ' + (d.tokens_added || 6) + ' טוקנים הופעלו.');
+                    alert((d.tokens_added || 6) + ' טוקנים הופעלו.');
                     btn.textContent = 'הופעל ✓';
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
@@ -152,16 +152,7 @@ function generateProductPage(){
       <div class="page-header">
         <div>
           <h1 class="gradient-text">🎟️ חבילות טוקנים</h1>
-          <p class="page-subtitle">סרטון ראשון במבצע 9.99 ש"ח — 15 שניות!</p>
-        </div>
-      </div>
-
-      <div class="trial-banner ai-glow">
-        <div class="trial-content">
-          <div class="trial-badge">🎁 מבצע מיוחד</div>
-          <h2 class="gradient-text">סרטון ראשון ב-9.99 ש"ח</h2>
-          <p class="trial-desc">6 טוקנים · עד 15 שניות · ללא התחייבות</p>
-          <button class="btn btn-large btn-primary buy-btn" data-package="trial" data-amount="9.99">התחילו עכשיו</button>
+          <p class="page-subtitle">בוחרים חבילה לפי אורך הסרטון וכמות הסרטונים.</p>
         </div>
       </div>
 
