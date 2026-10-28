@@ -11,8 +11,8 @@ class TokenPackagesTest(unittest.TestCase):
         self.assertEqual(q["price_ils"], Decimal("8.80"))
 
     def test_promo_applies_to_1080p_30s_only(self):
-        self.assertEqual(tp.quote("1080p", 30, 5)["price_ils"], Decimal("112.23"))
-        self.assertEqual(tp.quote("1080p", 30, 20)["price_ils"], Decimal("448.94"))
+        self.assertEqual(tp.quote("1080p", 30, 5)["price_ils"], Decimal("106.62"))
+        self.assertEqual(tp.quote("1080p", 30, 20)["price_ils"], Decimal("381.60"))
         self.assertEqual(tp.quote("720p", 30, 5)["promo_discount"], Decimal("0"))
 
     def test_pack_tokens_scale_with_count(self):

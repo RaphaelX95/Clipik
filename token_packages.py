@@ -20,6 +20,15 @@ VIDEO_TYPES = (("720p", 15), ("1080p", 15), ("720p", 20), ("1080p", 20), ("720p"
 # מבצעים לפי סוג סרטון: אחוז הנחה מהמחיר הרגיל
 PROMOS = {("1080p", 30): Decimal("0.15")}
 
+# הנחה לפי כמות בחבילה (מוכפלת עם מבצע הסוג אם יש). סרטון בודד ללא הנחה.
+PACK_DISCOUNTS = {
+    1: Decimal("0"),
+    5: Decimal("0.05"),
+    10: Decimal("0.10"),
+    15: Decimal("0.12"),
+    20: Decimal("0.15"),
+}
+
 TRIAL_PACKAGE_ID = "trial"
 TRIAL_TOKENS = 6
 TRIAL_PRICE = Decimal("9.99")
@@ -45,7 +54,8 @@ def quote(resolution: str, duration: int, count: int) -> dict:
     cost_usd = _uni.RATE_PER_SECOND_USD[resolution] * duration * count
     cost_ils = cost_usd * _uni.USD_TO_ILS
     discount = PROMOS.get((resolution, duration), Decimal("0"))
-    price = _money(cost_ils * MARKUP * (Decimal("1") - discount))
+    pack_discount = PACK_DISCOUNTS[count]
+    price = _money(cost_ils * MARKUP * (Decimal("1") - discount) * (Decimal("1") - pack_discount))
     return {
         "package_id": package_id(resolution, duration, count),
         "resolution": resolution,
@@ -55,6 +65,7 @@ def quote(resolution: str, duration: int, count: int) -> dict:
         "price_ils": price,
         "cost_ils": _money(cost_ils),
         "promo_discount": discount,
+        "pack_discount": pack_discount,
     }
 
 
