@@ -32,4 +32,4 @@ async function saveDraft(){const product=$('#productName').childNodes[0].textCon
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 updateTokenCost(Number($('#duration').value));
 window.openProjects=async function(){const box=$('#projectList');box.innerHTML='<p>טוענים טיוטות…</p>';$('#projectsDialog').showModal();try{const r=await fetch('/api/projects');if(!r.ok)throw new Error('load failed');const d=await r.json();if(!d.projects.length){box.innerHTML='<p>אין עדיין טיוטות שמורות.<br>צרו סרטון ושמרו אותו כאן.</p>';return}box.innerHTML=d.projects.map(p=>'<article><strong>'+esc(p.product)+'</strong><small>'+esc(p.style)+' · '+esc(p.platform)+' · '+(p.duration||15)+' שניות · '+new Date(p.created_at).toLocaleDateString('he-IL')+'</small><p>'+esc(p.script.slice(0,160))+'</p></article>').join('')}catch(e){box.innerHTML='<p>אין חיבור לשרת המקומי.</p>'}};
-window.showPackages=function(){window.location.href='/packages.html'};$('#closePackages')
+window.showPackages=function(){window.location.href='/pricing.html'};$('#closePackages')

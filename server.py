@@ -441,8 +441,9 @@ class Handler(BaseHTTPRequestHandler):
     REDIRECTS = {
         '/templates.html': '/create.html',
         '/tips.html': '/create.html',
-        '/product-page.html': '/packages.html',
-        '/analytics.html': '/packages.html',
+        '/product-page.html': '/pricing.html',
+        '/packages.html': '/pricing.html',
+        '/analytics.html': '/pricing.html',
     }
 
     def _cookie(self, name):
@@ -549,7 +550,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Location', REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/packages.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -571,8 +572,6 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'faq.html').read_bytes()
         elif path == '/login.html':
             body = (ROOT / 'login.html').read_bytes()
-        elif path == '/packages.html':
-            body = (ROOT / 'packages.html').read_bytes()
         elif path == '/payment_success.html':
             body = (ROOT / 'payment_success.html').read_bytes()
         elif path == '/payment_failure.html':
@@ -661,7 +660,7 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
         if path == "/payment/cancel":
-            body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>התשלום בוטל</h1><p>החיוב לא בוצע. ניתן לנסות שוב בכל עת.</p><p><a href='/packages.html'>חזרה לחבילות</a></p></body></html>"
+            body = "<html><body style='font-family: Arial; text-align: center; padding: 50px; direction: rtl;'><h1>התשלום בוטל</h1><p>החיוב לא בוצע. ניתן לנסות שוב בכל עת.</p><p><a href='/pricing.html'>חזרה למחירון</a></p></body></html>"
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body.encode("utf-8"))))
@@ -703,7 +702,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/packages.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
             self.send_error(404, "Not found")
             return
         body = b""
@@ -749,8 +748,6 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / "robots.txt").read_bytes()
         elif path == "/":
             body = (ROOT / "create.html").read_bytes()
-        if path == "/packages.html":
-            body = (ROOT / "packages.html").read_bytes()
         if path == "/my-videos.html":
             body = (ROOT / "my-videos.html").read_bytes()
         if path == "/product-builder.html":
@@ -914,7 +911,7 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
         description = self._sanitize(payload.get("description", ""), 500)
         bullets = [self._sanitize(b, 120) for b in payload.get("bullets", [])][:8]
         cta_text = self._sanitize(payload.get("cta_text", "קנו עכשיו"), 80)
-        cta_url = self._sanitize(payload.get("cta_url", product_url or "/packages.html"), 200)
+        cta_url = self._sanitize(payload.get("cta_url", product_url or "/pricing.html"), 200)
         style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
         video_url = self._sanitize(payload.get("video_url", ""), 500)
 
