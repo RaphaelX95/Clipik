@@ -22,6 +22,7 @@ except Exception:
     pass
 import fal_provider as _fal_provider
 import unifically_provider as _uni
+import token_packages as _token_packages
 import requests as _requests
 
 ROOT = Path(__file__).resolve().parent
@@ -800,38 +801,18 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return self.send_json(400, {"error": "Invalid JSON"})
 
-        package_id = self._sanitize(payload.get("package_id", ""), 20)
-        amount = float(payload.get("amount", 0))
+        package_id = self._sanitize(payload.get("package_id", ""), 40)
         user_id = self._sanitize(payload.get("user_id", "demo-user"), 40)
         user_email = self._sanitize(payload.get("email", ""), 120)
 
-        # Package token mapping
-        package_tokens = {
-            "trial": 6,
-            "3": 6,
-            "5": 10,
-            "10": 20,
-            "50": 50,
-            "120": 120,
-            "250": 250,
-            "500": 500,
-        }
-        tokens = package_tokens.get(str(package_id), 0)
-        if tokens <= 0 or amount < 0:
+        # המחיר נקבע בשרת לפי מזהה החבילה. סכום שנשלח מהלקוח מתעלם.
+        pkg = _token_packages.lookup(package_id)
+        if pkg is None:
             return self.send_json(400, {"error": "Invalid package"})
+        tokens = pkg["tokens"]
+        amount = float(pkg["price_ils"])
 
-        # Free trial - add tokens directly without payment
-        if package_id == "trial" and amount == 0:
-            user = _get_user(user_id)
-            if user:
-                new_total = int(user.get("tokens", 0)) + tokens
-                user['free_trial_used'] = False
-                _save_users(_load_users())
-                _update_user_tokens(user_id, new_total)
-                return self.send_json(200, {"ok": True, "tokens_added": tokens, "tokens_total": new_total, "message": "סרטון ראשון במבצע 9.99 ש״ח! הטוקנים הופעלו."})
-            return self.send_json(404, {"error": "User not found"})
-
-        description = f"טוקנים - {tokens} טוקנים (חבילת {package_id})"
+        description = f"טוקנים - {tokens} טוקנים (חבילה {package_id})"
         result = _icount_create_payment_link(
             amount=amount,
             description=description,
