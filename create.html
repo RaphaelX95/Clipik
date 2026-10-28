@@ -307,6 +307,18 @@
     $("#createBtn").onclick = async () => {
       const btn = $("#createBtn"); if (btn.disabled) return;
       const duration = +$("#duration").value;
+      // בדיקה לפני השליחה: הגדרה לא תקינה לא יוצאת לשרת ולא מנכה טוקנים
+      const SOLD_DURATIONS = [5, 10, 15, 20, 30];
+      const SOLD_RESOLUTIONS = ["720p", "1080p"];
+      let problem = "";
+      if (!productImages[0]) problem = "כדי ליצור סרטון צריך להעלות תמונה של המוצר";
+      else if (!SOLD_DURATIONS.includes(duration)) problem = "בחרו אורך סרטון מהאפשרויות (5, 10, 15, 20 או 30 שניות)";
+      else if (!SOLD_RESOLUTIONS.includes($("#resolution").value)) problem = "בחרו רזולוציה: 720p או 1080p";
+      if (problem) {
+        const st = $("#previewStatus"); st.style.display = "block"; st.textContent = problem;
+        toast(problem);
+        return;
+      }
       const payload = {
         image_data_url: productImages[0] || "",
         product: $("#productName").value.trim() || productName || "מוצר לדוגמה",
