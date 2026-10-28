@@ -245,8 +245,9 @@ def _icount_session() -> str:
             _ICOUNT_SID = data["sid"]
             _ICOUNT_SID_EXIRES = now + 900  # 15 minutes
             return _ICOUNT_SID
-    except Exception:
-        pass
+        print(f"[icount] login failed: status={r.status_code} error={str(data.get('error_description') or data.get('error') or data)[:200]}", flush=True)
+    except Exception as exc:
+        print(f"[icount] login exception: {exc!r}", flush=True)
     return ""
 
 
@@ -271,9 +272,11 @@ def _icount_create_payment_link(amount: float, order_id: str, description: str, 
         sale_url = data.get("sale_url", "")
         if sale_url:
             return {"ok": True, "sale_url": sale_url}
-        return {"error": data.get("error_description", "Failed")}
+        print(f"[icount] generate_sale failed: status={r.status_code} data={str(data)[:300]}", flush=True)
+        return {"error": f"iCount: {data.get('error_description') or data.get('error') or 'Failed'}"}
     except Exception as exc:
-        return {"error": str(exc)}
+        print(f"[icount] generate_sale exception: {exc!r}", flush=True)
+        return {"error": f"iCount exception: {exc}"}
 
 
 def _icount_verify_payment(confirmation_code: str, expected_amount: float) -> bool:
