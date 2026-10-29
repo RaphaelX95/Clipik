@@ -276,6 +276,10 @@ def _cta(cta_text, cta_url):
     return f'<section class="buy"><div class="buy-cta"><a class="cta-btn" href="{href}"{target} data-f="cta_text">{esc(cta_text)}</a></div></section>'
 
 
+# חלקים שאפשר להסיר מהדף. התוכן נשמר, והסימון קובע רק מה מופיע.
+HIDEABLE = ("description", "benefits", "reviews", "faq", "specs", "shipping", "details", "cta")
+
+
 def _stars(n) -> str:
     n = max(0, min(5, int(round(n))))
     return "★" * n + "☆" * (5 - n)
@@ -385,9 +389,20 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
     reviews = _clean_reviews(page.get("reviews"))
     specs = _clean_specs(page.get("specs"))
     shipping = str(page.get("shipping") or "").strip()[:200]
-    body = _body(theme["template"], product, headline, price, description, images, benefits, faq)
-    body = body.replace("</h1>", "</h1>" + _rate_line(reviews), 1)
-    body = _place_buy(body, _details(details_title, details) + _extra(reviews, specs, shipping), _cta(cta_text, cta_url))
+    hidden = {k for k in (page.get("hidden") or []) if k in HIDEABLE}
+    # מה שמוסתר לא מופיע בדף, אבל התוכן נשאר שמור ואפשר להחזיר אותו בבונה
+    v_description = "" if "description" in hidden else description
+    v_benefits = [] if "benefits" in hidden else benefits
+    v_faq = [] if "faq" in hidden else faq
+    v_reviews = [] if "reviews" in hidden else reviews
+    v_specs = [] if "specs" in hidden else specs
+    v_shipping = "" if "shipping" in hidden else shipping
+    v_details_title = "" if "details" in hidden else details_title
+    v_details = "" if "details" in hidden else details
+    v_cta = "" if "cta" in hidden else _cta(cta_text, cta_url)
+    body = _body(theme["template"], product, headline, price, v_description, images, v_benefits, v_faq)
+    body = body.replace("</h1>", "</h1>" + _rate_line(v_reviews), 1)
+    body = _place_buy(body, _details(v_details_title, v_details) + _extra(v_reviews, v_specs, v_shipping), v_cta)
     doc = f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
@@ -405,7 +420,7 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
                                  "cta_text": cta_text, "cta_url": cta_url,
                                  "details_title": details_title, "details": details,
                                  "reviews": reviews, "specs_text": str(page.get("specs") or ""),
-                                 "shipping": shipping, "theme": theme}, images)
+                                 "shipping": shipping, "hidden": sorted(hidden), "theme": theme}, images)
     return doc
 
 
@@ -640,6 +655,8 @@ EDITOR_JS = r"""
     });
   });
 
+  function has(sel) { return !!document.querySelector(sel); }
+
   function text(sel) {
     var el = document.querySelector(sel);
     return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
@@ -660,19 +677,23 @@ EDITOR_JS = r"""
     });
     var faq = [];
     (page.faq || []).forEach(function (orig, k) {
-      var q = text('[data-faq="' + k + '"]');
-      var a = text('[data-faqa="' + k + '"]');
+      // שאלה שמוסתרת לא נמצאת בדף, ולכן שומרים את הערך המקורי שלה
+      var qEl = document.querySelector('[data-faq="' + k + '"]');
+      var aEl = document.querySelector('[data-faqa="' + k + '"]');
+      var q = qEl ? text('[data-faq="' + k + '"]') : orig.q;
+      var a = aEl ? text('[data-faqa="' + k + '"]') : orig.a;
       if (q && a) faq.push({ q: q, a: a });
     });
     return {
       product: text('[data-f="product"]') || page.product,
       headline: text('[data-f="headline"]') || page.headline,
       price: text('[data-f="price"]'),
-      description: text('[data-f="description"]'),
-      cta_text: text('[data-f="cta_text"]') || 'להזמנה עכשיו',
+      description: has('[data-f="description"]') ? text('[data-f="description"]') : (page.description || ''),
+      cta_text: (has('[data-f="cta_text"]') ? text('[data-f="cta_text"]') : '') || page.cta_text || 'להזמנה עכשיו',
       cta_url: page.cta_url || '',
-      details_title: text('[data-f="details_title"]'),
-      details: multi('[data-f="details"]'),
+      details_title: has('[data-f="details_title"]') ? text('[data-f="details_title"]') : (page.details_title || ''),
+      details: has('[data-f="details"]') ? multi('[data-f="details"]') : (page.details || ''),
+      hidden: page.hidden || [],
       benefits: benefits,
       faq: faq,
       images: images.slice(0, LIMIT),
@@ -845,6 +866,7 @@ def _with_editor(doc: str, fields: dict, images: list) -> str:
             "details_title": fields["details_title"],
             "details": fields["details"],
             "reviews": fields["reviews"],
+            "hidden": fields["hidden"],
             "specs": fields["specs_text"],
             "shipping": fields["shipping"],
             "benefits": list(fields["benefits"]),

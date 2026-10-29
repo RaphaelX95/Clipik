@@ -12,7 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
-from product_page import render_product_page, clean_images, clean_theme, example_page_html, example_edit_html, template_data, EXAMPLES
+from product_page import render_product_page, clean_images, clean_theme, example_page_html, example_edit_html, template_data, EXAMPLES, HIDEABLE as HIDEABLE_SECTIONS
 from decimal import Decimal
 import os
 import threading
@@ -1025,6 +1025,7 @@ class Handler(BaseHTTPRequestHandler):
             "details_title": clean(payload.get("details_title", ""), 80),
             "details": clean(payload.get("details", ""), 2000),
             "specs": clean(payload.get("specs", ""), 1500),
+            "hidden": [k for k in (payload.get("hidden") or []) if isinstance(k, str) and k in HIDEABLE_SECTIONS],
             "shipping": clean(payload.get("shipping", ""), 200),
             "images": clean_images(payload.get("images")),
             "benefits": items_in("benefits", 160, 6),
