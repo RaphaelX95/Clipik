@@ -937,9 +937,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         e = lambda v: html.escape(str(v or ""), quote=True)
         bullets = "".join(f"<li>{e(b)}</li>" for b in page.get("bullets", []))
-        cta_url = page.get("cta_url") or "/pricing.html"
+        cta_url = page.get("cta_url") or ""
         if not (cta_url.startswith("/") or cta_url.startswith("https://") or cta_url.startswith("http://")):
-            cta_url = "/pricing.html"
+            cta_url = ""
+        cta_html = f"<a class=\"cta\" href=\"{e(cta_url)}\">{e(page.get('cta_text') or 'קנו עכשיו')}</a>" if cta_url else ""
         video = f"<video src=\"{e(page.get('video_url'))}\" controls playsinline style='width:100%;border-radius:12px'></video>" if str(page.get("video_url", "")).startswith(("https://", "/")) else ""
         body = f"""<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
@@ -952,7 +953,7 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
 {video}
 <p>{e(page.get('description'))}</p>
 <ul>{bullets}</ul>
-<a class="cta" href="{e(cta_url)}">{e(page.get('cta_text') or 'קנו עכשיו')}</a>
+{cta_html}
 </div></body></html>""".encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -975,8 +976,8 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
         headline = self._sanitize(payload.get("headline", product), 200)
         description = self._sanitize(payload.get("description", ""), 500)
         bullets = [self._sanitize(b, 120) for b in payload.get("bullets", [])][:8]
-        cta_text = self._sanitize(payload.get("cta_text", "קנו עכשיו"), 80)
-        cta_url = self._sanitize(payload.get("cta_url", product_url or "/pricing.html"), 200)
+        cta_text = self._sanitize(payload.get("cta_text", ""), 80)
+        cta_url = self._sanitize(payload.get("cta_url", ""), 200)
         style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
         video_url = self._sanitize(payload.get("video_url", ""), 500)
 

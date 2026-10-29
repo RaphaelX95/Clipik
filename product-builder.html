@@ -114,10 +114,6 @@
         <textarea class="textarea" id="pbFaq" rows="4" placeholder="כמה זמן נמשכת הסוללה? | עד 10 שעות בשימוש רגיל
 האם אפשר לשטוף את המוצר במים? | כן, השטיפה בטוחה"></textarea>
       </div>
-      <div class="field">
-        <div class="label"><label for="pbCta">כתובת האתר שאליו הכפתור מוביל</label></div>
-        <input class="input" id="pbCta" placeholder="למשל: https://www.example.com/product">
-      </div>
       <button class="btn btn-primary btn-large" id="generateBtn" onclick="generateProductPage()">
         <span>✨</span> צרו דף מוצר
       </button>
@@ -201,8 +197,6 @@ function renderPreview() {
   const headline = document.getElementById('pbHeadline').value || title;
   const price = document.getElementById('pbPrice').value.trim();
   const descRaw = document.getElementById('pbDesc').value.trim();
-  const ctaUrl = document.getElementById('pbCta').value.trim() || '/pricing.html';
-  const ctaText = 'קנו עכשיו';
   const bulletsRaw = document.getElementById('pbBullets').value || '';
   const bullets = bulletsRaw.split('\n').filter(l => l.trim());
   const testimonialsRaw = document.getElementById('pbTestimonials').value || '';
@@ -239,7 +233,6 @@ function renderPreview() {
           ${faq.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
         </div>
       </div>` : ''}
-      <a class="preview-cta" href="${esc(ctaUrl)}" onclick="return false">${ctaText}</a>
     </div>
   `;
 }
@@ -252,8 +245,6 @@ async function generateProductPage() {
     price: document.getElementById('pbPrice').value.trim(),
     description: document.getElementById('pbDesc').value.trim(),
     bullets: document.getElementById('pbBullets').value.split('\n').filter(l => l.trim()),
-    cta_text: 'קנו עכשיו',
-    cta_url: document.getElementById('pbCta').value.trim() || '/pricing.html',
     style: 'UGC טבעי'
   };
 
@@ -321,7 +312,7 @@ async function downloadPageHtml(url, slug) {
 }
 
 // Live preview on input
-['pbTitle','pbHeadline','pbPrice','pbDesc','pbBullets','pbTestimonials','pbFaq','pbCta'].forEach(id => {
+['pbTitle','pbHeadline','pbPrice','pbDesc','pbBullets','pbTestimonials','pbFaq'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', renderPreview);
 });
