@@ -844,7 +844,7 @@ h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;l
 
 /* ריווח התוכן מהסיידבר ומהקצוות */
 .main-content{padding:28px clamp(16px,3vw,40px) 56px}
-@media (max-width:768px){.main-content{padding-top:72px}}
+@media (max-width:768px){.main-content{padding-top:72px !important}}
 .main-content .container{padding:0}
 .ai-glow{box-shadow:var(--shadow) !important;animation:none !important}
 .trial-banner{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin:8px 0 22px}
