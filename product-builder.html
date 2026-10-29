@@ -141,9 +141,9 @@
       </div>
 
       <div class="field">
-        <div class="label">תמונות המוצר (עד 10)</div>
+        <div class="label">תמונות המוצר (עד 3)</div>
         <input type="file" id="pbImages" accept="image/*" multiple hidden>
-        <button type="button" class="btn btn-secondary" id="pbAddImages">+ הוספת תמונות (עד 10)</button>
+        <button type="button" class="btn btn-secondary" id="pbAddImages">+ הוספת תמונות (עד 3)</button>
         <div id="pbImgGrid" class="img-grid"></div>
       </div>
 
@@ -213,7 +213,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const LIMITS = { images: 10, benefits: 6, reviews: 10, faq: 20 };
+const LIMITS = { images: 3, benefits: 6, reviews: 10, faq: 20 };
 const DEFAULT_BENEFITS = ['איכות גבוהה', 'נוח לשימוש', 'עיצוב מודרני'];
 const DEFAULT_FAQ = [
   ['איך משתמשים במוצר?', 'פשוט מאוד: קראו את ההוראות שמגיעות עם המוצר והתחילו להשתמש.'],
@@ -304,7 +304,7 @@ function renderImages() {
   $('pbImgGrid').innerHTML = images.map((src, i) =>
     `<div class="img-item"><img src="${src}" alt=""><button type="button" class="rm" data-i="${i}" aria-label="הסרת תמונה">×</button></div>`
   ).join('');
-  $('pbAddImages').textContent = images.length ? `+ הוספת תמונות (${images.length}/10)` : '+ הוספת תמונות (עד 10)';
+  $('pbAddImages').textContent = images.length ? `+ הוספת תמונות (${images.length}/3)` : '+ הוספת תמונות (עד 3)';
 }
 function shrinkImage(file) {
   return new Promise((resolve, reject) => {
@@ -410,7 +410,7 @@ $('pbImages').addEventListener('change', async e => {
   const files = Array.from(e.target.files || []);
   e.target.value = '';
   for (const f of files) {
-    if (images.length >= LIMITS.images) { toast('אפשר עד 10 תמונות'); break; }
+    if (images.length >= LIMITS.images) { toast('אפשר עד 3 תמונות'); break; }
     if (!f.type.startsWith('image/')) continue;
     try { images.push(await shrinkImage(f)); }
     catch (err) { toast('לא הצלחנו לטעון אחת התמונות'); }

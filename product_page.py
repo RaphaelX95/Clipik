@@ -321,8 +321,8 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
     return doc
 
 
-def render_product_page(page: dict) -> str:
-    return _render(page, clean_images(page.get("images")))
+def render_product_page(page: dict, edit: bool = False) -> str:
+    return _render(page, clean_images(page.get("images")), edit=edit)
 
 
 # ---- דפי דוגמה ----
@@ -460,25 +460,35 @@ EXAMPLES = [
 
 # ---- עריכה ישירה: אותו דף מוצר, עם טקסטים שאפשר ללחוץ ולשנות ----
 EDITOR_CSS = """
-body.pe-on{padding-bottom:300px}
+body.pe-on{padding-bottom:210px}
+body.pe-on.pe-min{padding-bottom:48px}
 [contenteditable]{outline:1px dashed rgba(0,0,0,.3);outline-offset:4px;border-radius:4px;cursor:text}
 [contenteditable]:hover{background:rgba(255,236,140,.3)}
 [contenteditable]:focus{outline:2px solid #6c5ce7;background:rgba(255,236,140,.22)}
-#pe-bar{position:fixed;left:0;right:0;bottom:0;z-index:9999;max-height:48vh;overflow:auto;background:#fff;color:#1d1d1f;border-top:1px solid #ddd;box-shadow:0 -6px 24px rgba(0,0,0,.14);padding:12px 16px;font:14px/1.5 system-ui,sans-serif;text-align:right}
-#pe-bar .pe-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+#pe-bar{position:fixed;left:0;right:0;bottom:0;z-index:9999;max-height:30vh;overflow:auto;background:#fff;color:#1d1d1f;border-top:1px solid #ddd;box-shadow:0 -6px 24px rgba(0,0,0,.14);padding:8px 14px;font:13px/1.45 system-ui,sans-serif;text-align:right}
+#pe-bar.pe-collapsed{max-height:none;padding-top:6px;padding-bottom:6px}
+#pe-bar.pe-collapsed #pe-body{display:none}
+#pe-bar .pe-hint{color:#555}
+#pe-bar .pe-count{color:#555;font-size:12px}
+#pe-bar .pe-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
 #pe-bar button{font:inherit;padding:6px 14px;border-radius:8px;border:1px solid #6c5ce7;background:#6c5ce7;color:#fff;cursor:pointer}
 #pe-bar button:disabled{opacity:.6;cursor:default}
 #pe-bar .pe-thumb{display:flex;flex-direction:column;gap:4px;align-items:center}
-#pe-bar .pe-thumb img{width:64px!important;height:64px!important;object-fit:cover;border-radius:8px;display:block}
-#pe-bar .pe-thumb button{padding:3px 8px;font-size:12px;background:#fff;color:#6c5ce7}
+#pe-bar .pe-thumb img{width:52px!important;height:52px!important;object-fit:cover;border-radius:8px;display:block}
+#pe-bar .pe-thumb button{padding:2px 8px;font-size:12px;background:#fff;color:#6c5ce7}
+#pe-bar .pe-thumb .pe-del{color:#b42318;border-color:#b42318}
+#pe-bar #pe-toggle{padding:3px 10px;font-size:12px;background:#fff;color:#6c5ce7}
 #pe-bar #pe-status{color:#555}
 """
 
 EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת הדף">
-  <div class="pe-row"><strong>עריכה ישירה בדף</strong><span>לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
-  <div class="pe-row" id="pe-imgs"></div>
-  <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
-  <div class="pe-row" id="pe-result" hidden></div>
+  <div class="pe-row"><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
+  <div id="pe-body">
+    <div class="pe-row"><span class="pe-hint">לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
+    <div class="pe-row" id="pe-imgs"></div>
+    <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
+    <div class="pe-row" id="pe-result" hidden></div>
+  </div>
 </div>"""
 
 EDITOR_JS = r"""
@@ -491,7 +501,16 @@ EDITOR_JS = r"""
   var result = document.getElementById('pe-result');
   var saveBtn = document.getElementById('pe-save');
 
+  var LIMIT = 3;
+  var toggleBtn = document.getElementById('pe-toggle');
+  var bar = document.getElementById('pe-bar');
   document.body.classList.add('pe-on');
+  toggleBtn.addEventListener('click', function () {
+    var hidden = bar.classList.toggle('pe-collapsed');
+    document.body.classList.toggle('pe-min', hidden);
+    toggleBtn.textContent = hidden ? 'הצגת העריכה' : 'הסתרת העריכה';
+    toggleBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+  });
   document.querySelectorAll('details').forEach(function (d) { d.open = true; });
   document.querySelectorAll('a.cta-btn').forEach(function (a) {
     a.addEventListener('click', function (e) { e.preventDefault(); });
@@ -552,7 +571,7 @@ EDITOR_JS = r"""
       details: multi('[data-f="details"]'),
       benefits: benefits,
       faq: faq,
-      images: images,
+      images: images.slice(0, LIMIT),
       theme: page.theme,
       reviews: []
     };
@@ -582,13 +601,22 @@ EDITOR_JS = r"""
     });
   }
 
-  function swapImage(oldSrc, newSrc) {
-    document.querySelectorAll('img').forEach(function (im) {
-      if (im.getAttribute('src') === oldSrc) im.setAttribute('src', newSrc);
-    });
-    document.querySelectorAll('[style]').forEach(function (el) {
-      var st = el.getAttribute('style') || '';
-      if (st.indexOf(oldSrc) > -1) el.setAttribute('style', st.split(oldSrc).join(newSrc));
+  // אחרי כל שינוי בתמונות נטען מחדש הדף עם העריכה, כך שהתמונות מוצגות במקום שלהן
+  function refreshPage() {
+    statusEl.textContent = 'מעדכן את הדף...';
+    fetch('/api/product-page/preview?edit=1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; });
+    }).then(function (d) {
+      if (!d.html) throw new Error('no html');
+      document.open();
+      document.write(d.html);
+      document.close();
+    }).catch(function () {
+      statusEl.textContent = 'לא הצלחנו לעדכן את התצוגה';
     });
   }
 
@@ -599,24 +627,29 @@ EDITOR_JS = r"""
   document.body.appendChild(fileInput);
   var pending = -1;
 
+  // i = מספר התמונה להחלפה, או אורך הרשימה להוספה
   function pickFile(i) { pending = i; fileInput.value = ''; fileInput.click(); }
 
   fileInput.addEventListener('change', function () {
     var f = fileInput.files[0];
     var i = pending;
+    pending = -1;
     if (!f || i < 0) return;
     if (f.size > 10 * 1024 * 1024) { statusEl.textContent = 'תמונה גדולה מדי (מקס 10MB)'; return; }
     statusEl.textContent = 'מעבד את התמונה...';
     shrink(f).then(function (next) {
-      swapImage(images[i], next);
-      images[i] = next;
-      renderThumbs();
-      statusEl.textContent = 'התמונה הוחלפה';
+      if (i >= images.length) { if (images.length < LIMIT) images.push(next); }
+      else images[i] = next;
+      refreshPage();
     }).catch(function () { statusEl.textContent = 'לא הצלחנו לקרוא את התמונה'; });
   });
 
   function renderThumbs() {
     imgBox.innerHTML = '';
+    var count = document.createElement('span');
+    count.className = 'pe-count';
+    count.textContent = 'תמונות: ' + images.length + ' מתוך ' + LIMIT;
+    imgBox.appendChild(count);
     images.forEach(function (src, i) {
       var box = document.createElement('div');
       box.className = 'pe-thumb';
@@ -625,12 +658,29 @@ EDITOR_JS = r"""
       im.alt = 'תמונה ' + (i + 1);
       var b = document.createElement('button');
       b.type = 'button';
-      b.textContent = 'החלפת תמונה';
+      b.textContent = 'החלפה';
       b.addEventListener('click', function () { pickFile(i); });
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'pe-del';
+      del.textContent = 'הסרה';
+      del.addEventListener('click', function () {
+        if (images.length <= 1) { statusEl.textContent = 'צריך להשאיר לפחות תמונה אחת'; return; }
+        images.splice(i, 1);
+        refreshPage();
+      });
       box.appendChild(im);
       box.appendChild(b);
+      box.appendChild(del);
       imgBox.appendChild(box);
     });
+    if (images.length < LIMIT) {
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.textContent = '+ הוספת תמונה';
+      add.addEventListener('click', function () { pickFile(images.length); });
+      imgBox.appendChild(add);
+    }
   }
   renderThumbs();
 
