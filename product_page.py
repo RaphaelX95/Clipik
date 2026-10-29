@@ -697,12 +697,15 @@ body.pe-on.pe-min{padding-bottom:48px}
 #pe-bar #pe-status{color:#555}
 #pe-sections label{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-size:12px}
 #pe-sections input{margin:0;accent-color:#6c5ce7}
+#pe-import-row input{font:inherit;padding:6px 10px;border:1px solid #ccc;border-radius:8px;min-width:240px;flex:1}
+#pe-import-row #pe-import-status{color:#555}
 """
 
 EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת הדף">
   <div class="pe-row"><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
   <div id="pe-body">
     <div class="pe-row"><span class="pe-hint">לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
+    <div class="pe-row" id="pe-import-row"><span class="pe-hint">קישור למוצר בחנות שלכם:</span><input id="pe-link" type="url" dir="ltr" placeholder="https://your-shop.com/product" autocomplete="off"><button id="pe-import" type="button">מילוי אוטומטי מהקישור</button><span id="pe-import-status" role="status"></span></div>
     <div class="pe-row" id="pe-sections"><span class="pe-hint">מה מוצג בדף:</span>__SECTIONS__</div>
     <div class="pe-row" id="pe-imgs"></div>
     <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
@@ -768,7 +771,15 @@ EDITOR_JS = r"""
     return el ? el.innerText.replace(/\n{3,}/g, '\n\n').trim() : '';
   }
 
+  // ערכים שמוחלפים בכוח, למשל אחרי מילוי אוטומטי מהקישור. נמצאים רק לרגע הרינדור הבא
+  var overrides = null;
   function collect() {
+    var c = collectRaw();
+    if (overrides) { Object.keys(overrides).forEach(function (k) { c[k] = overrides[k]; }); }
+    return c;
+  }
+
+  function collectRaw() {
     var benefits = [];
     (page.benefits || []).forEach(function (orig, k) {
       var sel = '[data-ben="' + k + '"]';
@@ -857,6 +868,38 @@ EDITOR_JS = r"""
       c.hidden = h;
       page = c;
       refreshPage();
+    });
+  });
+
+  // מילוי אוטומטי: שם, תיאור, מחיר ותמונות מהקישור, והקישור עצמו הופך לכפתור הקנייה
+  var linkEl = document.getElementById('pe-link');
+  var importBtn = document.getElementById('pe-import');
+  var importStatus = document.getElementById('pe-import-status');
+  importBtn.addEventListener('click', function () {
+    var url = linkEl.value.trim();
+    if (!url) { importStatus.textContent = 'הדביקו קישור למוצר'; return; }
+    importBtn.disabled = true;
+    importStatus.textContent = 'מייבא את פרטי המוצר...';
+    fetch('/api/product-page/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.d.error || 'לא הצלחנו לייבא את המוצר');
+      var d = res.d;
+      var o = { cta_url: d.url, headline: d.product || undefined, product: d.product || undefined };
+      if (d.price) o.price = d.price;
+      if (d.description) o.description = d.description;
+      if (d.images && d.images.length) o.images = d.images.slice(0, LIMIT);
+      Object.keys(o).forEach(function (k) { if (o[k] === undefined) delete o[k]; });
+      overrides = o;
+      refreshPage();
+      overrides = null;
+    }).catch(function (err) {
+      importStatus.textContent = err.message;
+      importBtn.disabled = false;
     });
   });
 

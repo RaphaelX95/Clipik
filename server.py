@@ -34,6 +34,7 @@ import fal_provider as _fal_provider
 import unifically_provider as _uni
 import token_packages as _token_packages
 import requests as _requests
+import product_import as _product_import
 
 ROOT = Path(__file__).resolve().parent
 # תיקיית הנתונים (קבצי JSON של משתמשים, פרויקטים ותשלומים). ברירת מחדל: תיקיית הקוד.
@@ -903,6 +904,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle_product_page()
         if path == "/api/product-page/preview":
             return self._handle_product_preview()
+        if path == "/api/product-page/import":
+            return self._handle_product_import()
         if path == "/api/analytics/summary":
             token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
             if not _analytics_ok(token):
@@ -1050,6 +1053,19 @@ class Handler(BaseHTTPRequestHandler):
         _store.save(f"product_page_{slug}", page, DATA_DIR)
         page_url = f"{_BASE_URL}/p/{slug}"
         return self.send_json(201, {"ok": True, "page": {"slug": slug}, "page_url": page_url})
+
+    def _handle_product_import(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        url = payload.get("url")
+        try:
+            data = _product_import.import_product(url if isinstance(url, str) else "")
+        except _product_import.ImportError_ as exc:
+            return self.send_json(400, {"error": str(exc)})
+        except Exception:
+            return self.send_json(502, {"error": "לא הצלחנו לייבא את המוצר מהקישור"})
+        return self.send_json(200, data)
 
     def _handle_product_preview(self):
         payload, error = self._read_product_payload()
