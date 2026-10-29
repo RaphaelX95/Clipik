@@ -82,6 +82,13 @@ h2{font-size:24px;font-weight:900;margin:0 0 16px}
 .faq details[open] summary::after{content:"\\2212"}
 .faq details p{margin:0 0 18px;font-size:16px;line-height:1.7;color:#3b3754}
 .foot{text-align:center;color:#6b6880;font-size:13px;padding:56px 20px 40px}
+.buy{max-width:820px;margin:48px auto 0;padding:0 20px;text-align:center}
+.buy-details{text-align:right;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 24px;margin-bottom:28px}
+.buy-details h2{font-size:24px;line-height:1.3;margin:0 0 12px}
+.buy-details .buy-txt{font-size:17px;line-height:1.8;color:#3b3754;white-space:pre-line;margin:0}
+.cta-btn{display:inline-block;max-width:100%;box-sizing:border-box;background:var(--accent);color:#fff;font-weight:800;font-size:19px;line-height:1.2;padding:18px 44px;border-radius:999px;text-decoration:none;box-shadow:0 12px 26px -12px var(--accent)}
+.cta-btn:hover{filter:brightness(1.06)}
+@media (max-width:600px){.buy{padding:0 16px}.buy-details{padding:22px 18px}.cta-btn{display:block;width:100%;padding:18px 20px;font-size:18px}}
 .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px}
 """
@@ -156,6 +163,9 @@ LAYOUT_CSS = {
 @media (max-width:600px){.ed-row{grid-template-columns:1fr}.ed-row.flip .ed-img{order:0}}
 """,
 }
+
+
+DEFAULT_CTA = "להזמנה עכשיו"
 
 
 def _text_block(product, headline, price, description, cls=""):
@@ -250,6 +260,19 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
     return _text_block(product, headline, price, description)
 
 
+def _buy(cta_text, cta_url, details_title, details):
+    """הסבר חופשי על המוצר וכפתור קריאה לפעולה, בסוף הדף."""
+    parts = []
+    if details_title or details:
+        title = f'<h2 data-f="details_title">{esc(details_title)}</h2>' if details_title else ""
+        text = f'<p class="buy-txt" data-f="details">{esc(details)}</p>' if details else ""
+        parts.append(f'<div class="buy-details">{title}{text}</div>')
+    href = esc(cta_url) if cta_url else "#"
+    target = ' target="_blank" rel="noopener"' if cta_url else ""
+    parts.append(f'<div class="buy-cta"><a class="cta-btn" href="{href}"{target} data-f="cta_text">{esc(cta_text)}</a></div>')
+    return '<section class="buy">' + "".join(parts) + "</section>"
+
+
 def _faq_sec(faq):
     return _faq(faq) if faq else ""
 
@@ -270,7 +293,14 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
         f":root{{--ink:{colors['ink']};--band:{colors['band']};--paper:{colors['paper']};"
         f"--accent:{colors['accent']};--mint:{colors['mint']};--line:#e6dfd2;--font:'{font_name}'}}"
     )
+    cta_text = str(page.get("cta_text") or "").strip() or DEFAULT_CTA
+    cta_url = str(page.get("cta_url") or "").strip()
+    if not cta_url.lower().startswith(("http://", "https://")):
+        cta_url = ""
+    details_title = str(page.get("details_title") or "").strip()
+    details = str(page.get("details") or "").strip()
     body = _body(theme["template"], product, headline, price, description, images, benefits, faq)
+    body += _buy(cta_text, cta_url, details_title, details)
     doc = f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
@@ -285,6 +315,8 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
     if edit:
         doc = _with_editor(doc, {"product": product, "headline": headline, "price": price,
                                  "description": description, "benefits": benefits, "faq": faq,
+                                 "cta_text": cta_text, "cta_url": cta_url,
+                                 "details_title": details_title, "details": details,
                                  "theme": theme}, images)
     return doc
 
@@ -298,10 +330,36 @@ def render_product_page(page: dict) -> str:
 from example_images import IMAGES as _PHOTOS
 
 
+_COPY = {
+    "ex-1": ("להזמנת הסוקולנט", "על הצמח ועל העציץ",
+             "הסוקולנט מגיע בעציץ טרקוטה טבעי, שמכניס מעט חום לכל חלל.\nהעציץ עשוי חרס, ולכן נותן לאדמה להתייבש בין ההשקיות ומונע שורשים רטובים."),
+    "ex-2": ("להזמנת הבקבוק", "למה הבקבוק הזה שווה את זה",
+             "שתי דפנות נירוסטה עם בידוד ואקום שומרות על הנוזל בטמפרטורה שלו לאורך היום.\nפקק הברגה אטום שלא נפתח בתיק, והבקבוק מתאים גם לתה קר, למים עם קרח ולמשקאות חמים."),
+    "ex-3": ("להזמנת המנורה", "שלוש רמות אור, מגע אחד",
+             "המנורה מכוונת את עוצמת האור בלחיצה ארוכה על המתג. בלילה אפשר לקרוא בלי להפריע לשינה.\nהבסיס יציב, הכבל ארוך מספיק, והטעינה נעשית דרך USB."),
+    "ex-4": ("להזמנת הכרית", "שינה שמתאימה לצורת הראש",
+             "הכרית מזיכרון צורה נשענת על הצוואר ומחזירה את עצמה לצורה אחרי כל קימה.\nהכיסוי מתפרק ונשטף במכונה, והמילוי נשאר במקומו גם אחרי תקופה ארוכה של שימוש."),
+    "ex-5": ("להזמנת הסט", "שני סכינים, שתי משימות",
+             "סכין השף לחיתוך ירקות וחלבונים, וסכין הקילוף לעבודה עדינה על פירות וירקות קטנים.\nהלהבים עשויים נירוסטה ונשמרים חדים בעזרת השחזה קלה. הסט מגיע על בלוק עץ שמשאיר את הסכינים מסודרים על השיש."),
+    "ex-6": ("להזמנת התיק", "מחשב נייד, ספר ובקבוק, הכול נכנס",
+             "תא מרופד למחשב נייד עד 15.6 אינץ' שומר עליו מפני תנועה ושריטות.\nרצועות גב רכות, רוכסנים חזקים ומעבר לכבל טעינה, כך שאפשר לחבר את הטלפון בלי לפתוח את התיק."),
+    "ex-7": ("להזמנת הספל", "עבודת יד בכל ספל",
+             "כל ספל נוצר בעבודת יד, ולכן לכל אחד יש שונות קטנה בצורה ובגוון הזיגוג. זה חלק מהיופי שלו.\nמתאים לקפה ולתה. מומלץ לשטוף ביד כדי לשמור על הזיגוג לאורך זמן."),
+    "ex-8": ("להזמנת המחצלת", "אחיזה טובה גם בזיעה",
+             "משטח הפקק נותן אחיזה טובה לידיים וכפות הרגליים, גם באימון חם. הפקק טבעי, נעים למגע ומרגיש חם יותר מגומי.\nמשקל קל, רצועת נשיאה מצורפת, ומחצלת שנפרשת בקלות על כל משטח."),
+    "ex-9": ("להזמנת השעון", "מסך עגול ומעקב יומיומי",
+             "מסך עגול מציג את השעה, הצעדים, הדופק והתראות מהטלפון.\nעמיד למים לשחייה קלה ולהזעה, ומודד שינה שעוזר להבין את קצב היום. הטעינה מגנטית ונעשית בקלות."),
+    "ex-10": ("להזמנת הסרום", "טפטפת אחת, מינון מדויק",
+              "הטפטפת נותנת מינון מדויק, כך שמספיק כמה טיפות לפנים ולצוואר בבוקר ובערב.\nהנוסחה קלה ולא שומנית, מתאימה לעור רגיל ורגיש, ונספגת מהר לפני איפור. מומלץ להמשיך עם קרם לחות."),
+}
+
+
 def _example(slug, name, layout, color, font, product, headline, price, description, benefits, faq, photo):
+    cta, details_title, details = _COPY[slug]
     page = {
         "product": product, "headline": headline, "price": price, "description": description,
         "benefits": benefits, "faq": [{"q": q, "a": a} for q, a in faq],
+        "cta_text": cta, "cta_url": "", "details_title": details_title, "details": details,
         "theme": {"template": layout, "font": font, "color": color},
     }
     return {"slug": slug, "name": name, "look": f"{LAYOUTS[layout]} · {font} · {color}", "page": page, "images": [_PHOTOS[photo]]}
@@ -435,6 +493,9 @@ EDITOR_JS = r"""
 
   document.body.classList.add('pe-on');
   document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+  document.querySelectorAll('a.cta-btn').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); });
+  });
   document.querySelectorAll('summary').forEach(function (s) {
     s.addEventListener('click', function (e) { e.preventDefault(); });
   });
@@ -442,20 +503,29 @@ EDITOR_JS = r"""
     el.setAttribute('contenteditable', 'true');
     el.setAttribute('spellcheck', 'false');
     el.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); return; }
+      // ההסבר החופשי הוא רב-שורות, אז שם Enter מותר. בשאר השדות הוא נחסם
+      if (e.key === 'Enter') { if (el.getAttribute('data-f') !== 'details') e.preventDefault(); return; }
       // רווח בתוך שאלה (summary) היה פותח ומסגיר את התשובה, אז מוסיפים אותו ידנית
       if (e.key === ' ' && el.tagName === 'SUMMARY') { e.preventDefault(); document.execCommand('insertText', false, ' '); }
     });
     el.addEventListener('paste', function (e) {
       e.preventDefault();
       var t = (e.clipboardData || window.clipboardData).getData('text') || '';
-      document.execCommand('insertText', false, t.replace(/\s+/g, ' '));
+      if (el.getAttribute('data-f') !== 'details') t = t.replace(/\s+/g, ' ');
+      else t = t.replace(/\r/g, '');
+      document.execCommand('insertText', false, t);
     });
   });
 
   function text(sel) {
     var el = document.querySelector(sel);
     return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+
+  // טקסט רב-שורות: innerText שומר על שורות חדשות
+  function multi(sel) {
+    var el = document.querySelector(sel);
+    return el ? el.innerText.replace(/\n{3,}/g, '\n\n').trim() : '';
   }
 
   function collect() {
@@ -476,6 +546,10 @@ EDITOR_JS = r"""
       headline: text('[data-f="headline"]') || page.headline,
       price: text('[data-f="price"]'),
       description: text('[data-f="description"]'),
+      cta_text: text('[data-f="cta_text"]') || 'להזמנה עכשיו',
+      cta_url: page.cta_url || '',
+      details_title: text('[data-f="details_title"]'),
+      details: multi('[data-f="details"]'),
       benefits: benefits,
       faq: faq,
       images: images,
@@ -610,6 +684,10 @@ def _with_editor(doc: str, fields: dict, images: list) -> str:
             "headline": fields["headline"],
             "price": fields["price"],
             "description": fields["description"],
+            "cta_text": fields["cta_text"],
+            "cta_url": fields["cta_url"],
+            "details_title": fields["details_title"],
+            "details": fields["details"],
             "benefits": list(fields["benefits"]),
             "faq": [{"q": f["q"], "a": f["a"]} for f in fields["faq"]],
             "theme": fields["theme"],

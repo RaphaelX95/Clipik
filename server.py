@@ -1008,11 +1008,18 @@ class Handler(BaseHTTPRequestHandler):
                 a = clean(f.get("a", ""), 600)
                 if q.strip() and a.strip():
                     faq.append({"q": q, "a": a})
+        cta_url = clean(payload.get("cta_url", ""), 500).strip()
+        if not cta_url.lower().startswith(("http://", "https://")):
+            cta_url = ""
         return {
             "product": clean(payload.get("product", ""), 120),
             "headline": clean(payload.get("headline", ""), 200),
             "price": clean(payload.get("price", ""), 40),
             "description": clean(payload.get("description", ""), 800),
+            "cta_text": clean(payload.get("cta_text", ""), 40),
+            "cta_url": cta_url,
+            "details_title": clean(payload.get("details_title", ""), 80),
+            "details": clean(payload.get("details", ""), 2000),
             "images": clean_images(payload.get("images")),
             "benefits": items_in("benefits", 160, 6),
             "reviews": reviews,

@@ -165,6 +165,38 @@
         <button type="button" class="btn btn-secondary" id="pbAddFaq">+ הוספת שאלה</button>
       </div>
 
+      <div class="field">
+
+        <div class="label"><label for="pbDetailsTitle">כותרת להסבר המלא (לא חובה)</label></div>
+
+        <input class="input" id="pbDetailsTitle" placeholder="לדוגמה: למה המוצר הזה שווה את זה">
+
+      </div>
+
+      <div class="field">
+
+        <div class="label"><label for="pbDetails">הסבר מלא על המוצר (לא חובה)</label></div>
+
+        <textarea class="textarea" id="pbDetails" rows="6" placeholder="כתבו כאן כל מה שהלקוח צריך לדעת. אפשר לשבור שורות."></textarea>
+
+      </div>
+
+      <div class="field">
+
+        <div class="label"><label for="pbCtaText">טקסט הכפתור</label></div>
+
+        <input class="input" id="pbCtaText" maxlength="40" placeholder="להזמנה עכשיו">
+
+      </div>
+
+      <div class="field">
+
+        <div class="label"><label for="pbCtaUrl">קישור לכפתור (לא חובה)</label></div>
+
+        <input class="input" id="pbCtaUrl" dir="ltr" placeholder="https://...">
+
+      </div>
+
       <button class="btn btn-primary btn-large" id="generateBtn" type="button"><span>✨</span> צרו דף מוצר</button>
       <div id="createResult"></div>
     </section>
@@ -310,6 +342,10 @@ function collect() {
     headline: $('pbHeadline').value.trim(),
     price: $('pbPrice').value.trim(),
     description: $('pbDesc').value.trim(),
+    cta_text: $('pbCtaText').value.trim(),
+    cta_url: $('pbCtaUrl').value.trim(),
+    details_title: $('pbDetailsTitle').value.trim(),
+    details: $('pbDetails').value.trim(),
     images, benefits, reviews, faq,
     theme: { ...theme }
   };
@@ -416,7 +452,7 @@ $('generateBtn').addEventListener('click', async () => {
   }
 });
 
-['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc'].forEach(id => $(id).addEventListener('input', schedulePreview));
+['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails'].forEach(id => $(id).addEventListener('input', schedulePreview));
 renderThemeOptions();
 bindThemeOptions();
 
@@ -438,6 +474,10 @@ async function loadTemplate(slug) {
     $('pbHeadline').value = page.headline || '';
     $('pbPrice').value = page.price || '';
     $('pbDesc').value = page.description || '';
+    $('pbCtaText').value = page.cta_text || '';
+    $('pbCtaUrl').value = page.cta_url || '';
+    $('pbDetailsTitle').value = page.details_title || '';
+    $('pbDetails').value = page.details || '';
     images = d.images || [];
     (page.benefits || []).forEach(b => addBenefit(b));
     addReview();
