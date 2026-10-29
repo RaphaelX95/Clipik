@@ -88,6 +88,10 @@
 </aside>
 <main class="main-content" class="main">
   <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
+  <div id="pbTemplateNotice" class="result" style="display:none;margin:0 0 16px">
+    ✏️ אתם עורכים את התבנית <strong></strong>. הסגנון, הצבעים והגופן נשארים כמו בתבנית. אפשר לשנות תוכן ותמונות.
+    <div style="margin-top:8px"><a href="/product-examples.html">חזרה לתבניות</a></div>
+  </div>
   <div class="page-header">
     <div>
       <h1 class="gradient-text">📦 יצירת דף מוצר</h1>
@@ -413,12 +417,58 @@ $('generateBtn').addEventListener('click', async () => {
 ['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc'].forEach(id => $(id).addEventListener('input', schedulePreview));
 renderThemeOptions();
 bindThemeOptions();
-DEFAULT_BENEFITS.forEach(v => addBenefit(v));
-addReview();
-addReview();
-DEFAULT_FAQ.forEach(([q, a]) => addFaq(q, a));
-renderImages();
-updatePreview();
+
+function fillDefaults() {
+  DEFAULT_BENEFITS.forEach(v => addBenefit(v));
+  addReview();
+  addReview();
+  DEFAULT_FAQ.forEach(([q, a]) => addFaq(q, a));
+}
+
+// עריכת תבנית: התוכן של הדוגמה נטען, והסגנון (תבנית, צבעים וגופן) נשאר קבוע
+async function loadTemplate(slug) {
+  try {
+    const r = await fetch('/api/product-templates/' + encodeURIComponent(slug));
+    if (!r.ok) throw new Error('not found');
+    const d = await r.json();
+    const page = d.page;
+    $('pbTitle').value = page.product || '';
+    $('pbHeadline').value = page.headline || '';
+    $('pbPrice').value = page.price || '';
+    $('pbDesc').value = page.description || '';
+    images = d.images || [];
+    (page.benefits || []).forEach(b => addBenefit(b));
+    addReview();
+    addReview();
+    (page.faq || []).forEach(f => addFaq(f.q, f.a));
+    theme.template = page.theme.template;
+    theme.font = page.theme.font;
+    theme.color = page.theme.color;
+    renderThemeOptions();
+    ['pbTemplates', 'pbColors', 'pbFonts'].forEach(id => { const f = $(id).parentElement; if (f) f.style.display = 'none'; });
+    const notice = document.getElementById('pbTemplateNotice');
+    if (notice) {
+      notice.style.display = 'block';
+      notice.querySelector('strong').textContent = d.name;
+    }
+    renderImages();
+    updatePreview();
+  } catch (e) {
+    toast('לא נמצאה התבנית. פותחים דף ריק.');
+    fillDefaults();
+    renderImages();
+    updatePreview();
+  }
+}
+
+const templateSlug = new URLSearchParams(location.search).get('template');
+if (templateSlug) {
+  loadTemplate(templateSlug);
+} else {
+  fillDefaults();
+  renderImages();
+  updatePreview();
+}
 
 function toggleMenu() {
   const side = document.querySelector('.side');

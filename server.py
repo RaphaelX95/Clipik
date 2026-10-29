@@ -12,7 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
-from product_page import render_product_page, clean_images, clean_theme, example_page_html, EXAMPLES
+from product_page import render_product_page, clean_images, clean_theme, example_page_html, template_data, EXAMPLES
 from decimal import Decimal
 import os
 import threading
@@ -668,6 +668,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
         if path.startswith("/p/"):
             return self._serve_product_page(path[3:].strip("/"))
+        if path.startswith("/api/product-templates/"):
+            data = template_data(path[len("/api/product-templates/"):].strip("/"))
+            if data is None:
+                return self.send_json(404, {"error": "not found"})
+            return self.send_json(200, data)
         if path.startswith("/product-examples/"):
             body = example_page_html(path[len("/product-examples/"):].strip("/"))
             if body is None:
