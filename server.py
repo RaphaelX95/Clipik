@@ -1048,7 +1048,8 @@ class Handler(BaseHTTPRequestHandler):
         payload, error = self._read_product_payload()
         if error:
             return self.send_json(*error)
-        return self.send_json(200, {"html": render_product_page(self._build_product_page(payload))})
+        edit = "edit=1" in self.path
+        return self.send_json(200, {"html": render_product_page(self._build_product_page(payload), edit=edit)})
 
     def _handle_script_generate(self):
         try:
