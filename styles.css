@@ -937,3 +937,8 @@ aside.side{display:none !important}
 @media (min-width: 901px) {
   .options-row{grid-template-columns:1fr}
 }
+
+/* אייקונים של התפריט: קווים נקיים במקום אימוג'ים */
+.sidebar-link .sidebar-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px}
+.sidebar-link .sidebar-icon svg{display:block}
+.sidebar-login-cta svg{vertical-align:-3px;margin-inline-end:6px}
