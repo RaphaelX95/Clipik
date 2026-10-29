@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דוגמאות לדפי מוצר - קליפיק</title>
+  <title>תבניות לדף מוצר - קליפיק</title>
   <meta name="description" content="שישה דפי מוצר לדוגמה, עם תבניות, צבעים וגופנים שונים. בחרו סגנון והתחילו ליצור דף משלכם.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,8 +45,8 @@
 <main class="main-content">
   <div class="container" style="max-width:1040px;padding-top:32px;padding-bottom:64px">
     <header style="margin-bottom:28px">
-      <h1 class="h1" style="font-size:30px">דוגמאות לדפי מוצר</h1>
-      <p class="section-sub" style="font-size:16px">שישה דפים לדוגמה, כל אחד בתבנית, בצבע ובגופן אחרים. לחצו על דף כדי לראות אותו במלואו, ובחרו את הסגנון שאתם אוהבים.</p>
+      <h1 class="h1" style="font-size:30px">תבניות לדף מוצר</h1>
+      <p class="section-sub" style="font-size:16px">שישה סגנונות מוכנים לדף מוצר, בכיוונים שונים: תמונה למעלה, במרכז, בצד, קולאז', תמונה מלאה ומגזין. בחרו סגנון, ואז צרו דף משלכם בעמוד יצירת דף מוצר.</p>
     </header>
     <div class="grid grid-3" id="exampleGrid"></div>
     <p style="color:var(--muted);font-size:13px;margin-top:24px">המוצרים בדוגמאות בדיוניים. בונים דף משלכם ב<a href="/product-builder.html">יצירת דף מוצר</a>.</p>
@@ -67,12 +67,12 @@
 
 <script>
   var examples = [
-    { slug: 'ex-1', name: 'אוזניות אלחוטיות', look: 'מודרנית · כחול וטורקיז · Heebo' },
-    { slug: 'ex-2', name: 'בקבוק תרמי נירוסטה', look: 'מינימלית · ירוק וזהב · Assistant' },
-    { slug: 'ex-3', name: 'מנורת שולחן LED', look: 'בולטת · שחור וצהוב · Rubik' },
-    { slug: 'ex-4', name: 'כרית שינה מזיכרון', look: 'מודרנית · בורדו וורוד · Frank Ruhl Libre' },
-    { slug: 'ex-5', name: 'סט סכיני מטבח', look: 'מינימלית · סגול וכתום · Heebo' },
-    { slug: 'ex-6', name: 'תיק גב למחשב נייד', look: 'בולטת · כחול וטורקיז · Frank Ruhl Libre' }
+    { slug: 'ex-1', name: 'אוזניות אלחוטיות', look: 'עליונה · כחול וטורקיז · Heebo' },
+    { slug: 'ex-2', name: 'בקבוק תרמי נירוסטה', look: 'במרכז · ירוק וזהב · Assistant' },
+    { slug: 'ex-3', name: 'מנורת שולחן LED', look: 'תמונה מלאה · שחור וצהוב · Rubik' },
+    { slug: 'ex-4', name: 'כרית שינה מזיכרון', look: 'צד לצד · בורדו וורוד · Frank Ruhl Libre' },
+    { slug: 'ex-5', name: 'סט סכיני מטבח', look: 'מגזין · סגול וכתום · Heebo' },
+    { slug: 'ex-6', name: 'תיק גב למחשב נייד', look: 'קולאז\u0027 · כחול וטורקיז · Frank Ruhl Libre' }
   ];
   document.getElementById('exampleGrid').innerHTML = examples.map(function (ex) {
     return '<div class="card" style="padding:14px">' +
