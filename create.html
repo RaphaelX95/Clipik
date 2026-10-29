@@ -50,6 +50,10 @@
       <div class="step-line"></div>
       <span class="step" id="step3"><b>3</b></span>
     </div>
+    <div id="promoBanner" role="region" aria-label="דפי מוצר בחינם" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent);color:#fff;border-radius:16px;padding:14px 18px;margin:0 0 22px;box-shadow:0 6px 18px rgba(255,90,31,.25)">
+      <strong style="font-size:16px;line-height:1.4;flex:1 1 260px">רוצים להקפיץ את המכירות? יצירת דפי מוצר מדהימים בחינם לגמרי!</strong>
+      <a href="/product-examples.html" class="btn" style="background:#fff;color:var(--ink);box-shadow:none;white-space:nowrap">צפה בתבניות לדפי מוצר</a>
+    </div>
     <h2 id="stageTitle" style="text-align:center;margin-bottom:4px">נתחיל מהמוצר</h2>
     <p id="stageCount" style="text-align:center;color:var(--muted);margin-bottom:24px">שלב 1 מתוך 3</p>
 
@@ -200,6 +204,8 @@
       });
       $("#stageTitle").textContent = ["נתחיל מהמוצר","בוחרים תסריט וסגנון","תצוגה וצירת סרטון"][n - 1];
       $("#stageCount").textContent = "שלב " + n + " מתוך 3";
+      const banner = $("#promoBanner");
+      if (banner) banner.hidden = n !== 1;
       window.scrollTo({top: 0, behavior: "smooth"});
     }
 
