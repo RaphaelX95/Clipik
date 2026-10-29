@@ -690,15 +690,18 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
 .sidebar-toggle {
   display: none;
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 200;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 14px 16px;
+  text-align: right;
+  font: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow);
 }
 
 @media (max-width: 768px) {
@@ -714,7 +717,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   }
   .main-content {
     margin-right: 0;
-    padding-top: 68px;
+    padding-top: 56px;
   }
 }
 
@@ -819,6 +822,7 @@ h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;l
 
 /* ריווח התוכן מהסיידבר ומהקצוות */
 .main-content{padding:28px clamp(16px,3vw,40px) 56px}
+@media (max-width:768px){.main-content{padding-top:72px}}
 .main-content .container{padding:0}
 .ai-glow{box-shadow:var(--shadow) !important;animation:none !important}
 .trial-banner{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin:8px 0 22px}
