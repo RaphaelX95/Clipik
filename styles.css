@@ -1,23 +1,23 @@
 /* Clipik - Studio Light Design System */
 :root{
-  /* הרקע קריר ואפור-בהיר, והתוכן יושב על כרטיסים לבנים: ההפרדה בין השניים היא המבנה */
-  --bg:#f2f3f5;
-  --bg-2:#e9ebef;
+  /* רקע נייטרלי חם, והתוכן יושב על כרטיסים לבנים עם מסגרת עדינה: ההפרדה בין השניים היא המבנה */
+  --bg:#f6f5f2;
+  --bg-2:#efede8;
   --surface:#ffffff;
-  --surface-2:#f4f5f7;
-  --ink:#14161a;
-  --ink-2:#3b4048;
-  --muted:#6b717c;
-  --line:#e3e5ea;
+  --surface-2:#f1efeb;
+  --ink:#1a1a1a;
+  --ink-2:#4a4a48;
+  --muted:#7a7874;
+  --line:#e6e3dd;
   /* צבע מותג אחד בלבד: אדום-כתום, לכפתור הראשי, לשלב הפעיל ולפוקוס */
   --accent:#ff5a1f;
   --accent-2:#e2470f;
   --accent-soft:#fff0e8;
-  --teal:#14161a;
-  --radius:14px;
+  --teal:#1a1a1a;
+  --radius:16px;
   --radius-sm:10px;
-  --shadow:0 1px 2px rgba(20,22,26,0.05),0 6px 20px rgba(20,22,26,0.05);
-  --shadow-lg:0 2px 4px rgba(20,22,26,0.06),0 14px 36px rgba(20,22,26,0.09);
+  --shadow:0 1px 2px rgba(26,26,26,0.05),0 8px 24px rgba(26,26,26,0.06);
+  --shadow-lg:0 2px 4px rgba(26,26,26,0.06),0 18px 40px rgba(26,26,26,0.10);
   --font:'Heebo','Noto Sans Hebrew',system-ui,sans-serif;
   --display:'Frank Ruhl Libre','Heebo',serif;
 }
@@ -69,9 +69,9 @@ a:hover{color:var(--accent-2);text-decoration:underline}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn-primary{
-  background:var(--accent);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,0.35);
+  background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(26,26,26,0.08),0 6px 16px rgba(255,90,31,0.22);
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(124,58,237,0.45)}
+.btn-primary:hover{background:var(--accent-2);transform:translateY(-1px);box-shadow:0 1px 2px rgba(26,26,26,0.08),0 10px 24px rgba(255,90,31,0.30)}
 .btn-secondary{background:var(--surface-2);color:var(--ink)}
 .btn-secondary:hover{background:var(--line)}
 .btn-large{padding:14px 20px;font-size:16px;border-radius:14px}
@@ -81,7 +81,7 @@ a:hover{color:var(--accent-2);text-decoration:underline}
 .container{max-width:1200px;margin:0 auto;padding:24px}
 
 /* Hero */
-.hero{padding:72px 24px 56px;text-align:center;background:linear-gradient(180deg,#f8fafc,#ffffff)}
+.hero{padding:72px 24px 56px;text-align:center;background:linear-gradient(180deg,#f6f5f2,#ffffff)}
 .hero h1{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:-.6px;line-height:1.1}
 .hero p{color:var(--muted);font-size:18px;margin-top:12px;max-width:640px;margin-inline:auto}
 .gradient-text{
@@ -455,11 +455,11 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 90, 31, 0.3);
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 8px 24px rgba(255, 90, 31, 0.4);
 }
 .btn-secondary {
   background: var(--surface);
@@ -476,7 +476,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
 .hero {
   padding: 80px 24px 64px;
   text-align: center;
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #f6f5f2 0%, #ffffff 100%);
   position: relative;
   overflow: hidden;
 }
@@ -487,8 +487,8 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at 30% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 70% 80%, rgba(13, 148, 136, 0.08) 0%, transparent 50%);
+  background: radial-gradient(circle at 30% 50%, rgba(255, 90, 31, 0.07) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255, 170, 120, 0.08) 0%, transparent 50%);
   animation: float 20s ease-in-out infinite;
 }
 @keyframes float {
@@ -516,7 +516,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
 .input:focus, .select:focus, .textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft), 0 2px 8px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 2px 8px rgba(255, 90, 31, 0.1);
 }
 
 /* Enhanced Chips */
@@ -541,7 +541,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   background: var(--accent);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 90, 31, 0.3);
 }
 
 /* Section spacing */
@@ -849,7 +849,7 @@ h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;l
   --accent-2:#e2470f;
   --teal:#14161a;
   width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff5a1f,#14161a);color:#fff;
-  background:linear-gradient(135deg,#ff5a1f,#e2470f);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,0.35);
+  background:linear-gradient(135deg,#ff5a1f,#e2470f);color:#fff;box-shadow:0 6px 16px rgba(255,90,31,0.22);
   background:linear-gradient(135deg,#ff5a1f,#14161a);
   background:linear-gradient(135deg,#ff5a1f,#14161a);color:#fff;
 .progress > span{display:block;height:100%;background:linear-gradient(135deg,#ff5a1f,#14161a);width:0%;transition:width .4s}
