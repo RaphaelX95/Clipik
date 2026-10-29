@@ -470,6 +470,7 @@ body.pe-on.pe-min{padding-bottom:48px}
 #pe-bar.pe-collapsed #pe-body{display:none}
 #pe-bar .pe-hint{color:#555}
 #pe-bar .pe-count{color:#555;font-size:12px}
+#pe-bar #pe-back{color:#6c5ce7;font-size:13px;text-decoration:none;font-weight:600}
 #pe-bar .pe-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
 #pe-bar button{font:inherit;padding:6px 14px;border-radius:8px;border:1px solid #6c5ce7;background:#6c5ce7;color:#fff;cursor:pointer}
 #pe-bar button:disabled{opacity:.6;cursor:default}
@@ -482,7 +483,7 @@ body.pe-on.pe-min{padding-bottom:48px}
 """
 
 EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת הדף">
-  <div class="pe-row"><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
+  <div class="pe-row"><a id="pe-back" href="/product-examples.html">→ חזרה לתבניות</a><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
   <div id="pe-body">
     <div class="pe-row"><span class="pe-hint">לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
     <div class="pe-row" id="pe-imgs"></div>
@@ -502,6 +503,10 @@ EDITOR_JS = r"""
   var saveBtn = document.getElementById('pe-save');
 
   var LIMIT = 3;
+  // חזרה: אם יש היסטוריה בדפדפן חוזרים אליה, אחרת (למשל פתיחה מקישור חיצוני) לעמוד התבניות
+  document.getElementById('pe-back').addEventListener('click', function (e) {
+    if (window.history.length > 1) { e.preventDefault(); window.history.back(); }
+  });
   var toggleBtn = document.getElementById('pe-toggle');
   var bar = document.getElementById('pe-bar');
   document.body.classList.add('pe-on');
