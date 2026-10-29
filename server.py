@@ -12,7 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
-from product_page import render_product_page, clean_images, clean_theme, example_page_html, template_data, EXAMPLES
+from product_page import render_product_page, clean_images, clean_theme, example_page_html, example_edit_html, template_data, EXAMPLES
 from decimal import Decimal
 import os
 import threading
@@ -673,8 +673,11 @@ class Handler(BaseHTTPRequestHandler):
             if data is None:
                 return self.send_json(404, {"error": "not found"})
             return self.send_json(200, data)
-        if path.startswith("/product-examples/"):
-            body = example_page_html(path[len("/product-examples/"):].strip("/"))
+        if path.startswith("/product-examples/") or path.startswith("/product-edit/"):
+            if path.startswith("/product-edit/"):
+                body = example_edit_html(path[len("/product-edit/"):].strip("/"))
+            else:
+                body = example_page_html(path[len("/product-examples/"):].strip("/"))
             if body is None:
                 return self.send_json(404, {"error": "not found"})
             data = body.encode("utf-8")
