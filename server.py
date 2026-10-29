@@ -12,7 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
-from product_page import render_product_page, clean_images, clean_theme
+from product_page import render_product_page, clean_images, clean_theme, example_page_html, EXAMPLES
 from decimal import Decimal
 import os
 import threading
@@ -606,7 +606,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Location", self.REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/product-examples.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -616,6 +616,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'create.html').read_bytes()
         elif path == '/templates.html':
             body = (ROOT / 'templates.html').read_bytes()
+        elif path == '/product-examples.html':
+            body = (ROOT / 'product-examples.html').read_bytes()
         elif path == '/my-videos.html':
             body = (ROOT / 'my-videos.html').read_bytes()
         elif path == '/product-builder.html':
@@ -666,6 +668,18 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
         if path.startswith("/p/"):
             return self._serve_product_page(path[3:].strip("/"))
+        if path.startswith("/product-examples/"):
+            body = example_page_html(path[len("/product-examples/"):].strip("/"))
+            if body is None:
+                return self.send_json(404, {"error": "not found"})
+            data = body.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if path == "/api/auth/logout":
             return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
         if path == "/api/auth/me":
@@ -768,12 +782,14 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/product-examples.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
             self.send_error(404, "Not found")
             return
         body = b""
         if path == "/templates.html":
             body = (ROOT / "templates.html").read_bytes()
+        if path == "/product-examples.html":
+            body = (ROOT / "product-examples.html").read_bytes()
         if path == "/my-videos.html":
             body = (ROOT / "my-videos.html").read_bytes()
         if path == "/product-builder.html":
@@ -1211,7 +1227,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send_security_headers(self):
         self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('X-Frame-Options', 'DENY')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
         self.send_header('X-XSS-Protection', '1; mode=block')
         self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
         self.send_header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
