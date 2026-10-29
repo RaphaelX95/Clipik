@@ -6,6 +6,7 @@
 """
 import base64
 import html
+import json
 import re
 
 MAX_IMAGES = 10
@@ -159,23 +160,23 @@ LAYOUT_CSS = {
 
 
 def _text_block(product, headline, price, description, cls=""):
-    kicker = f'<span class="kicker">{esc(product)}</span>' if product else ""
-    price_html = f'<div class="price">{esc(price)}</div>' if price else ""
-    desc_html = f'<p class="lead">{esc(description)}</p>' if description else ""
-    return f'<div class="{cls}">{kicker}<h1>{esc(headline)}</h1>{price_html}{desc_html}</div>'
+    kicker = f'<span class="kicker" data-f="product">{esc(product)}</span>' if product else ""
+    price_html = f'<div class="price" data-f="price">{esc(price)}</div>' if price else ""
+    desc_html = f'<p class="lead" data-f="description">{esc(description)}</p>' if description else ""
+    return f'<div class="{cls}">{kicker}<h1 data-f="headline">{esc(headline)}</h1>{price_html}{desc_html}</div>'
 
 
 def _benefits(benefits, cls="bens"):
     if not benefits:
         return ""
-    items = "".join(f'<div class="ben"><div class="n">{k + 1:02d}</div><p>{esc(b)}</p></div>' for k, b in enumerate(benefits))
+    items = "".join(f'<div class="ben"><div class="n">{k + 1:02d}</div><p data-ben="{k}">{esc(b)}</p></div>' for k, b in enumerate(benefits))
     return f'<div class="{cls}">{items}</div>'
 
 
 def _faq(faq):
     if not faq:
         return ""
-    items = "".join(f'<details><summary>{esc(f["q"])}</summary><p>{esc(f["a"])}</p></details>' for f in faq)
+    items = "".join(f'<details><summary data-faq="{k}">{esc(f["q"])}</summary><p data-faqa="{k}">{esc(f["a"])}</p></details>' for k, f in enumerate(faq))
     return f'<section class="sec faq"><h2>שאלות נפוצות</h2>{items}</section>'
 
 
@@ -197,7 +198,7 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
     if layout == "center":
         head = f'<header class="center-head">{_text_block(product, headline, price, description)}</header>'
         media = f'<figure class="center-main">{_img(main, alt)}</figure>' if main else ""
-        items = "".join(f'<div class="item"><span>{k + 1:02d}</span>{esc(b)}</div>' for k, b in enumerate(benefits))
+        items = "".join(f'<div class="item"><span>{k + 1:02d}</span><span data-ben="{k}">{esc(b)}</span></div>' for k, b in enumerate(benefits))
         lst = f'<div class="center-list">{items}</div>' if items else ""
         more = f'<div class="sec-more"><div class="thumbs">{"".join(_img(i, alt) for i in rest)}</div></div>' if rest else ""
         return head + media + lst + more + _faq(faq)
@@ -220,7 +221,7 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
         mosaic = f'<div class="mosaic">{"".join(cells)}</div>' if cells else ""
         chips = ""
         if benefits:
-            chips = '<div class="sec"><div class="chips">' + "".join(f"<span>{esc(b)}</span>" for b in benefits) + "</div></div>"
+            chips = '<div class="sec"><div class="chips">' + "".join(f'<span data-ben="{k}">{esc(b)}</span>' for k, b in enumerate(benefits)) + "</div></div>"
         return head + mosaic + chips + _faq(faq)
 
     if layout == "overlay":
@@ -238,7 +239,7 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
         rows = []
         pool = images
         for k, b in enumerate(benefits):
-            text = f'<div><div class="ed-num">{k + 1:02d}</div><p>{esc(b)}</p></div>'
+            text = f'<div><div class="ed-num">{k + 1:02d}</div><p data-ben="{k}">{esc(b)}</p></div>'
             if pool:
                 src = pool[k % len(pool)]
                 flip = " flip" if k % 2 else ""
@@ -254,7 +255,7 @@ def _faq_sec(faq):
     return _faq(faq) if faq else ""
 
 
-def _render(page: dict, images: list) -> str:
+def _render(page: dict, images: list, edit: bool = False) -> str:
     theme = clean_theme(page.get("theme"))
     colors = COLORS[theme["color"]]
     font_name, font_weights = FONTS[theme["font"]]
@@ -271,7 +272,7 @@ def _render(page: dict, images: list) -> str:
         f"--accent:{colors['accent']};--mint:{colors['mint']};--line:#e6dfd2;--font:'{font_name}'}}"
     )
     body = _body(theme["template"], product, headline, price, description, images, benefits, faq)
-    return f"""<!doctype html>
+    doc = f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{esc(headline)}</title>
@@ -282,6 +283,11 @@ def _render(page: dict, images: list) -> str:
 {body}
 <footer class="foot">נוצר באמצעות קליפיק</footer>
 </body></html>"""
+    if edit:
+        doc = _with_editor(doc, {"product": product, "headline": headline, "price": price,
+                                 "description": description, "benefits": benefits, "faq": faq,
+                                 "theme": theme}, images)
+    return doc
 
 
 def render_product_page(page: dict) -> str:
@@ -390,6 +396,231 @@ EXAMPLES = [
 ]
 
 
+# ---- עריכה ישירה: אותו דף מוצר, עם טקסטים שאפשר ללחוץ ולשנות ----
+EDITOR_CSS = """
+body.pe-on{padding-bottom:300px}
+[contenteditable]{outline:1px dashed rgba(0,0,0,.3);outline-offset:4px;border-radius:4px;cursor:text}
+[contenteditable]:hover{background:rgba(255,236,140,.3)}
+[contenteditable]:focus{outline:2px solid #6c5ce7;background:rgba(255,236,140,.22)}
+#pe-bar{position:fixed;left:0;right:0;bottom:0;z-index:9999;max-height:48vh;overflow:auto;background:#fff;color:#1d1d1f;border-top:1px solid #ddd;box-shadow:0 -6px 24px rgba(0,0,0,.14);padding:12px 16px;font:14px/1.5 system-ui,sans-serif;text-align:right}
+#pe-bar .pe-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+#pe-bar button{font:inherit;padding:6px 14px;border-radius:8px;border:1px solid #6c5ce7;background:#6c5ce7;color:#fff;cursor:pointer}
+#pe-bar button:disabled{opacity:.6;cursor:default}
+#pe-bar .pe-thumb{display:flex;flex-direction:column;gap:4px;align-items:center}
+#pe-bar .pe-thumb img{width:64px!important;height:64px!important;object-fit:cover;border-radius:8px;display:block}
+#pe-bar .pe-thumb button{padding:3px 8px;font-size:12px;background:#fff;color:#6c5ce7}
+#pe-bar #pe-status{color:#555}
+"""
+
+EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת הדף">
+  <div class="pe-row"><strong>עריכה ישירה בדף</strong><span>לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
+  <div class="pe-row" id="pe-imgs"></div>
+  <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
+  <div class="pe-row" id="pe-result" hidden></div>
+</div>"""
+
+EDITOR_JS = r"""
+(function () {
+  var data = JSON.parse(document.getElementById('pe-data').textContent);
+  var page = data.page;
+  var images = data.images.slice();
+  var imgBox = document.getElementById('pe-imgs');
+  var statusEl = document.getElementById('pe-status');
+  var result = document.getElementById('pe-result');
+  var saveBtn = document.getElementById('pe-save');
+
+  document.body.classList.add('pe-on');
+  document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+  document.querySelectorAll('summary').forEach(function (s) {
+    s.addEventListener('click', function (e) { e.preventDefault(); });
+  });
+  document.querySelectorAll('[data-f],[data-ben],[data-faq],[data-faqa]').forEach(function (el) {
+    el.setAttribute('contenteditable', 'true');
+    el.setAttribute('spellcheck', 'false');
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); return; }
+      // רווח בתוך שאלה (summary) היה פותח ומסגיר את התשובה, אז מוסיפים אותו ידנית
+      if (e.key === ' ' && el.tagName === 'SUMMARY') { e.preventDefault(); document.execCommand('insertText', false, ' '); }
+    });
+    el.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var t = (e.clipboardData || window.clipboardData).getData('text') || '';
+      document.execCommand('insertText', false, t.replace(/\s+/g, ' '));
+    });
+  });
+
+  function text(sel) {
+    var el = document.querySelector(sel);
+    return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+
+  function collect() {
+    var benefits = [];
+    (page.benefits || []).forEach(function (orig, k) {
+      var sel = '[data-ben="' + k + '"]';
+      var v = document.querySelector(sel) ? text(sel) : orig;
+      if (v) benefits.push(v);
+    });
+    var faq = [];
+    (page.faq || []).forEach(function (orig, k) {
+      var q = text('[data-faq="' + k + '"]');
+      var a = text('[data-faqa="' + k + '"]');
+      if (q && a) faq.push({ q: q, a: a });
+    });
+    return {
+      product: text('[data-f="product"]') || page.product,
+      headline: text('[data-f="headline"]') || page.headline,
+      price: text('[data-f="price"]'),
+      description: text('[data-f="description"]'),
+      benefits: benefits,
+      faq: faq,
+      images: images,
+      theme: page.theme,
+      reviews: []
+    };
+  }
+
+  function shrink(file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+          var s = Math.min(1, 1000 / Math.max(img.width, img.height));
+          var c = document.createElement('canvas');
+          c.width = Math.round(img.width * s);
+          c.height = Math.round(img.height * s);
+          var x = c.getContext('2d');
+          x.fillStyle = '#fff';
+          x.fillRect(0, 0, c.width, c.height);
+          x.drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = function () { reject(new Error('bad image')); };
+        img.src = r.result;
+      };
+      r.onerror = function () { reject(r.error); };
+      r.readAsDataURL(file);
+    });
+  }
+
+  function swapImage(oldSrc, newSrc) {
+    document.querySelectorAll('img').forEach(function (im) {
+      if (im.getAttribute('src') === oldSrc) im.setAttribute('src', newSrc);
+    });
+    document.querySelectorAll('[style]').forEach(function (el) {
+      var st = el.getAttribute('style') || '';
+      if (st.indexOf(oldSrc) > -1) el.setAttribute('style', st.split(oldSrc).join(newSrc));
+    });
+  }
+
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/png,image/jpeg,image/webp';
+  fileInput.hidden = true;
+  document.body.appendChild(fileInput);
+  var pending = -1;
+
+  function pickFile(i) { pending = i; fileInput.value = ''; fileInput.click(); }
+
+  fileInput.addEventListener('change', function () {
+    var f = fileInput.files[0];
+    var i = pending;
+    if (!f || i < 0) return;
+    if (f.size > 10 * 1024 * 1024) { statusEl.textContent = 'תמונה גדולה מדי (מקס 10MB)'; return; }
+    statusEl.textContent = 'מעבד את התמונה...';
+    shrink(f).then(function (next) {
+      swapImage(images[i], next);
+      images[i] = next;
+      renderThumbs();
+      statusEl.textContent = 'התמונה הוחלפה';
+    }).catch(function () { statusEl.textContent = 'לא הצלחנו לקרוא את התמונה'; });
+  });
+
+  function renderThumbs() {
+    imgBox.innerHTML = '';
+    images.forEach(function (src, i) {
+      var box = document.createElement('div');
+      box.className = 'pe-thumb';
+      var im = document.createElement('img');
+      im.src = src;
+      im.alt = 'תמונה ' + (i + 1);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = 'החלפת תמונה';
+      b.addEventListener('click', function () { pickFile(i); });
+      box.appendChild(im);
+      box.appendChild(b);
+      imgBox.appendChild(box);
+    });
+  }
+  renderThumbs();
+
+  function showResult(url) {
+    result.hidden = false;
+    result.innerHTML = '';
+    var a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = url;
+    var copy = document.createElement('button');
+    copy.type = 'button'; copy.textContent = 'העתקת הקישור';
+    copy.addEventListener('click', function () {
+      if (!navigator.clipboard) { statusEl.textContent = 'לא הצלחנו להעתיק'; return; }
+      navigator.clipboard.writeText(url).then(
+        function () { statusEl.textContent = 'הקישור הועתק'; },
+        function () { statusEl.textContent = 'לא הצלחנו להעתיק'; });
+    });
+    result.appendChild(a);
+    result.appendChild(copy);
+  }
+
+  saveBtn.addEventListener('click', function () {
+    var body = collect();
+    if (!body.product) { statusEl.textContent = 'כדי לשמור צריך שם מוצר'; return; }
+    saveBtn.disabled = true;
+    statusEl.textContent = 'שומר...';
+    fetch('/api/product-page', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      if (!res.ok || !res.d.page_url) throw new Error(res.d.error || 'השמירה לא הצליחה, נסו שוב');
+      statusEl.textContent = 'הדף נשמר';
+      showResult(res.d.page_url);
+    }).catch(function (err) {
+      statusEl.textContent = err.message;
+    }).then(function () {
+      saveBtn.disabled = false;
+    });
+  });
+})();
+"""
+
+
+def _with_editor(doc: str, fields: dict, images: list) -> str:
+    """מוסיף לדף השמור את סרגל העריכה והסקריפט. הדף עצמו נשאר זהה לתצוגה האמיתית."""
+    data = {
+        "page": {
+            "product": fields["product"],
+            "headline": fields["headline"],
+            "price": fields["price"],
+            "description": fields["description"],
+            "benefits": list(fields["benefits"]),
+            "faq": [{"q": f["q"], "a": f["a"]} for f in fields["faq"]],
+            "theme": fields["theme"],
+        },
+        "images": list(images),
+    }
+    payload = json.dumps(data, ensure_ascii=False).replace("</", "<\/")
+    tail = (
+        f"<style>{EDITOR_CSS}</style>{EDITOR_BAR}"
+        f'<script id="pe-data" type="application/json">{payload}</script>'
+        f"<script>{EDITOR_JS}</script>"
+    )
+    return doc.replace("</body>", tail + "</body>")
+
+
 def template_data(slug: str):
     """נתוני תבנית לעריכה: התוכן, התמונות והעיצוב של הדוגמה."""
     for ex in EXAMPLES:
@@ -408,4 +639,12 @@ def example_page_html(slug: str):
     for ex in EXAMPLES:
         if ex["slug"] == slug:
             return _render(ex["page"], ex["images"])
+    return None
+
+
+def example_edit_html(slug: str):
+    """דף הדוגמה בדיוק כמו בתצוגה האמיתית, עם אפשרות לערוך אותו ישירות."""
+    for ex in EXAMPLES:
+        if ex["slug"] == slug:
+            return _render(ex["page"], ex["images"], edit=True)
     return None
