@@ -260,17 +260,31 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
     return _text_block(product, headline, price, description)
 
 
-def _buy(cta_text, cta_url, details_title, details):
-    """הסבר חופשי על המוצר וכפתור קריאה לפעולה, בסוף הדף."""
-    parts = []
-    if details_title or details:
-        title = f'<h2 data-f="details_title">{esc(details_title)}</h2>' if details_title else ""
-        text = f'<p class="buy-txt" data-f="details">{esc(details)}</p>' if details else ""
-        parts.append(f'<div class="buy-details">{title}{text}</div>')
+def _details(details_title, details):
+    """הסבר חופשי על המוצר. מופיע מעל השאלות הנפוצות."""
+    if not (details_title or details):
+        return ""
+    title = f'<h2 data-f="details_title">{esc(details_title)}</h2>' if details_title else ""
+    text = f'<p class="buy-txt" data-f="details">{esc(details)}</p>' if details else ""
+    return f'<section class="buy"><div class="buy-details">{title}{text}</div></section>'
+
+
+def _cta(cta_text, cta_url):
+    """כפתור קריאה לפעולה, בסוף הדף."""
     href = esc(cta_url) if cta_url else "#"
     target = ' target="_blank" rel="noopener"' if cta_url else ""
-    parts.append(f'<div class="buy-cta"><a class="cta-btn" href="{href}"{target} data-f="cta_text">{esc(cta_text)}</a></div>')
-    return '<section class="buy">' + "".join(parts) + "</section>"
+    return f'<section class="buy"><div class="buy-cta"><a class="cta-btn" href="{href}"{target} data-f="cta_text">{esc(cta_text)}</a></div></section>'
+
+
+def _place_buy(body, details_html, cta_html):
+    """הסבר מעל השאלות הנפוצות, וכפתור בסוף הדף (אחרי השאלות)."""
+    marker = '<section class="sec faq">'
+    idx = body.find(marker)
+    if idx >= 0:
+        body = body[:idx] + details_html + body[idx:]
+    else:
+        body += details_html
+    return body + cta_html
 
 
 def _faq_sec(faq):
@@ -300,7 +314,7 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
     details_title = str(page.get("details_title") or "").strip()
     details = str(page.get("details") or "").strip()
     body = _body(theme["template"], product, headline, price, description, images, benefits, faq)
-    body += _buy(cta_text, cta_url, details_title, details)
+    body = _place_buy(body, _details(details_title, details), _cta(cta_text, cta_url))
     doc = f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
