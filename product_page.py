@@ -654,6 +654,27 @@ EXAMPLES = [
 ]
 
 # ---- עריכה ישירה: אותו דף מוצר, עם טקסטים שאפשר ללחוץ ולשנות ----
+SECTION_LABELS = (
+    ("description", "תיאור קצר"),
+    ("benefits", "יתרונות"),
+    ("shipping", "משלוח והחזרות"),
+    ("specs", "מפרט"),
+    ("details", "הסבר מלא"),
+    ("reviews", "ביקורות"),
+    ("faq", "שאלות נפוצות"),
+    ("cta", "כפתור קנייה"),
+)
+
+
+def _section_checks(hidden) -> str:
+    """תיבות סימון להצגה או הסתרה של כל חלק בדף. סומן = מוצג."""
+    out = []
+    for key, label in SECTION_LABELS:
+        checked = "" if key in hidden else " checked"
+        out.append(f'<label><input type="checkbox" data-hide-key="{key}"{checked}> {label}</label>')
+    return "".join(out)
+
+
 EDITOR_CSS = """
 body.pe-on{padding-bottom:210px}
 body.pe-on.pe-min{padding-bottom:48px}
@@ -674,12 +695,15 @@ body.pe-on.pe-min{padding-bottom:48px}
 #pe-bar .pe-thumb .pe-del{color:#b42318;border-color:#b42318}
 #pe-bar #pe-toggle{padding:3px 10px;font-size:12px;background:#fff;color:#6c5ce7}
 #pe-bar #pe-status{color:#555}
+#pe-sections label{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-size:12px}
+#pe-sections input{margin:0;accent-color:#6c5ce7}
 """
 
 EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת הדף">
   <div class="pe-row"><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
   <div id="pe-body">
     <div class="pe-row"><span class="pe-hint">לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
+    <div class="pe-row" id="pe-sections"><span class="pe-hint">מה מוצג בדף:</span>__SECTIONS__</div>
     <div class="pe-row" id="pe-imgs"></div>
     <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
     <div class="pe-row" id="pe-result" hidden></div>
@@ -823,6 +847,19 @@ EDITOR_JS = r"""
     });
   }
 
+  // הצגה או הסתרה של חלק בדף. לפני הרינדור שומרים את מה שנערך עד עכשיו
+  document.querySelectorAll('#pe-sections input').forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      var key = cb.getAttribute('data-hide-key');
+      var c = collect();
+      var h = (c.hidden || []).filter(function (k) { return k !== key; });
+      if (!cb.checked) h.push(key);
+      c.hidden = h;
+      page = c;
+      refreshPage();
+    });
+  });
+
   var fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'image/png,image/jpeg,image/webp';
@@ -952,8 +989,9 @@ def _with_editor(doc: str, fields: dict, images: list) -> str:
         "images": list(images),
     }
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\/")
+    bar = EDITOR_BAR.replace("__SECTIONS__", _section_checks(fields["hidden"]))
     tail = (
-        f"<style>{EDITOR_CSS}</style>{EDITOR_BAR}"
+        f"<style>{EDITOR_CSS}</style>{bar}"
         f'<script id="pe-data" type="application/json">{payload}</script>'
         f"<script>{EDITOR_JS}</script>"
     )
