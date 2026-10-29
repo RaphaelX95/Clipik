@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דוגמאות לדפי מוצר - קליפיק</title>
+  <meta name="description" content="שישה דפי מוצר לדוגמה, עם תבניות, צבעים וגופנים שונים. בחרו סגנון והתחילו ליצור דף משלכם.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:image" content="https://clipik.pro/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://clipik.pro/og-image.png">
+</head>
+<body>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
+<aside class="sidebar">
+  <a class="sidebar-brand" href="/create.html">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
+    קליפיק
+  </a>
+  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">עריכה</div>
+    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
+    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon">📦</span>יצירת דף מוצר</a>
+    <a href="/product-examples.html" class="sidebar-link active"><span class="sidebar-icon">🖼️</span>דוגמאות לדפי מוצר</a>
+    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <div class="sidebar-section">ניווט</div>
+    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
+    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
+    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
+  </nav>
+  <div class="sidebar-footer">© 2026 קליפיק</div>
+</aside>
+
+<main class="main-content">
+  <div class="container" style="max-width:1040px;padding-top:32px;padding-bottom:64px">
+    <header style="margin-bottom:28px">
+      <h1 class="h1" style="font-size:30px">דוגמאות לדפי מוצר</h1>
+      <p class="section-sub" style="font-size:16px">שישה דפים לדוגמה, כל אחד בתבנית, בצבע ובגופן אחרים. לחצו על דף כדי לראות אותו במלואו, ובחרו את הסגנון שאתם אוהבים.</p>
+    </header>
+    <div class="grid grid-3" id="exampleGrid"></div>
+    <p style="color:var(--muted);font-size:13px;margin-top:24px">המוצרים בדוגמאות בדיוניים. בונים דף משלכם ב<a href="/product-builder.html">יצירת דף מוצר</a>.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<footer class="footer">
+  <div class="container">
+    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <a href="/pricing.html">מחירון</a>
+      <a href="/examples.html">טיפים</a>
+      <a href="/faq.html">שאלות נפוצות</a>
+    </div>
+    <p>© 2026 קליפיק. כל הזכויות שמורות.</p>
+  </div>
+</footer>
+
+<script>
+  var examples = [
+    { slug: 'ex-1', name: 'אוזניות אלחוטיות', look: 'מודרנית · כחול וטורקיז · Heebo' },
+    { slug: 'ex-2', name: 'בקבוק תרמי נירוסטה', look: 'מינימלית · ירוק וזהב · Assistant' },
+    { slug: 'ex-3', name: 'מנורת שולחן LED', look: 'בולטת · שחור וצהוב · Rubik' },
+    { slug: 'ex-4', name: 'כרית שינה מזיכרון', look: 'מודרנית · בורדו וורוד · Frank Ruhl Libre' },
+    { slug: 'ex-5', name: 'סט סכיני מטבח', look: 'מינימלית · סגול וכתום · Heebo' },
+    { slug: 'ex-6', name: 'תיק גב למחשב נייד', look: 'בולטת · כחול וטורקיז · Frank Ruhl Libre' }
+  ];
+  document.getElementById('exampleGrid').innerHTML = examples.map(function (ex) {
+    return '<div class="card" style="padding:14px">' +
+      '<a href="/product-examples/' + ex.slug + '" target="_blank" rel="noopener" style="display:block;position:relative;height:360px;overflow:hidden;border-radius:12px;background:#f4efe6">' +
+        '<iframe src="/product-examples/' + ex.slug + '" title="' + ex.name + '" tabindex="-1" style="position:absolute;top:0;right:0;width:1000px;height:1180px;border:0;transform:scale(.3);transform-origin:top right;pointer-events:none"></iframe>' +
+      '</a>' +
+      '<h3 class="h3" style="font-size:18px;margin:14px 0 4px">' + ex.name + '</h3>' +
+      '<p style="color:var(--muted);font-size:13px;margin:0 0 12px">' + ex.look + '</p>' +
+      '<a class="btn btn-secondary" style="width:100%;text-align:center" href="/product-examples/' + ex.slug + '" target="_blank" rel="noopener">פתחו את הדף המלא</a>' +
+    '</div>';
+  }).join('');
+</script>
+<script>
+(function () {
+  var cta = document.querySelector('.sidebar-login-cta');
+  if (!cta) return;
+  var box = document.createElement('div');
+  box.id = 'sidebar-balance';
+  box.style.cssText = 'text-align:center;margin:-8px 16px 18px;font-size:15px;font-weight:700;color:#444';
+  box.textContent = 'טוקנים: 0';
+  cta.insertAdjacentElement('afterend', box);
+  fetch('/api/users/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); if (d && d.user && d.user.email) cta.textContent = '👤 ' + d.user.email; })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
