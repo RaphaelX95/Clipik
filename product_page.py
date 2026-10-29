@@ -19,6 +19,10 @@ LAYOUTS = {
     "collage": "קולאז'",
     "overlay": "תמונה מלאה",
     "editorial": "מגזין",
+    "stack": "ערימה",
+    "frame": "מסגרת",
+    "giant": "ענקית",
+    "minimal": "מינימלי",
 }
 # תבניות ישנות שנשמרו לפני שהתבניות הוחלפו
 _LEGACY_LAYOUTS = {"modern": "top", "minimal": "center", "bold": "overlay"}
@@ -95,6 +99,54 @@ h2{font-size:24px;font-weight:900;margin:0 0 16px}
 
 LAYOUT_CSS = {
     # תמונה גדולה מתחת לכותרת, תמונות נוספות למטה
+    # כותרת בראש, תמונה רחבה, ויתרונות בשני טורים
+    "stack": """
+.stack-head{background:var(--paper);padding:44px 20px 0;text-align:center}
+.stack-head .price{margin-inline:auto}
+.stack-head .kicker{background:var(--mint)}
+.stack-main{max-width:820px;margin:26px auto 0;padding:0 20px}
+.stack-main img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:24px}
+.l-stack .bens{grid-template-columns:1fr 1fr;gap:12px}
+.l-stack .ben{background:#fff;border-top:4px solid var(--accent);border-radius:16px;padding:18px}
+@media (max-width:600px){.l-stack .bens{grid-template-columns:1fr}}
+""",
+    # תמונה בתוך מסגרת עם צל מוזז, ויתרונות כרשימת סימון
+    "frame": """
+.frame-wrap{max-width:900px;margin:32px auto 0;padding:0 20px}
+.frame-row{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;border:2px solid var(--accent);border-radius:32px;padding:28px}
+.frame-media img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;box-shadow:12px 12px 0 var(--accent)}
+.frame-text .bens{grid-template-columns:1fr;gap:10px}
+.l-frame .ben{background:none;border-radius:0;padding:0;display:flex;gap:10px;align-items:flex-start}
+.l-frame .ben .n{font-size:0}
+.l-frame .ben .n::after{content:"✓";font-size:18px;color:var(--accent);font-weight:900}
+.l-frame .ben p{margin:0;font-size:17px}
+@media (max-width:700px){.frame-row{grid-template-columns:1fr;padding:20px}}
+""",
+    # כותרת גדולה מאוד, תמונה עגולה, ויתרונות עם מספרים גדולים
+    "giant": """
+.giant-head{max-width:900px;margin:0 auto;padding:48px 20px 0}
+.l-giant h1{font-size:clamp(40px,9vw,68px);line-height:1.05;letter-spacing:-.01em}
+.giant-circle{max-width:420px;margin:36px auto 0;padding:0 20px}
+.giant-circle img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;border:10px solid #fff;box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}
+.l-giant .bens{grid-template-columns:1fr;gap:26px}
+.l-giant .ben{background:none;border-radius:0;padding:0}
+.l-giant .ben .n{font-size:48px;font-weight:900;color:var(--accent);line-height:1}
+.l-giant .ben p{font-size:22px;margin-top:4px}
+""",
+    # עמוד שקט: עמודה צרה, הרבה רווח, ויתרונות ברשימה דקה
+    "minimal": """
+.min-head{max-width:560px;margin:0 auto;padding:68px 20px 0;text-align:center}
+.min-head h1{font-size:36px;font-weight:600;letter-spacing:-.01em}
+.min-head .price{background:none;color:var(--ink);border:1px solid var(--line)}
+.min-head .kicker{background:none;color:#6b6880;padding:0}
+.min-img{max-width:420px;margin:40px auto 0;padding:0 20px}
+.min-img img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:4px}
+.l-minimal .sec{max-width:560px}
+.l-minimal .bens{grid-template-columns:1fr;gap:0}
+.l-minimal .ben{background:none;border-radius:0;padding:16px 0;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:baseline}
+.l-minimal .ben .n{font-size:12px;color:#6b6880;min-width:24px}
+.l-minimal .ben p{margin:0;font-size:17px;font-weight:500}
+""",
     "top": """
 .band{background:var(--band);color:#f7f1e6;padding:56px 20px 130px;position:relative;overflow:hidden}
 .band .wrap{position:relative;z-index:1}
@@ -256,6 +308,30 @@ def _body(layout, product, headline, price, description, images, benefits, faq):
             else:
                 rows.append(f'<div class="ed-row noimg">{text}</div>')
         return head + "".join(rows) + _faq(faq)
+
+    if layout == "stack":
+        head = f'<header class="stack-head">{_text_block(product, headline, price, description)}</header>'
+        media = f'<figure class="stack-main">{_img(main, alt)}</figure>' if main else ""
+        more = f'<div class="sec-more"><div class="thumbs">{"".join(_img(i, alt) for i in rest)}</div></div>' if rest else ""
+        return head + media + more + f'<section class="sec">{_benefits(benefits)}</section>' + _faq(faq)
+
+    if layout == "frame":
+        media = f'<div class="frame-media">{_img(main, alt)}</div>' if main else ""
+        text = f'<div class="frame-text">{_text_block(product, headline, price, description)}{_benefits(benefits)}</div>'
+        more = f'<div class="sec-more"><div class="thumbs">{"".join(_img(i, alt) for i in rest)}</div></div>' if rest else ""
+        return f'<div class="frame-wrap"><div class="frame-row">{media}{text}</div>{more}</div>' + _faq(faq)
+
+    if layout == "giant":
+        head = f'<header class="giant-head">{_text_block(product, headline, price, description)}</header>'
+        media = f'<div class="giant-circle">{_img(main, alt)}</div>' if main else ""
+        more = f'<div class="sec-more"><div class="thumbs">{"".join(_img(i, alt) for i in rest)}</div></div>' if rest else ""
+        return head + media + f'<section class="sec">{_benefits(benefits)}</section>' + more + _faq(faq)
+
+    if layout == "minimal":
+        head = f'<header class="min-head">{_text_block(product, headline, price, description)}</header>'
+        media = f'<figure class="min-img">{_img(main, alt)}</figure>' if main else ""
+        more = f'<div class="sec-more"><div class="thumbs">{"".join(_img(i, alt) for i in rest)}</div></div>' if rest else ""
+        return head + media + f'<section class="sec">{_benefits(benefits)}</section>' + more + _faq(faq)
 
     return _text_block(product, headline, price, description)
 
@@ -539,7 +615,7 @@ EXAMPLES = [
               ("מה הנפח שלו?", "כ-25 ליטר."),
               ("יש אחריות?", "שנה אחריות על התפרים והרוכסנים.")],
              "backpack"),
-    _example("ex-7", "ספל קרמיקה בעבודת יד", "top", "rose", "rubik", "ספל קרמיקה בעבודת יד", "הבוקר מתחיל בספל שאוהבים", "₪59",
+    _example("ex-7", "ספל קרמיקה בעבודת יד", "stack", "rose", "rubik", "ספל קרמיקה בעבודת יד", "הבוקר מתחיל בספל שאוהבים", "₪59",
              "ספל קרמיקה עם גימור חול מט, שמחזיק את החום ומתאים לקפה, לתה ולשוקו.",
              ["גימור מט שנעים ביד", "מתאים למיקרוגל ולמדיח כלים", "נפח של כ-350 מ\"ל"],
              [("אפשר לשים במיקרוגל?", "כן. מומלץ להימנע משינויים פתאומיים בטמפרטורה."),
@@ -548,7 +624,7 @@ EXAMPLES = [
               ("מה נפח הספל?", "כ-350 מ\"ל."),
               ("מה קורה אם הספל נשבר בהובלה?", "שולחים החלפה.")],
              "mug"),
-    _example("ex-8", "מחצלת יוגה עם רצועת פקק", "center", "mono", "heebo", "מחצלת יוגה עם רצועת פקק", "תנועה נעימה על מחצלת יציבה", "₪99",
+    _example("ex-8", "מחצלת יוגה עם רצועת פקק", "frame", "mono", "heebo", "מחצלת יוגה עם רצועת פקק", "תנועה נעימה על מחצלת יציבה", "₪99",
              "מחצלת עבה ונוחה עם משטח שלא מחליק, ורצועת פקק שנושאת אותה בקלות.",
              ["עובי נדיב שנעים לברכיים", "משטח שלא מחליק גם בזיעה", "רצועת פקק לנשיאה קלה"],
              [("מה עובי המחצלת?", "כ-6 מ\"מ."),
@@ -557,7 +633,7 @@ EXAMPLES = [
               ("מאיזה חומר היא עשויה?", "חומר ללא PVC."),
               ("יש אחריות?", "שנה אחריות על פגמי ייצור.")],
              "yoga"),
-    _example("ex-9", "שעון חכם עם מסך עגול", "side", "ocean", "assistant", "שעון חכם עם מסך עגול", "צעדים, דופק ושינה במקום אחד", "₪349",
+    _example("ex-9", "שעון חכם עם מסך עגול", "giant", "ocean", "assistant", "שעון חכם עם מסך עגול", "צעדים, דופק ושינה במקום אחד", "₪349",
              "שעון חכם עם מסך עגול, מעקב פעילות, דופק ושינה, ורצועה נוחה ליום שלם.",
              ["מעקב צעדים, דופק ושינה", "סוללה לכמה ימים", "עמיד למים לרחצה רגילה"],
              [("כמה זמן נמשכת הסוללה?", "בשימוש רגיל עד כמה ימים, תלוי בשימוש במסך ובהתראות."),
@@ -566,7 +642,7 @@ EXAMPLES = [
               ("מה כלול באריזה?", "השעון, כבל טעינה ומדריך קצר."),
               ("יש אחריות?", "שנה אחריות מהיצרן.")],
              "watch"),
-    _example("ex-10", "סרום לעור עם טפטפת", "overlay", "plum", "frank", "סרום לעור עם טפטפת", "עור רענן בכמה טיפות", "₪89",
+    _example("ex-10", "סרום לעור עם טפטפת", "minimal", "plum", "frank", "סרום לעור עם טפטפת", "עור רענן בכמה טיפות", "₪89",
              "סרום מרוכז בבקבוק זכוכית כהה עם טפטפת, לשימוש יומיומי בבוקר או בערב.",
              ["מרקם קל שנספג מהר", "בקבוק זכוכית כהה שמגן על הרכיבים", "מתאים לשימוש יומיומי"],
              [("כמה טיפות להשתמש?", "שתיים עד שלוש טיפות, על פנים נקיות ויבשות."),
