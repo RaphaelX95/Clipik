@@ -68,34 +68,24 @@
 </footer>
 
 <script>
-  // חמש התבניות תואמות בדיוק לסגנונות ולאורכים שנתמכים במסך היצירה.
+  // חמש התבניות תואמות לסגנונות שנתמכים במסך היצירה. האורך נבחר בתוך התבנית.
   var templates = [
-    { style: 'UGC טבעי', title: 'UGC טבעי', icon: '🎬', duration: 15, desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.' },
-    { style: 'הדגמת מוצר', title: 'הדגמת מוצר', icon: '🔍', duration: 15, desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.' },
-    { style: 'פתיחת חבילה', title: 'פתיחת חבילה', icon: '📦', duration: 15, desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.' },
-    { style: 'קריינות ותקריבים', title: 'קריינות ותקריבים', icon: '🎙️', duration: 20, desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.' },
-    { style: 'מדריך קצר', title: 'מדריך קצר', icon: '📚', duration: 30, desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.' }
+    { style: 'UGC טבעי', title: 'UGC טבעי', icon: '🎬', desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.' },
+    { style: 'הדגמת מוצר', title: 'הדגמת מוצר', icon: '🔍', desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.' },
+    { style: 'פתיחת חבילה', title: 'פתיחת חבילה', icon: '📦', desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.' },
+    { style: 'קריינות ותקריבים', title: 'קריינות ותקריבים', icon: '🎙️', desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.' },
+    { style: 'מדריך קצר', title: 'מדריך קצר', icon: '📚', desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.' }
   ];
-
-  // טוקנים לסרטון אחד לפי אורך: 720p לפי הבסיס, 1080p פי 1.5
-  var baseTokens = { 5: 2, 10: 4, 15: 6, 20: 8, 25: 10, 30: 12 };
-
-  function tokensFor(duration, res) {
-    var base = baseTokens[duration];
-    return res === '1080p' ? Math.round(base * 1.5) : base;
-  }
 
   var grid = document.getElementById('templateGrid');
   grid.innerHTML = templates.map(function (t) {
-    var href = '/template.html?style=' + encodeURIComponent(t.style) + '&duration=' + t.duration;
+    var href = '/template.html?style=' + encodeURIComponent(t.style);
     return '<div class="card">' +
       '<div style="font-size:40px;margin-bottom:10px">' + t.icon + '</div>' +
       '<h3 class="h3" style="font-size:18px;margin-bottom:6px">' + t.title + '</h3>' +
       '<p style="color:var(--muted);font-size:14px;margin-bottom:14px">' + t.desc + '</p>' +
       '<div class="chips" style="margin-bottom:16px">' +
-        '<span class="chip" style="cursor:default">' + t.duration + ' שניות</span>' +
-        '<span class="chip" style="cursor:default">720p: ' + tokensFor(t.duration, '720p') + ' טוקנים</span>' +
-        '<span class="chip" style="cursor:default">1080p: ' + tokensFor(t.duration, '1080p') + ' טוקנים</span>' +
+        '<span class="chip" style="cursor:default">אורך לבחירה: 5 עד 30 שניות</span>' +
       '</div>' +
       '<a class="btn btn-primary" style="width:100%;text-align:center" href="' + href + '">בחרו תבנית</a>' +
     '</div>';
