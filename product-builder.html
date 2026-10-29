@@ -76,8 +76,8 @@
   <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
   <div class="page-header">
     <div>
-      <h1 class="gradient-text">📦 בונידו דף מוצר</h1>
-      <p class="page-subtitle">צרו דף מוצר AI מודרני עם hero, תאורים, שאלות נפוצות ו-CTA</p>
+      <h1 class="gradient-text">📦 יצירת דף מוצר</h1>
+      <p class="page-subtitle">צרו דף מוצר עם כותרת, תיאור, יתרונות, ביקורות ושאלות נפוצות</p>
     </div>
   </div>
 
@@ -85,38 +85,38 @@
     <section class="panel editor">
       <div class="field">
         <div class="label"><label for="pbTitle">שם המוצר</label></div>
-        <input class="input" id="pbTitle" placeholder="לדוגמה: פלאנר טבעולוגני">
+        <input class="input" id="pbTitle" placeholder="לדוגמה: מטריה מתקפלת">
       </div>
       <div class="field">
-        <div class="label"><label for="pbHeadline">כותרת ראשית (hero)</label></div>
-        <input class="input" id="pbHeadline" placeholder="לדוגמה: הפתרון הטבעולוגני הרביעי">
+        <div class="label"><label for="pbHeadline">כותרת ראשית (המשפט הראשון שהלקוח רואה)</label></div>
+        <input class="input" id="pbHeadline" placeholder="לדוגמה: המטריה שנכנסת לתיק">
       </div>
       <div class="field">
         <div class="label"><label for="pbPrice">מחיר</label></div>
         <input class="input" id="pbPrice" placeholder="₪99.90">
       </div>
       <div class="field">
-        <div class="label"><label for="pbDesc">תיאור קצר</label></div>
+        <div class="label"><label for="pbDesc">תיאור קצר של המוצר</label></div>
         <textarea class="textarea" id="pbDesc" rows="3" placeholder="תיאור קצר של המוצר שיופיע מתחת לכותרת..."></textarea>
       </div>
       <div class="field">
-        <div class="label"><label for="pbBullets">נקודות למהירות (מופרדות בשורה חדשה)</label></div>
-        <textarea class="textarea" id="pbBullets" rows="4" placeholder="✓ עדכון אוטומטי
-✓ תמיכה 24/7
-✓ אינטגרציה עם Shopify"></textarea>
+        <div class="label"><label for="pbBullets">היתרונות של המוצר (כל יתרון בשורה נפרדת)</label></div>
+        <textarea class="textarea" id="pbBullets" rows="4" placeholder="נפתחת בשנייה אחת
+נכנסת לתיק קטן
+עמידה לרוח ולגשם"></textarea>
       </div>
       <div class="field">
-        <div class="label"><label for="pbTestimonials">טענות לקוחות (מופרדות בשורה חדשה)</label></div>
-        <textarea class="textarea" id="pbTestimonials" rows="3" placeholder="למשל: השירות מדהים, השתפרתי את המכירות ב-40%"></textarea>
+        <div class="label"><label for="pbTestimonials">ביקורות לקוחות (כל ביקורת בשורה נפרדת)</label></div>
+        <textarea class="textarea" id="pbTestimonials" rows="3" placeholder="למשל: הזמנתי לאמא שלי והיא מאוד מרוצה"></textarea>
       </div>
       <div class="field">
-        <div class="label"><label for="pbFaq">שאלות נפוצות (שאלה | תשובה)</label></div>
-        <textarea class="textarea" id="pbFaq" rows="4" placeholder="איך זה עובד? | פשוט מאוד — העלו תמונה וקיבלתם סרטון
-האם יש תמיכה? | כן, 24/7 דרך הצ'אט"></textarea>
+        <div class="label"><label for="pbFaq">שאלות נפוצות על המוצר (שאלה | תשובה, בשורה נפרדת לכל שאלה)</label></div>
+        <textarea class="textarea" id="pbFaq" rows="4" placeholder="כמה זמן נמשכת הסוללה? | עד 10 שעות בשימוש רגיל
+האם אפשר לשטוף את המוצר במים? | כן, השטיפה בטוחה"></textarea>
       </div>
       <div class="field">
-        <div class="label"><label for="pbCta">כתובת CTA</label></div>
-        <input class="input" id="pbCta" placeholder="/pricing.html">
+        <div class="label"><label for="pbCta">כתובת האתר שאליו הכפתור מוביל</label></div>
+        <input class="input" id="pbCta" placeholder="למשל: https://www.example.com/product">
       </div>
       <button class="btn btn-primary btn-large" id="generateBtn" onclick="generateProductPage()">
         <span>✨</span> צרו דף מוצר
@@ -220,14 +220,14 @@ function renderPreview() {
       </div>
       ${bullets.length ? `
       <div class="preview-section">
-        <h2>למה לבחור במוצר זה?</h2>
+        <h2>היתרונות של המוצר</h2>
         <ul class="preview-bullets">
           ${bullets.map(b => `<li>${esc(b)}</li>`).join('')}
         </ul>
       </div>` : ''}
       ${testimonials.length ? `
       <div class="preview-section">
-        <h2>מה הלקוחות אומרים</h2>
+        <h2>ביקורות לקוחות</h2>
         <div class="preview-testimonials">
           ${testimonials.map(t => `<blockquote>"${esc(t)}"</blockquote>`).join('')}
         </div>
