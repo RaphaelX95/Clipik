@@ -686,44 +686,39 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   min-height: 100vh;
 }
 
-/* Mobile sidebar toggle */
-.sidebar-toggle {
+/* שורה עליונה במובייל: סמל התפריט משמאל, שם המותג במרכז שמקשר לעמוד הראשי */
+.mobile-bar {
   display: none;
   position: fixed;
   top: 0;
   right: 0;
   left: 0;
-  z-index: 200;
-  background: var(--surface);
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  border-radius: 0;
-  padding: 12px 16px;
   height: 53px;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
   box-sizing: border-box;
-  font-size: 0;
-  color: transparent;
-  cursor: pointer;
 }
-/* סמל התפריט בצד שמאל, שם המותג במרכז, כמו בשורה העליונה של santa-nest */
-.sidebar-toggle::before {
-  content: "\2630";
+.mobile-bar .sidebar-toggle {
   position: absolute;
-  left: 16px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
+  background: none;
+  border: 0;
+  padding: 8px;
   font-size: 22px;
   line-height: 1;
   color: var(--ink, #1d1d1f);
+  cursor: pointer;
 }
-.sidebar-toggle::after {
-  content: "קליפיק";
-  display: block;
-  text-align: center;
+.mobile-brand {
   font-size: 18px;
   font-weight: 800;
-  line-height: 29px;
   color: var(--ink, #1d1d1f);
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {
@@ -734,8 +729,8 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   .sidebar.open {
     transform: translateX(0);
   }
-  .sidebar-toggle {
-    display: block;
+  .mobile-bar {
+    display: flex;
   }
   .main-content {
     margin-right: 0;
@@ -747,7 +742,7 @@ h4, .h4 { font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.
   .sidebar {
     transform: translateX(0) !important;
   }
-  .sidebar-toggle {
+  .mobile-bar {
     display: none !important;
   }
 }
