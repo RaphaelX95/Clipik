@@ -14,6 +14,32 @@ def esc(value) -> str:
     return html.escape(str(value or ""), quote=True)
 
 
+TEMPLATES = ("modern", "minimal", "bold")
+FONTS = {
+    "heebo": ("Heebo", "400;700;900"),
+    "rubik": ("Rubik", "400;700;900"),
+    "frank": ("Frank Ruhl Libre", "400;700;900"),
+    "assistant": ("Assistant", "400;700"),
+}
+COLORS = {
+    "plum": {"band": "#241b45", "accent": "#e8542b", "paper": "#f4efe6", "mint": "#dff2ea", "ink": "#1b1530"},
+    "forest": {"band": "#1f3d2f", "accent": "#c8a24a", "paper": "#f3f1ea", "mint": "#e3eee6", "ink": "#16241c"},
+    "ocean": {"band": "#0d3b5c", "accent": "#17a6a3", "paper": "#eef5f8", "mint": "#dcedf3", "ink": "#0b2233"},
+    "rose": {"band": "#4a1d2e", "accent": "#e0557a", "paper": "#faf1f3", "mint": "#f6dfe6", "ink": "#2a1420"},
+    "mono": {"band": "#111111", "accent": "#f5c518", "paper": "#f5f5f2", "mint": "#e8e8e4", "ink": "#111111"},
+}
+DEFAULT_THEME = {"template": "modern", "font": "heebo", "color": "plum"}
+
+
+def clean_theme(value) -> dict:
+    value = value if isinstance(value, dict) else {}
+    return {
+        "template": value.get("template") if value.get("template") in TEMPLATES else DEFAULT_THEME["template"],
+        "font": value.get("font") if value.get("font") in FONTS else DEFAULT_THEME["font"],
+        "color": value.get("color") if value.get("color") in COLORS else DEFAULT_THEME["color"],
+    }
+
+
 def clean_images(images) -> list:
     if not isinstance(images, list):
         return []
@@ -21,10 +47,9 @@ def clean_images(images) -> list:
 
 
 CSS = """
-:root{--ink:#1b1530;--plum:#241b45;--paper:#f4efe6;--accent:#e8542b;--mint:#dff2ea;--muted:#6b6880;--line:#e6dfd2}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Heebo,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-.band{background:var(--plum);color:#f7f1e6;padding:56px 20px 130px;position:relative;overflow:hidden}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font),Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.band{background:var(--band);color:#f7f1e6;padding:56px 20px 130px;position:relative;overflow:hidden}
 .band::after{content:"";position:absolute;left:-120px;bottom:-160px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(232,84,43,.75),rgba(232,84,43,0) 70%)}
 .wrap{max-width:760px;margin:0 auto;position:relative;z-index:1}
 .kicker{display:inline-block;font-size:13px;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:999px;margin-bottom:16px}
@@ -63,6 +88,34 @@ h1{font-size:clamp(30px,6vw,46px);line-height:1.12;margin:0 0 14px;font-weight:9
 @media (max-width:600px){.gallery{margin-top:-70px}.arrow{width:38px;height:38px}}
 """
 
+TEMPLATE_CSS = {
+    "modern": "",
+    "minimal": """
+.t-minimal .band{background:var(--paper);color:var(--ink);padding:44px 20px 0;text-align:center}
+.t-minimal .band::after{display:none}
+.t-minimal .kicker{background:var(--mint);color:var(--ink)}
+.t-minimal .lead{margin:0 auto}
+.t-minimal .price{background:var(--ink)}
+.t-minimal .wrap{padding-bottom:24px}
+.t-minimal .gallery{margin-top:0;box-shadow:none;border:1px solid var(--line)}
+.t-minimal h1{font-weight:700}
+.t-minimal .ben{background:#fff;border:1px solid var(--line)}
+.t-minimal .ben .n{color:var(--ink)}
+.t-minimal .rev::before{color:var(--ink)}
+""",
+    "bold": """
+.t-bold .band{background:var(--ink);padding:72px 20px 150px}
+.t-bold h1{font-size:clamp(40px,9vw,72px);font-weight:900;letter-spacing:-.01em;line-height:1.05}
+.t-bold .ben{background:var(--accent);color:#fff}
+.t-bold .ben .n{color:#fff;opacity:.85}
+.t-bold .rev{background:var(--ink);color:#fff;border-color:var(--ink)}
+.t-bold .rev b{color:#cfcfcf}
+.t-bold .rev::before{color:var(--accent)}
+.t-bold .faq details{background:var(--mint);border-color:transparent}
+.t-bold .gallery{border-radius:12px}
+""",
+}
+
 _GALLERY_JS = """
 (function(){
   var slides=document.querySelectorAll('.slide'), thumbs=document.querySelectorAll('.thumbs button'), i=0;
@@ -81,6 +134,15 @@ _GALLERY_JS = """
 
 
 def render_product_page(page: dict) -> str:
+    theme = clean_theme(page.get("theme"))
+    colors = COLORS[theme["color"]]
+    font_name, font_weights = FONTS[theme["font"]]
+    font_query = font_name.replace(" ", "+")
+    root_css = (
+        f":root{{--ink:{colors['ink']};--band:{colors['band']};--paper:{colors['paper']};"
+        f"--accent:{colors['accent']};--mint:{colors['mint']};--muted:#6b6880;--line:#e6dfd2;"
+        f"--font:'{font_name}'}}"
+    )
     product = str(page.get("product") or "").strip()
     headline = str(page.get("headline") or "").strip() or product or "שם המוצר"
     price = str(page.get("price") or "").strip()
@@ -138,9 +200,9 @@ def render_product_page(page: dict) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{esc(headline)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
-<style>{CSS}</style></head>
-<body>
+<link href="https://fonts.googleapis.com/css2?family={font_query}:wght@{font_weights}&display=swap" rel="stylesheet">
+<style>{root_css}{CSS}{TEMPLATE_CSS[theme["template"]]}</style></head>
+<body class="t-{theme["template"]}">
 <header class="band"><div class="wrap">
   <span class="kicker">{esc(product) if product else "מוצר חדש"}</span>
   <h1>{esc(headline)}</h1>

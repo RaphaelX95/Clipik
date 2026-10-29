@@ -12,7 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
-from product_page import render_product_page, clean_images
+from product_page import render_product_page, clean_images, clean_theme
 from decimal import Decimal
 import os
 import threading
@@ -993,6 +993,7 @@ class Handler(BaseHTTPRequestHandler):
             "benefits": items_in("benefits", 160, 6),
             "reviews": reviews,
             "faq": faq,
+            "theme": clean_theme(payload.get("theme")),
         }
 
     def _handle_product_page(self):
