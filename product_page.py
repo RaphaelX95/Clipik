@@ -724,7 +724,7 @@ EDITOR_JS = r"""
   var result = document.getElementById('pe-result');
   var saveBtn = document.getElementById('pe-save');
 
-  var LIMIT = 3;
+  var LIMIT = 5;
   // חזרה: אם יש היסטוריה בדפדפן חוזרים אליה, אחרת (למשל פתיחה מקישור חיצוני) לעמוד התבניות
   document.getElementById('pe-back').addEventListener('click', function (e) {
     if (window.history.length > 1) { e.preventDefault(); window.history.back(); }

@@ -119,6 +119,15 @@
       </div>
 
       <div class="field">
+        <div class="label"><label for="pbImportUrl">העלו מוצר באמצעות קישור</label></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input class="input" id="pbImportUrl" dir="ltr" type="url" placeholder="https://your-shop.com/product" autocomplete="off" style="flex:1;min-width:200px">
+          <button type="button" class="btn btn-secondary" id="pbImport">מילוי אוטומטי</button>
+        </div>
+        <small id="pbImportStatus" role="status" style="color:#555"></small>
+      </div>
+
+      <div class="field">
         <div class="label"><label for="pbTitle">שם המוצר</label></div>
         <input class="input" id="pbTitle" placeholder="לדוגמה: מטריה מתקפלת">
       </div>
@@ -160,9 +169,9 @@
       </div>
 
       <div class="field">
-        <div class="label">תמונות המוצר (עד 3)</div>
+        <div class="label">תמונות המוצר (עד 5)</div>
         <input type="file" id="pbImages" accept="image/*" multiple hidden>
-        <button type="button" class="btn btn-secondary" id="pbAddImages">+ הוספת תמונות (עד 3)</button>
+        <button type="button" class="btn btn-secondary" id="pbAddImages">+ הוספת תמונות (עד 5)</button>
         <div id="pbImgGrid" class="img-grid"></div>
       </div>
 
@@ -241,7 +250,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const LIMITS = { images: 3, benefits: 6, reviews: 10, faq: 20 };
+const LIMITS = { images: 5, benefits: 6, reviews: 10, faq: 20 };
 const DEFAULT_BENEFITS = ['איכות גבוהה', 'נוח לשימוש', 'עיצוב מודרני'];
 const DEFAULT_FAQ = [
   ['איך משתמשים במוצר?', 'פשוט מאוד: קראו את ההוראות שמגיעות עם המוצר והתחילו להשתמש.'],
@@ -333,7 +342,7 @@ function renderImages() {
   $('pbImgGrid').innerHTML = images.map((src, i) =>
     `<div class="img-item"><img src="${src}" alt=""><button type="button" class="rm" data-i="${i}" aria-label="הסרת תמונה">×</button></div>`
   ).join('');
-  $('pbAddImages').textContent = images.length ? `+ הוספת תמונות (${images.length}/3)` : '+ הוספת תמונות (עד 3)';
+  $('pbAddImages').textContent = images.length ? `+ הוספת תמונות (${images.length}/${LIMITS.images})` : '+ הוספת תמונות (עד 5)';
 }
 function shrinkImage(file) {
   return new Promise((resolve, reject) => {
@@ -443,7 +452,7 @@ $('pbImages').addEventListener('change', async e => {
   const files = Array.from(e.target.files || []);
   e.target.value = '';
   for (const f of files) {
-    if (images.length >= LIMITS.images) { toast('אפשר עד 3 תמונות'); break; }
+    if (images.length >= LIMITS.images) { toast('אפשר עד 5 תמונות'); break; }
     if (!f.type.startsWith('image/')) continue;
     try { images.push(await shrinkImage(f)); }
     catch (err) { toast('לא הצלחנו לטעון אחת התמונות'); }
@@ -486,6 +495,34 @@ $('generateBtn').addEventListener('click', async () => {
 });
 
 ['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails', 'pbSpecs', 'pbShipping'].forEach(id => $(id).addEventListener('input', schedulePreview));
+
+// מילוי אוטומטי מקישור לחנות: שם, מחיר, תיאור ותמונות, והקישור עצמו הופך לכפתור הקנייה
+$('pbImport').addEventListener('click', async () => {
+  const url = $('pbImportUrl').value.trim();
+  const status = $('pbImportStatus');
+  if (!url) { status.textContent = 'הדביקו קישור למוצר'; return; }
+  const btn = $('pbImport');
+  btn.disabled = true;
+  status.textContent = 'מייבא את פרטי המוצר...';
+  try {
+    const r = await fetch('/api/product-page/import', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'לא הצלחנו לייבא את המוצר');
+    if (d.product) { $('pbTitle').value = d.product; $('pbHeadline').value = d.product; }
+    if (d.price) $('pbPrice').value = d.price;
+    if (d.description) $('pbDesc').value = d.description;
+    $('pbCtaUrl').value = d.url || url;
+    if (d.images && d.images.length) { images = d.images.slice(0, LIMITS.images); renderImages(); }
+    status.textContent = 'הפרטים מולאו. אפשר לערוך אותם למטה.';
+    schedulePreview();
+  } catch (err) {
+    status.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
 $('pbReviews').addEventListener('change', schedulePreview);
 document.querySelectorAll('#pbToggles input').forEach(i => i.addEventListener('change', schedulePreview));
 renderThemeOptions();
