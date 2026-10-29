@@ -29,11 +29,11 @@
   <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
-    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
-    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
+    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
     <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon">📦</span>יצירת דף מוצר</a>
-    <a href="/product-examples.html" class="sidebar-link"><span class="sidebar-icon">🖼️</span>תבניות לדפי מוצר</a>
-    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות לסרטון</a>
+    <a href="/product-examples.html" class="sidebar-link"><span class="sidebar-icon">🖼️</span>תבניות לדפי מוצר<span class="sidebar-badge">חדש</span></a>
+    <a href="/my-videos.html" class="sidebar-link active"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
     <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
     <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
@@ -61,7 +61,6 @@
   </nav>
 </aside>
 <main class="main-content" class="main">
-  <button id="menuBtn" class="menu-btn" onclick="toggleMenu()">☰ תפריט</button>
   <div class="page-header">
     <div>
       <h1 class="gradient-text">🎬 הסרטונים שלי</h1>
@@ -185,43 +184,6 @@ async function loadVideos() {
   }
 }
 
-function toggleMenu() {
-  const side = document.querySelector('.side');
-  const btn = document.getElementById('menuBtn');
-  if (!side) return;
-  if (side.style.display === 'block') {
-    side.style.display = '';
-    btn.textContent = '☰ תפריט';
-  } else {
-    side.style.display = 'block';
-    side.style.position = 'fixed';
-    side.style.top = '0';
-    side.style.right = '0';
-    side.style.bottom = '0';
-    side.style.zIndex = '999';
-    side.style.width = '260px';
-    side.style.boxShadow = '-4px 0 20px #0003';
-    btn.textContent = '✕ סגירה';
-  }
-}
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 680) {
-    const side = document.querySelector('.side');
-    if (side) {
-      side.style.display = '';
-      side.style.position = '';
-      side.style.top = '';
-      side.style.right = '';
-      side.style.bottom = '';
-      side.style.zIndex = '';
-      side.style.width = '';
-      side.style.boxShadow = '';
-    }
-    const btn = document.getElementById('menuBtn');
-    if (btn) btn.textContent = '☰ תפריט';
-  }
-});
 
 loadVideos();
 </script>

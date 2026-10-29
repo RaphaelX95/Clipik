@@ -777,7 +777,8 @@ h1,h2,.section-title,.hero h1,.logo{font-family:var(--display);font-weight:600;l
 .sidebar-link{border-radius:10px;transition:background .15s,color .15s}
 .sidebar-link.active{background:var(--ink);color:#fff}
 .sidebar-link.active:hover{background:var(--ink-2)}
-.sidebar-link .sidebar-icon{display:none}
+.sidebar-link .sidebar-icon{display:inline-block;width:24px;margin-left:8px;text-align:center}
+.sidebar-badge{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;line-height:1.5;vertical-align:middle}
 .sidebar-section{letter-spacing:0;color:var(--muted);font-weight:600;font-size:12px;text-transform:none}
 
 /* תנועה אחת מתוזמנת: כניסה של הטופס בעליה עדינה */
