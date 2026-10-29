@@ -270,18 +270,53 @@ async function generateProductPage() {
     if (!r.ok) throw new Error(d.error || 'שגיאה ביצירת הדף');
     toast('הדף נוצר בהצלחה ✓');
     const preview = document.getElementById('productPreview');
+    const url = d.page_url;
+    const slug = d.page && d.page.slug ? d.page.slug : 'product';
     preview.innerHTML = `
       <div class="empty">
         <div class="empty-icon">✅</div>
         <h3>הדף מוכן!</h3>
-        <p>הדף זמין בכתובת:</p>
-        <a href="${esc(d.page_url)}" target="_blank" class="gradient-text">${esc(d.page_url)}</a>
-        <button class="btn btn-secondary mt-2" onclick="window.open('${esc(d.page_url)}', '_blank')">פתחו דף</button>
+        <p>זו הכתובת של הדף. אפשר לשלוח אותה לכל מי שרוצים:</p>
+        <input class="input" id="pbLinkBox" readonly value="${esc(url)}" onclick="this.select()" style="direction:ltr;text-align:left;font-size:14px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px">
+          <button class="btn btn-primary" onclick="copyPageLink('${esc(url)}')">העתיקו קישור</button>
+          <button class="btn btn-secondary" onclick="window.open('${esc(url)}', '_blank')">פתחו דף</button>
+          <button class="btn btn-secondary" onclick="downloadPageHtml('${esc(url)}', '${esc(slug)}')">הורידו קובץ HTML</button>
+        </div>
+        <p style="font-size:13px;color:#8a8aa0;margin-top:14px">כל מי שיש לו את הקישור יכול לראות את הדף. הדף לא מופיע בחיפוש של גוגל.</p>
       </div>`;
   } catch (e) {
     toast('שגיאה: ' + e.message);
     btn.disabled = false;
     btn.innerHTML = '<span>✨</span> צרו דף מוצר';
+  }
+}
+
+async function copyPageLink(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('הקישור הועתק ✓');
+  } catch (e) {
+    const box = document.getElementById('pbLinkBox');
+    if (box) { box.select(); document.execCommand('copy'); toast('הקישור הועתק ✓'); }
+  }
+}
+
+async function downloadPageHtml(url, slug) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('bad status');
+    const html = await r.text();
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'product-' + slug + '.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (e) {
+    toast('לא הצלחנו להוריד את הקובץ');
   }
 }
 
