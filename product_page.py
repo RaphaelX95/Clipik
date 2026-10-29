@@ -276,6 +276,79 @@ def _cta(cta_text, cta_url):
     return f'<section class="buy"><div class="buy-cta"><a class="cta-btn" href="{href}"{target} data-f="cta_text">{esc(cta_text)}</a></div></section>'
 
 
+# חלקים שאפשר להסיר מהדף. התוכן נשמר, והסימון קובע רק מה מופיע.
+HIDEABLE = ("description", "benefits", "reviews", "faq", "specs", "shipping", "details", "cta")
+
+
+def _stars(n) -> str:
+    n = max(0, min(5, int(round(n))))
+    return "★" * n + "☆" * (5 - n)
+
+
+def _clean_reviews(raw) -> list:
+    out = []
+    for r in raw or []:
+        if not isinstance(r, dict):
+            continue
+        text = str(r.get("text", "")).strip()
+        if not text:
+            continue
+        try:
+            rating = max(1, min(5, int(r.get("rating", 5))))
+        except (TypeError, ValueError):
+            rating = 5
+        out.append({"name": str(r.get("name", "")).strip(), "text": text, "rating": rating})
+    return out
+
+
+def _clean_specs(text) -> list:
+    rows = []
+    for line in str(text or "").splitlines():
+        key, _, value = line.strip().partition(":")
+        if key.strip():
+            rows.append((key.strip(), value.strip()))
+    return rows[:12]
+
+
+def _rate_line(reviews) -> str:
+    if not reviews:
+        return ""
+    avg = sum(r["rating"] for r in reviews) / len(reviews)
+    word = "ביקורת" if len(reviews) == 1 else "ביקורות"
+    return f'<div class="rate"><span class="stars">{_stars(avg)}</span><span>{avg:.1f} · {len(reviews)} {word}</span></div>'
+
+
+def _extra(reviews, specs, shipping) -> str:
+    """משלוח, מפרט וביקורות. מופיעים אחרי ההסבר ולפני השאלות, בכל התבניות."""
+    parts = []
+    if shipping:
+        parts.append(f'<div class="sec"><div class="shipinfo">{esc(shipping)}</div></div>')
+    if specs:
+        rows = "".join(f"<tr><td>{esc(k)}</td><td>{esc(v)}</td></tr>" for k, v in specs)
+        parts.append(f'<section class="sec specs"><h2>מפרט</h2><table>{rows}</table></section>')
+    if reviews:
+        items = "".join(
+            f'<div class="rev"><div class="rev-top"><b>{esc(r["name"]) or "לקוח"}</b>'
+            f'<span class="stars">{_stars(r["rating"])}</span></div><p>{esc(r["text"])}</p></div>'
+            for r in reviews)
+        parts.append(f'<section class="sec reviews"><h2>ביקורות לקוחות</h2>{items}</section>')
+    return "".join(parts)
+
+
+FEATURE_CSS = """
+.rate{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:15px;margin:6px 0 4px}
+.stars{color:#d9a13b;letter-spacing:2px;font-size:16px}
+.shipinfo{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:15px;text-align:center;font-weight:600}
+.specs table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;font-size:15px}
+.specs td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+.specs tr:last-child td{border-bottom:0}
+.specs td:first-child{width:38%;color:#6b6880;font-weight:600}
+.reviews .rev{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:10px}
+.reviews .rev-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.reviews .rev p{margin:0;font-size:16px;line-height:1.7;color:#3b3754}
+"""
+
+
 def _place_buy(body, details_html, cta_html):
     """הסבר מעל השאלות הנפוצות, וכפתור בסוף הדף (אחרי השאלות)."""
     marker = '<section class="sec faq">'
@@ -313,15 +386,30 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
         cta_url = ""
     details_title = str(page.get("details_title") or "").strip()
     details = str(page.get("details") or "").strip()
-    body = _body(theme["template"], product, headline, price, description, images, benefits, faq)
-    body = _place_buy(body, _details(details_title, details), _cta(cta_text, cta_url))
+    reviews = _clean_reviews(page.get("reviews"))
+    specs = _clean_specs(page.get("specs"))
+    shipping = str(page.get("shipping") or "").strip()[:200]
+    hidden = {k for k in (page.get("hidden") or []) if k in HIDEABLE}
+    # מה שמוסתר לא מופיע בדף, אבל התוכן נשאר שמור ואפשר להחזיר אותו בבונה
+    v_description = "" if "description" in hidden else description
+    v_benefits = [] if "benefits" in hidden else benefits
+    v_faq = [] if "faq" in hidden else faq
+    v_reviews = [] if "reviews" in hidden else reviews
+    v_specs = [] if "specs" in hidden else specs
+    v_shipping = "" if "shipping" in hidden else shipping
+    v_details_title = "" if "details" in hidden else details_title
+    v_details = "" if "details" in hidden else details
+    v_cta = "" if "cta" in hidden else _cta(cta_text, cta_url)
+    body = _body(theme["template"], product, headline, price, v_description, images, v_benefits, v_faq)
+    body = body.replace("</h1>", "</h1>" + _rate_line(v_reviews), 1)
+    body = _place_buy(body, _details(v_details_title, v_details) + _extra(v_reviews, v_specs, v_shipping), v_cta)
     doc = f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{esc(headline)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family={font_query}:wght@{font_weights}&display=swap" rel="stylesheet">
-<style>{root_css}{BASE_CSS}{LAYOUT_CSS[theme["template"]]}</style></head>
+<style>{root_css}{BASE_CSS}{FEATURE_CSS}{LAYOUT_CSS[theme["template"]]}</style></head>
 <body class="l-{theme["template"]}">
 {body}
 <footer class="foot">נוצר באמצעות קליפיק</footer>
@@ -331,7 +419,8 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
                                  "description": description, "benefits": benefits, "faq": faq,
                                  "cta_text": cta_text, "cta_url": cta_url,
                                  "details_title": details_title, "details": details,
-                                 "theme": theme}, images)
+                                 "reviews": reviews, "specs_text": str(page.get("specs") or ""),
+                                 "shipping": shipping, "hidden": sorted(hidden), "theme": theme}, images)
     return doc
 
 
@@ -368,12 +457,28 @@ _COPY = {
 }
 
 
+_SPECS = {
+    "ex-1": 'גובה: כ-7 ס״מ\nקוטר עציץ: 8 ס״מ\nחומר: חרס טרקוטה\nניקוז: יש חור ניקוז בתחתית',
+    "ex-2": 'נפח: כ-500 מ״ל\nחומר: נירוסטה 304\nשמירת חום: עד 12 שעות\nשמירת קור: עד 24 שעות',
+    "ex-3": 'עוצמה: 3 רמות אור\nחיבור: USB\nאורך כבל: 1.5 מטר\nחומר: אלומיניום',
+    "ex-4": 'חומר: זיכרון צורה\nמידה: 50 × 70 ס״מ\nכיסוי: נשטף במכונה\nגובה: 12 ס״מ',
+    "ex-5": 'מספר להבים: 2\nחומר להב: נירוסטה\nבסיס: בלוק עץ\nשחזור: ביד',
+    "ex-6": 'נפח: 25 ליטר\nתא מחשב: עד 15.6 אינץ׳\nחומר: ניילון עמיד\nמשקל: 0.8 ק״ג',
+    "ex-7": 'נפח: 350 מ״ל\nחומר: קרמיקה\nזיגוג: בעבודת יד\nשטיפה: ביד',
+    "ex-8": 'עובי: 6 מ״מ\nמידות: 183 × 61 ס״מ\nחומר: גומי טבעי ופקק\nמשקל: 1.2 ק״ג',
+    "ex-9": 'מסך: AMOLED עגול\nעמידות: 5 ATM\nסוללה: עד 7 ימים\nחיבור: Bluetooth',
+    "ex-10": 'נפח: 30 מ״ל\nסוג עור: רגיל ורגיש\nטפטפת: מינון מדויק\nתוקף: 12 חודשים',
+}
+SHIPPING_DEFAULT = "משלוח עד 3 ימי עסקים · החזרה עד 14 יום"
+
+
 def _example(slug, name, layout, color, font, product, headline, price, description, benefits, faq, photo):
     cta, details_title, details = _COPY[slug]
     page = {
         "product": product, "headline": headline, "price": price, "description": description,
         "benefits": benefits, "faq": [{"q": q, "a": a} for q, a in faq],
         "cta_text": cta, "cta_url": "", "details_title": details_title, "details": details,
+        "specs": _SPECS[slug], "shipping": SHIPPING_DEFAULT,
         "theme": {"template": layout, "font": font, "color": color},
     }
     return {"slug": slug, "name": name, "look": f"{LAYOUTS[layout]} · {font} · {color}", "page": page, "images": [_PHOTOS[photo]]}
@@ -550,6 +655,8 @@ EDITOR_JS = r"""
     });
   });
 
+  function has(sel) { return !!document.querySelector(sel); }
+
   function text(sel) {
     var el = document.querySelector(sel);
     return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
@@ -570,24 +677,30 @@ EDITOR_JS = r"""
     });
     var faq = [];
     (page.faq || []).forEach(function (orig, k) {
-      var q = text('[data-faq="' + k + '"]');
-      var a = text('[data-faqa="' + k + '"]');
+      // שאלה שמוסתרת לא נמצאת בדף, ולכן שומרים את הערך המקורי שלה
+      var qEl = document.querySelector('[data-faq="' + k + '"]');
+      var aEl = document.querySelector('[data-faqa="' + k + '"]');
+      var q = qEl ? text('[data-faq="' + k + '"]') : orig.q;
+      var a = aEl ? text('[data-faqa="' + k + '"]') : orig.a;
       if (q && a) faq.push({ q: q, a: a });
     });
     return {
       product: text('[data-f="product"]') || page.product,
       headline: text('[data-f="headline"]') || page.headline,
       price: text('[data-f="price"]'),
-      description: text('[data-f="description"]'),
-      cta_text: text('[data-f="cta_text"]') || 'להזמנה עכשיו',
+      description: has('[data-f="description"]') ? text('[data-f="description"]') : (page.description || ''),
+      cta_text: (has('[data-f="cta_text"]') ? text('[data-f="cta_text"]') : '') || page.cta_text || 'להזמנה עכשיו',
       cta_url: page.cta_url || '',
-      details_title: text('[data-f="details_title"]'),
-      details: multi('[data-f="details"]'),
+      details_title: has('[data-f="details_title"]') ? text('[data-f="details_title"]') : (page.details_title || ''),
+      details: has('[data-f="details"]') ? multi('[data-f="details"]') : (page.details || ''),
+      hidden: page.hidden || [],
       benefits: benefits,
       faq: faq,
       images: images.slice(0, LIMIT),
       theme: page.theme,
-      reviews: []
+      reviews: page.reviews || [],
+      specs: page.specs || '',
+      shipping: page.shipping || '',
     };
   }
 
@@ -752,6 +865,10 @@ def _with_editor(doc: str, fields: dict, images: list) -> str:
             "cta_url": fields["cta_url"],
             "details_title": fields["details_title"],
             "details": fields["details"],
+            "reviews": fields["reviews"],
+            "hidden": fields["hidden"],
+            "specs": fields["specs_text"],
+            "shipping": fields["shipping"],
             "benefits": list(fields["benefits"]),
             "faq": [{"q": f["q"], "a": f["a"]} for f in fields["faq"]],
             "theme": fields["theme"],

@@ -33,6 +33,7 @@
 .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .hint{font-size:13px;color:#8a8aa0;margin:12px 0 0}
 .opts{display:grid;gap:8px}
+.chip-check{display:inline-flex;align-items:center;gap:6px;border:1px solid #e6dfd2;border-radius:10px;padding:8px 10px;font-size:14px;cursor:pointer}
 .opts.tpl{grid-template-columns:repeat(3,1fr)}
 .opts.fonts{grid-template-columns:repeat(2,1fr)}
 .opts.colors{grid-template-columns:repeat(5,1fr)}
@@ -104,6 +105,20 @@
   <div class="workspace">
     <section class="panel editor">
       <div class="field">
+        <div class="label">מה מופיע בדף (בטלו סימון כדי להסיר חלק)</div>
+        <div class="opts" id="pbToggles" style="display:flex;flex-wrap:wrap;gap:8px">
+          <label class="chip-check"><input type="checkbox" data-hide-key="description" checked> תיאור קצר</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="benefits" checked> יתרונות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="shipping" checked> משלוח והחזרות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="specs" checked> מפרט</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="details" checked> הסבר מלא</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="reviews" checked> ביקורות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="faq" checked> שאלות נפוצות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="cta" checked> כפתור קנייה</label>
+        </div>
+      </div>
+
+      <div class="field">
         <div class="label"><label for="pbTitle">שם המוצר</label></div>
         <input class="input" id="pbTitle" placeholder="לדוגמה: מטריה מתקפלת">
       </div>
@@ -157,6 +172,15 @@
         <div class="label">ביקורות לקוחות (עד 10). כתבו רק ביקורות של לקוחות אמיתיים.</div>
         <div id="pbReviews"></div>
         <button type="button" class="btn btn-secondary" id="pbAddReview">+ הוספת ביקורת</button>
+      </div>
+
+      <div class="field">
+        <div class="label"><label for="pbSpecs">מפרט המוצר (לא חובה)</label></div>
+        <textarea class="textarea" id="pbSpecs" rows="4" placeholder="שורה לכל פרט, בפורמט: גובה: 7 ס״מ"></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbShipping">משלוח והחזרות (לא חובה)</label></div>
+        <input class="input" id="pbShipping" placeholder="לדוגמה: משלוח עד 3 ימי עסקים · החזרה עד 14 יום">
       </div>
 
       <div class="field">
@@ -291,9 +315,10 @@ function addBenefit(v = '') {
   if ($('pbBenefits').children.length >= LIMITS.benefits) return toast('אפשר עד 6 יתרונות');
   addRow($('pbBenefits'), `<input class="input" placeholder="לדוגמה: נכנס לכל תיק" value="${esc(v)}">`);
 }
-function addReview(name = '', text = '') {
+function addReview(name = '', text = '', rating = 5) {
   if ($('pbReviews').children.length >= LIMITS.reviews) return toast('אפשר עד 10 ביקורות');
-  addRow($('pbReviews'), `<div class="row-stack"><input class="input rv-name" placeholder="שם הלקוח, לדוגמה: דנה, תל אביב" value="${esc(name)}"><textarea class="textarea rv-text" rows="2" placeholder="מה הלקוח כתב, לדוגמה: הזמנתי, הגיע מהר וממש מרוצה">${esc(text)}</textarea></div>`);
+  const stars = [5, 4, 3, 2, 1].map(n => `<option value="${n}"${n === Number(rating) ? ' selected' : ''}>${'★'.repeat(n)}</option>`).join('');
+  addRow($('pbReviews'), `<div class="row-stack"><input class="input rv-name" placeholder="שם הלקוח, לדוגמה: דנה, תל אביב" value="${esc(name)}"><select class="input rv-rating" aria-label="דירוג">${stars}</select><textarea class="textarea rv-text" rows="2" placeholder="מה הלקוח כתב, לדוגמה: הזמנתי, הגיע מהר וממש מרוצה">${esc(text)}</textarea></div>`);
 }
 function addFaq(q = '', a = '') {
   if ($('pbFaq').children.length >= LIMITS.faq) return toast('אפשר עד 20 שאלות');
@@ -331,6 +356,7 @@ function collect() {
   const benefits = Array.from($('pbBenefits').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
   const reviews = Array.from($('pbReviews').querySelectorAll('.row')).map(r => ({
     name: r.querySelector('.rv-name').value.trim(),
+    rating: Number(r.querySelector('.rv-rating').value) || 5,
     text: r.querySelector('.rv-text').value.trim()
   })).filter(r => r.text);
   const faq = Array.from($('pbFaq').querySelectorAll('.row')).map(r => ({
@@ -346,6 +372,9 @@ function collect() {
     cta_url: $('pbCtaUrl').value.trim(),
     details_title: $('pbDetailsTitle').value.trim(),
     details: $('pbDetails').value.trim(),
+    specs: $('pbSpecs').value.trim(),
+    hidden: Array.from(document.querySelectorAll('#pbToggles input')).filter(i => !i.checked).map(i => i.dataset.hideKey),
+    shipping: $('pbShipping').value.trim(),
     images, benefits, reviews, faq,
     theme: { ...theme }
   };
@@ -452,7 +481,9 @@ $('generateBtn').addEventListener('click', async () => {
   }
 });
 
-['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails'].forEach(id => $(id).addEventListener('input', schedulePreview));
+['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails', 'pbSpecs', 'pbShipping'].forEach(id => $(id).addEventListener('input', schedulePreview));
+$('pbReviews').addEventListener('change', schedulePreview);
+document.querySelectorAll('#pbToggles input').forEach(i => i.addEventListener('change', schedulePreview));
 renderThemeOptions();
 bindThemeOptions();
 
@@ -478,10 +509,14 @@ async function loadTemplate(slug) {
     $('pbCtaUrl').value = page.cta_url || '';
     $('pbDetailsTitle').value = page.details_title || '';
     $('pbDetails').value = page.details || '';
+    $('pbSpecs').value = page.specs || '';
+    const hiddenKeys = page.hidden || [];
+    document.querySelectorAll('#pbToggles input').forEach(i => { i.checked = !hiddenKeys.includes(i.dataset.hideKey); });
+    $('pbShipping').value = page.shipping || '';
     images = d.images || [];
     (page.benefits || []).forEach(b => addBenefit(b));
-    addReview();
-    addReview();
+    if ((page.reviews || []).length) (page.reviews || []).forEach(r => addReview(r.name, r.text, r.rating));
+    else { addReview(); addReview(); }
     (page.faq || []).forEach(f => addFaq(f.q, f.a));
     theme.template = page.theme.template;
     theme.font = page.theme.font;
