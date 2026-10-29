@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>יצירת דף מוצר - קליפיק</title>
-<meta name="description" content="צרו דף מוצר AI מודרני עם hero, תאורים, טענות, שאלות נפוצות ו-CTA. כל זה בחנות שלכם.">
+<meta name="description" content="צרו דף מוצר מעוצב עם תמונות, יתרונות, ביקורות ושאלות נפוצות. הקישור לדף נוצר אוטומטית.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&subset=hebrew&display=swap" rel="stylesheet">
@@ -19,20 +19,20 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://clipik.pro/og-image.png">
 <style>
-.preview-page{background:#f6f6fb;color:#1d1d2b;border-radius:12px;padding:24px 18px;font-family:Arial,sans-serif;direction:rtl;text-align:right}
-.preview-page h1{font-size:26px;margin:4px 0 12px;line-height:1.25;color:#1d1d2b}
-.preview-page p,.preview-page li{font-size:16px;line-height:1.6;margin:0 0 8px}
-.preview-page .muted{color:#8a8aa0}
-.preview-price{font-size:22px;font-weight:700;color:#ff6b3d;margin:6px 0 10px}
-.preview-section{margin-top:22px}
-.preview-section h2{font-size:18px;margin:0 0 10px}
-.preview-bullets{padding-right:20px;margin:0}
-.preview-testimonials blockquote{margin:0 0 10px;padding:12px 14px;background:#fff;border-radius:10px;border-right:3px solid #ff6b3d;font-size:15px}
-.preview-faq details{background:#fff;border-radius:10px;padding:10px 14px;margin-bottom:8px}
-.preview-faq summary{font-weight:700;cursor:pointer}
-.preview-faq p{margin:8px 0 0}
-.preview-cta{display:inline-block;margin-top:22px;padding:14px 26px;border-radius:12px;background:#ff6b3d;color:#fff;text-decoration:none;font-weight:700;cursor:default}
+.row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.row > .input{flex:1}
+.row-stack{flex:1;display:flex;flex-direction:column;gap:6px}
+.rm{flex:0 0 40px;height:42px;border:1px solid #e6dfd2;background:#fff;border-radius:10px;cursor:pointer;font-size:20px;color:#6b6880}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:10px}
+.img-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#f4efe6}
+.img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.img-item .rm{position:absolute;top:4px;left:4px;width:28px;height:28px;flex:none;font-size:16px;line-height:1;padding:0;background:rgba(255,255,255,.95)}
+.result{text-align:right;margin-top:18px;padding:18px;border-radius:16px;background:#f4efe6}
+.result h3{margin:0 0 6px}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hint{font-size:13px;color:#8a8aa0;margin:12px 0 0}
 </style>
+
 </head>
 <body>
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
@@ -77,7 +77,7 @@
   <div class="page-header">
     <div>
       <h1 class="gradient-text">📦 יצירת דף מוצר</h1>
-      <p class="page-subtitle">צרו דף מוצר עם כותרת, תיאור, יתרונות, ביקורות ושאלות נפוצות</p>
+      <p class="page-subtitle">צרו דף מוצר מעוצב עם תמונות, יתרונות, ביקורות ושאלות נפוצות. הקישור לדף נוצר אוטומטית.</p>
     </div>
   </div>
 
@@ -92,59 +92,256 @@
         <input class="input" id="pbHeadline" placeholder="לדוגמה: המטריה שנכנסת לתיק">
       </div>
       <div class="field">
-        <div class="label"><label for="pbPrice">מחיר</label></div>
-        <input class="input" id="pbPrice" placeholder="₪99.90">
+        <div class="label"><label for="pbPrice">מחיר (לא חובה)</label></div>
+        <input class="input" id="pbPrice" placeholder="לדוגמה: ₪49.90">
       </div>
       <div class="field">
         <div class="label"><label for="pbDesc">תיאור קצר של המוצר</label></div>
-        <textarea class="textarea" id="pbDesc" rows="3" placeholder="תיאור קצר של המוצר שיופיע מתחת לכותרת..."></textarea>
+        <textarea class="textarea" id="pbDesc" rows="3" placeholder="מה המוצר, ולמי הוא מתאים"></textarea>
       </div>
+
       <div class="field">
-        <div class="label"><label for="pbBullets">היתרונות של המוצר (כל יתרון בשורה נפרדת)</label></div>
-        <textarea class="textarea" id="pbBullets" rows="4" placeholder="נפתחת בשנייה אחת
-נכנסת לתיק קטן
-עמידה לרוח ולגשם"></textarea>
+        <div class="label">תמונות המוצר (עד 10)</div>
+        <input type="file" id="pbImages" accept="image/*" multiple hidden>
+        <button type="button" class="btn btn-secondary" id="pbAddImages">+ הוספת תמונות (עד 10)</button>
+        <div id="pbImgGrid" class="img-grid"></div>
       </div>
+
       <div class="field">
-        <div class="label"><label for="pbTestimonials">ביקורות לקוחות (כל ביקורת בשורה נפרדת)</label></div>
-        <textarea class="textarea" id="pbTestimonials" rows="3" placeholder="למשל: הזמנתי לאמא שלי והיא מאוד מרוצה"></textarea>
+        <div class="label">היתרונות של המוצר (עד 6). אפשר לשנות או להוסיף.</div>
+        <div id="pbBenefits"></div>
+        <button type="button" class="btn btn-secondary" id="pbAddBenefit">+ הוספת יתרון</button>
       </div>
+
       <div class="field">
-        <div class="label"><label for="pbFaq">שאלות נפוצות על המוצר (שאלה | תשובה, בשורה נפרדת לכל שאלה)</label></div>
-        <textarea class="textarea" id="pbFaq" rows="4" placeholder="כמה זמן נמשכת הסוללה? | עד 10 שעות בשימוש רגיל
-האם אפשר לשטוף את המוצר במים? | כן, השטיפה בטוחה"></textarea>
+        <div class="label">ביקורות לקוחות (עד 10). כתבו רק ביקורות של לקוחות אמיתיים.</div>
+        <div id="pbReviews"></div>
+        <button type="button" class="btn btn-secondary" id="pbAddReview">+ הוספת ביקורת</button>
       </div>
-      <button class="btn btn-primary btn-large" id="generateBtn" onclick="generateProductPage()">
-        <span>✨</span> צרו דף מוצר
-      </button>
+
+      <div class="field">
+        <div class="label">שאלות נפוצות (עד 20). ערכו את התשובות לפני היצירה.</div>
+        <div id="pbFaq"></div>
+        <button type="button" class="btn btn-secondary" id="pbAddFaq">+ הוספת שאלה</button>
+      </div>
+
+      <button class="btn btn-primary btn-large" id="generateBtn" type="button"><span>✨</span> צרו דף מוצר</button>
+      <div id="createResult"></div>
     </section>
 
     <aside class="panel preview">
       <div class="prevhead"><span>תצוגה מקדימה</span></div>
-      <div class="prevbody" id="productPreview">
-        <div class="empty">
-          <div class="empty-icon">📦</div>
-          <p>התחילו למלא פרטים ולראות את תצוגת הדף כאן</p>
-        </div>
-      </div>
+      <iframe id="pbFrame" title="תצוגה מקדימה של הדף" sandbox="allow-scripts" style="width:100%;height:75vh;border:0;border-radius:14px;background:#f4efe6"></iframe>
     </aside>
   </div>
 </main>
+
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-function esc(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+const LIMITS = { images: 10, benefits: 6, reviews: 10, faq: 20 };
+const DEFAULT_BENEFITS = ['איכות גבוהה', 'נוח לשימוש', 'עיצוב מודרני'];
+const DEFAULT_FAQ = [
+  ['איך משתמשים במוצר?', 'פשוט מאוד: קראו את ההוראות שמגיעות עם המוצר והתחילו להשתמש.'],
+  ['כמה זמן לוקח המשלוח?', 'פרטי המשלוח מופיעים לפני סיום ההזמנה.'],
+  ['אפשר להחזיר את המוצר?', 'מדיניות ההחזרות מפורטת אצל המוכר.'],
+  ['האם יש אחריות?', 'פרטי האחריות מופיעים אצל המוכר.'],
+  ['איך שומרים על המוצר?', 'מומלץ לשמור על המוצר נקי ויבש ולפי ההנחיות.']
+];
 
+const $ = id => document.getElementById(id);
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function toast(msg) {
-  const t = document.getElementById('toast');
+  const t = $('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+let images = [];
+let previewTimer = null;
+function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(updatePreview, 400); }
+
+function addRow(box, innerHtml) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = innerHtml + '<button type="button" class="rm" aria-label="הסרה">×</button>';
+  row.querySelector('.rm').onclick = () => { row.remove(); schedulePreview(); };
+  row.querySelectorAll('input,textarea').forEach(el => el.addEventListener('input', schedulePreview));
+  box.appendChild(row);
+  schedulePreview();
+}
+function addBenefit(v = '') {
+  if ($('pbBenefits').children.length >= LIMITS.benefits) return toast('אפשר עד 6 יתרונות');
+  addRow($('pbBenefits'), `<input class="input" placeholder="לדוגמה: נכנס לכל תיק" value="${esc(v)}">`);
+}
+function addReview(name = '', text = '') {
+  if ($('pbReviews').children.length >= LIMITS.reviews) return toast('אפשר עד 10 ביקורות');
+  addRow($('pbReviews'), `<div class="row-stack"><input class="input rv-name" placeholder="שם הלקוח, לדוגמה: דנה, תל אביב" value="${esc(name)}"><textarea class="textarea rv-text" rows="2" placeholder="מה הלקוח כתב, לדוגמה: הזמנתי, הגיע מהר וממש מרוצה">${esc(text)}</textarea></div>`);
+}
+function addFaq(q = '', a = '') {
+  if ($('pbFaq').children.length >= LIMITS.faq) return toast('אפשר עד 20 שאלות');
+  addRow($('pbFaq'), `<div class="row-stack"><input class="input faq-q" placeholder="השאלה" value="${esc(q)}"><textarea class="textarea faq-a" rows="2" placeholder="התשובה">${esc(a)}</textarea></div>`);
+}
+
+function renderImages() {
+  $('pbImgGrid').innerHTML = images.map((src, i) =>
+    `<div class="img-item"><img src="${src}" alt=""><button type="button" class="rm" data-i="${i}" aria-label="הסרת תמונה">×</button></div>`
+  ).join('');
+  $('pbAddImages').textContent = images.length ? `+ הוספת תמונות (${images.length}/10)` : '+ הוספת תמונות (עד 10)';
+}
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1000 / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+    img.src = url;
+  });
+}
+
+function collect() {
+  const benefits = Array.from($('pbBenefits').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+  const reviews = Array.from($('pbReviews').querySelectorAll('.row')).map(r => ({
+    name: r.querySelector('.rv-name').value.trim(),
+    text: r.querySelector('.rv-text').value.trim()
+  })).filter(r => r.text);
+  const faq = Array.from($('pbFaq').querySelectorAll('.row')).map(r => ({
+    q: r.querySelector('.faq-q').value.trim(),
+    a: r.querySelector('.faq-a').value.trim()
+  })).filter(f => f.q && f.a);
+  return {
+    product: $('pbTitle').value.trim(),
+    headline: $('pbHeadline').value.trim(),
+    price: $('pbPrice').value.trim(),
+    description: $('pbDesc').value.trim(),
+    images, benefits, reviews, faq
+  };
+}
+
+async function updatePreview() {
+  try {
+    const r = await fetch('/api/product-page/preview', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(collect())
+    });
+    if (!r.ok) return;
+    const d = await r.json();
+    $('pbFrame').srcdoc = d.html;
+  } catch (e) { /* התצוגה המקדימה תתעדכן בפעם הבאה */ }
+}
+
+function showResult(url) {
+  $('createResult').innerHTML = `
+    <div class="result">
+      <h3>הדף מוכן!</h3>
+      <p>זו הכתובת של הדף. אפשר לשלוח אותה לכל מי שרוצים:</p>
+      <input class="input" id="rLink" readonly value="${esc(url)}" onclick="this.select()" style="direction:ltr;text-align:left">
+      <div class="result-actions">
+        <button type="button" class="btn btn-primary" id="rCopy">העתיקו קישור</button>
+        <button type="button" class="btn btn-secondary" id="rOpen">פתחו דף</button>
+        <button type="button" class="btn btn-secondary" id="rDl">הורידו קובץ HTML</button>
+      </div>
+      <p class="hint">כל מי שיש לו את הקישור יכול לראות את הדף. הדף לא מופיע בחיפוש של גוגל.</p>
+    </div>`;
+  $('rCopy').onclick = () => copyLink(url);
+  $('rOpen').onclick = () => window.open(url, '_blank');
+  $('rDl').onclick = () => downloadPage(url);
+}
+async function copyLink(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('הקישור הועתק ✓');
+  } catch (e) {
+    const box = $('rLink');
+    if (box) { box.select(); document.execCommand('copy'); toast('הקישור הועתק ✓'); }
+  }
+}
+async function downloadPage(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('bad status');
+    const html = await r.text();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    a.download = 'product-' + url.split('/').pop() + '.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (e) {
+    toast('לא הצלחנו להוריד את הקובץ');
+  }
+}
+
+$('pbAddImages').addEventListener('click', () => $('pbImages').click());
+$('pbImages').addEventListener('change', async e => {
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  for (const f of files) {
+    if (images.length >= LIMITS.images) { toast('אפשר עד 10 תמונות'); break; }
+    if (!f.type.startsWith('image/')) continue;
+    try { images.push(await shrinkImage(f)); }
+    catch (err) { toast('לא הצלחנו לטעון אחת התמונות'); }
+  }
+  renderImages();
+  schedulePreview();
+});
+$('pbImgGrid').addEventListener('click', e => {
+  const b = e.target.closest('.rm');
+  if (!b) return;
+  images.splice(+b.dataset.i, 1);
+  renderImages();
+  schedulePreview();
+});
+
+$('pbAddBenefit').addEventListener('click', () => addBenefit());
+$('pbAddReview').addEventListener('click', () => addReview());
+$('pbAddFaq').addEventListener('click', () => addFaq());
+$('generateBtn').addEventListener('click', async () => {
+  const btn = $('generateBtn');
+  if (!$('pbTitle').value.trim()) { toast('כתבו שם מוצר לפני היצירה'); $('pbTitle').focus(); return; }
+  const oldHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> יוצר דף...';
+  $('createResult').innerHTML = '';
+  try {
+    const r = await fetch('/api/product-page', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(collect())
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'שגיאה ביצירת הדף');
+    showResult(d.page_url);
+    toast('הדף נוצר בהצלחה ✓');
+  } catch (e) {
+    toast('שגיאה: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = oldHtml;
+  }
+});
+
+['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc'].forEach(id => $(id).addEventListener('input', schedulePreview));
+DEFAULT_BENEFITS.forEach(v => addBenefit(v));
+addReview();
+addReview();
+DEFAULT_FAQ.forEach(([q, a]) => addFaq(q, a));
+renderImages();
+updatePreview();
 
 function toggleMenu() {
   const side = document.querySelector('.side');
@@ -184,140 +381,6 @@ window.addEventListener('resize', () => {
   }
 });
 
-function parseFaq(text) {
-  if (!text) return [];
-  return text.split('\n').filter(line => line.includes('|')).map(line => {
-    const parts = line.split('|');
-    return { q: parts[0].trim(), a: parts.slice(1).join('|').trim() };
-  });
-}
-
-function renderPreview() {
-  const title = document.getElementById('pbTitle').value || 'שם המוצר';
-  const headline = document.getElementById('pbHeadline').value || title;
-  const price = document.getElementById('pbPrice').value.trim();
-  const descRaw = document.getElementById('pbDesc').value.trim();
-  const bulletsRaw = document.getElementById('pbBullets').value || '';
-  const bullets = bulletsRaw.split('\n').filter(l => l.trim());
-  const testimonialsRaw = document.getElementById('pbTestimonials').value || '';
-  const testimonials = testimonialsRaw.split('\n').filter(l => l.trim());
-  const faqRaw = document.getElementById('pbFaq').value || '';
-  const faq = parseFaq(faqRaw);
-
-  const preview = document.getElementById('productPreview');
-  preview.innerHTML = `
-    <div class="preview-page">
-      <div class="preview-hero">
-        <h1>${esc(headline)}</h1>
-        ${price ? `<div class="preview-price">${esc(price)}</div>` : ''}
-        ${descRaw ? `<p>${esc(descRaw)}</p>` : '<p class="muted">התיאור הקצר יופיע כאן.</p>'}
-      </div>
-      ${bullets.length ? `
-      <div class="preview-section">
-        <h2>היתרונות של המוצר</h2>
-        <ul class="preview-bullets">
-          ${bullets.map(b => `<li>${esc(b)}</li>`).join('')}
-        </ul>
-      </div>` : ''}
-      ${testimonials.length ? `
-      <div class="preview-section">
-        <h2>ביקורות לקוחות</h2>
-        <div class="preview-testimonials">
-          ${testimonials.map(t => `<blockquote>"${esc(t)}"</blockquote>`).join('')}
-        </div>
-      </div>` : ''}
-      ${faq.length ? `
-      <div class="preview-section">
-        <h2>שאלות נפוצות</h2>
-        <div class="preview-faq">
-          ${faq.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
-        </div>
-      </div>` : ''}
-    </div>
-  `;
-}
-
-async function generateProductPage() {
-  const btn = document.getElementById('generateBtn');
-  const payload = {
-    product: document.getElementById('pbTitle').value.trim() || 'מוצר לדוגמה',
-    headline: document.getElementById('pbHeadline').value.trim(),
-    price: document.getElementById('pbPrice').value.trim(),
-    description: document.getElementById('pbDesc').value.trim(),
-    bullets: document.getElementById('pbBullets').value.split('\n').filter(l => l.trim()),
-    style: 'UGC טבעי'
-  };
-
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> יוצר דף...';
-
-  try {
-    const r = await fetch('/api/product-page', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'שגיאה ביצירת הדף');
-    toast('הדף נוצר בהצלחה ✓');
-    const preview = document.getElementById('productPreview');
-    const url = d.page_url;
-    const slug = d.page && d.page.slug ? d.page.slug : 'product';
-    preview.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">✅</div>
-        <h3>הדף מוכן!</h3>
-        <p>זו הכתובת של הדף. אפשר לשלוח אותה לכל מי שרוצים:</p>
-        <input class="input" id="pbLinkBox" readonly value="${esc(url)}" onclick="this.select()" style="direction:ltr;text-align:left;font-size:14px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px">
-          <button class="btn btn-primary" onclick="copyPageLink('${esc(url)}')">העתיקו קישור</button>
-          <button class="btn btn-secondary" onclick="window.open('${esc(url)}', '_blank')">פתחו דף</button>
-          <button class="btn btn-secondary" onclick="downloadPageHtml('${esc(url)}', '${esc(slug)}')">הורידו קובץ HTML</button>
-        </div>
-        <p style="font-size:13px;color:#8a8aa0;margin-top:14px">כל מי שיש לו את הקישור יכול לראות את הדף. הדף לא מופיע בחיפוש של גוגל.</p>
-      </div>`;
-  } catch (e) {
-    toast('שגיאה: ' + e.message);
-    btn.disabled = false;
-    btn.innerHTML = '<span>✨</span> צרו דף מוצר';
-  }
-}
-
-async function copyPageLink(url) {
-  try {
-    await navigator.clipboard.writeText(url);
-    toast('הקישור הועתק ✓');
-  } catch (e) {
-    const box = document.getElementById('pbLinkBox');
-    if (box) { box.select(); document.execCommand('copy'); toast('הקישור הועתק ✓'); }
-  }
-}
-
-async function downloadPageHtml(url, slug) {
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('bad status');
-    const html = await r.text();
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'product-' + slug + '.html';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  } catch (e) {
-    toast('לא הצלחנו להוריד את הקובץ');
-  }
-}
-
-// Live preview on input
-['pbTitle','pbHeadline','pbPrice','pbDesc','pbBullets','pbTestimonials','pbFaq'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', renderPreview);
-});
-
-renderPreview();
 </script>
 <footer class="footer">
   <div class="container">

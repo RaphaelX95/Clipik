@@ -12,6 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
+from product_page import render_product_page, clean_images
 from decimal import Decimal
 import os
 import threading
@@ -40,6 +41,8 @@ DATA_DIR = Path(os.environ.get("DATA_DIR") or ROOT)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DATA = DATA_DIR / "projects.json"
 MAX_BODY = 1_000_000
+# דף מוצר יכול לכלול עד 10 תמונות, לכן מגבילים אותו בנפרד
+MAX_PRODUCT_BODY = 8_000_000
 
 # Base URL for the application (used for iCount redirects and meta tags)
 _BASE_URL = os.environ.get("BASE_URL", f"http://127.0.0.1:{os.environ.get('PORT', '8765')}")
@@ -874,6 +877,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle_script_generate()
         if path == "/api/product-page":
             return self._handle_product_page()
+        if path == "/api/product-page/preview":
+            return self._handle_product_preview()
         if path == "/api/analytics/summary":
             token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
             if not _analytics_ok(token):
@@ -925,9 +930,14 @@ class Handler(BaseHTTPRequestHandler):
         return self.send_json(201, {"project": project})
 
     def _serve_product_page(self, slug):
-        pages = _store.load("product_pages", [], DATA_DIR)
-        page = next((p for p in pages if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(pages, list) else None
-        if not page or not re.fullmatch(r"[a-f0-9]{8}", slug or ""):
+        page = None
+        if re.fullmatch(r"[a-f0-9]{8}", slug or ""):
+            page = _store.load(f"product_page_{slug}", None, DATA_DIR)
+            if not isinstance(page, dict):
+                # דפים ישנים נשמרו ברשימה אחת
+                legacy = _store.load("product_pages", [], DATA_DIR)
+                page = next((p for p in legacy if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(legacy, list) else None
+        if not isinstance(page, dict):
             body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק</a></p></body></html>".encode("utf-8")
             self.send_response(404)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -935,26 +945,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        e = lambda v: html.escape(str(v or ""), quote=True)
-        bullets = "".join(f"<li>{e(b)}</li>" for b in page.get("bullets", []))
-        cta_url = page.get("cta_url") or ""
-        if not (cta_url.startswith("/") or cta_url.startswith("https://") or cta_url.startswith("http://")):
-            cta_url = ""
-        cta_html = f"<a class=\"cta\" href=\"{e(cta_url)}\">{e(page.get('cta_text') or 'קנו עכשיו')}</a>" if cta_url else ""
-        video = f"<video src=\"{e(page.get('video_url'))}\" controls playsinline style='width:100%;border-radius:12px'></video>" if str(page.get("video_url", "")).startswith(("https://", "/")) else ""
-        body = f"""<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>{e(page.get('headline') or page.get('product'))} - קליפיק</title>
-<style>body{{margin:0;font-family:Arial,sans-serif;background:#f6f6fb;color:#1d1d2b}}
-.wrap{{max-width:640px;margin:0 auto;padding:24px 16px}}h1{{font-size:28px;margin:12px 0}}
-p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:12px;background:#ff6b3d;color:#fff;text-decoration:none;font-weight:700}}
-</style></head><body><div class="wrap">
-<h1>{e(page.get('headline') or page.get('product'))}</h1>
-{video}
-<p>{e(page.get('description'))}</p>
-<ul>{bullets}</ul>
-{cta_html}
-</div></body></html>""".encode("utf-8")
+        body = render_product_page(page).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -962,46 +953,70 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
         self.end_headers()
         self.wfile.write(body)
 
-    def _handle_product_page(self):
+    def _read_product_payload(self):
+        length = int(self.headers.get("Content-Length", "0") or 0)
+        if length <= 0 or length > MAX_PRODUCT_BODY:
+            return None, (413, {"error": "Request too large"})
         try:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0 or length > MAX_BODY:
-                return self.send_json(413, {"error": "Request too large"})
             payload = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):
-            return self.send_json(400, {"error": "Invalid JSON"})
+            return None, (400, {"error": "Invalid JSON"})
+        if not isinstance(payload, dict):
+            return None, (400, {"error": "Invalid JSON"})
+        return payload, None
 
-        product = self._sanitize(payload.get("product", "מוצר לדוגמה"), 120)
-        product_url = self._sanitize(payload.get("product_url", ""), 500)
-        headline = self._sanitize(payload.get("headline", product), 200)
-        description = self._sanitize(payload.get("description", ""), 500)
-        bullets = [self._sanitize(b, 120) for b in payload.get("bullets", [])][:8]
-        cta_text = self._sanitize(payload.get("cta_text", ""), 80)
-        cta_url = self._sanitize(payload.get("cta_url", ""), 200)
-        style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
-        video_url = self._sanitize(payload.get("video_url", ""), 500)
-
-        page = {
-            "id": uuid.uuid4().hex[:10],
-            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "product": product,
-            "product_url": product_url,
-            "headline": headline,
-            "description": description,
-            "bullets": bullets,
-            "cta_text": cta_text,
-            "cta_url": cta_url,
-            "style": style,
-            "video_url": video_url,
-            "slug": uuid.uuid4().hex[:8],
+    @staticmethod
+    def _build_product_page(payload):
+        clean = Handler._sanitize
+        items_in = lambda key, limit, max_items: [
+            t for t in (clean(i, limit) for i in (payload.get(key) or [])[:max_items] if isinstance(i, str)) if t.strip()
+        ]
+        reviews = []
+        for r in (payload.get("reviews") or [])[:10]:
+            if isinstance(r, dict):
+                text = clean(r.get("text", ""), 400)
+                if text.strip():
+                    reviews.append({"name": clean(r.get("name", ""), 60), "text": text})
+        faq = []
+        for f in (payload.get("faq") or [])[:20]:
+            if isinstance(f, dict):
+                q = clean(f.get("q", ""), 200)
+                a = clean(f.get("a", ""), 600)
+                if q.strip() and a.strip():
+                    faq.append({"q": q, "a": a})
+        return {
+            "product": clean(payload.get("product", ""), 120),
+            "headline": clean(payload.get("headline", ""), 200),
+            "price": clean(payload.get("price", ""), 40),
+            "description": clean(payload.get("description", ""), 800),
+            "images": clean_images(payload.get("images")),
+            "benefits": items_in("benefits", 160, 6),
+            "reviews": reviews,
+            "faq": faq,
         }
-        pages = _store.load("product_pages", [], DATA_DIR)
-        if not isinstance(pages, list):
-            pages = []
-        pages.insert(0, page)
-        _store.save("product_pages", pages[:100], DATA_DIR)
-        page_url = f"{_BASE_URL}/p/{page['slug']}"
-        return self.send_json(201, {"ok": True, "page": page, "page_url": page_url})
+
+    def _handle_product_page(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        page = self._build_product_page(payload)
+        if not page["product"].strip():
+            return self.send_json(400, {"error": "כתבו שם מוצר"})
+        slug = uuid.uuid4().hex[:8]
+        page.update({
+            "id": uuid.uuid4().hex[:10],
+            "slug": slug,
+            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        })
+        _store.save(f"product_page_{slug}", page, DATA_DIR)
+        page_url = f"{_BASE_URL}/p/{slug}"
+        return self.send_json(201, {"ok": True, "page": {"slug": slug}, "page_url": page_url})
+
+    def _handle_product_preview(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        return self.send_json(200, {"html": render_product_page(self._build_product_page(payload))})
 
     def _handle_script_generate(self):
         try:
