@@ -149,6 +149,11 @@
       ] }
   };
 
+  // בכל תבנית מוסיפים אפשרות "כתיבה חופשית" אחרי התסריטים המוכנים.
+  Object.keys(TEMPLATES).forEach(function (k) {
+    TEMPLATES[k].scripts.push({ title: 'כתיבה חופשית', free: true, text: function () { return ''; } });
+  });
+
   function $(id) { return document.getElementById(id); }
   function toast(msg) { var t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(function () { t.classList.remove('show'); }, 2600); }
 
@@ -193,14 +198,20 @@
     $('scriptOptions').innerHTML = cfg.scripts.map(function (s, i) {
       return '<button type="button" class="btn ' + (i === selectedScript ? 'btn-primary' : 'btn-secondary') + '" data-idx="' + i + '" style="justify-content:flex-start;text-align:right">' + s.title + '</button>';
     }).join('');
-    $('scriptText').value = cfg.scripts[selectedScript].text(p);
+    var s = cfg.scripts[selectedScript];
+    var ta = $('scriptText');
+    ta.placeholder = s.free ? 'כתבו כאן את התסריט שלכם…' : '';
+    // בכתיבה חופשית לא דורסים את מה שהלקוח כתב.
+    if (!s.free) ta.value = s.text(p);
   }
 
   $('scriptOptions').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-idx]');
     if (!b) return;
     selectedScript = +b.dataset.idx;
+    if (cfg.scripts[selectedScript].free) $('scriptText').value = '';
     renderScripts();
+    if (cfg.scripts[selectedScript].free) $('scriptText').focus();
   });
   $('productName').addEventListener('input', renderScripts);
   $('productUrl').addEventListener('input', renderScripts);
