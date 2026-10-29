@@ -119,6 +119,15 @@
       </div>
 
       <div class="field">
+        <div class="label"><label for="pbImportUrl">העלו מוצר באמצעות קישור</label></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input class="input" id="pbImportUrl" dir="ltr" type="url" placeholder="https://your-shop.com/product" autocomplete="off" style="flex:1;min-width:200px">
+          <button type="button" class="btn btn-secondary" id="pbImport">מילוי אוטומטי</button>
+        </div>
+        <small id="pbImportStatus" role="status" style="color:#555"></small>
+      </div>
+
+      <div class="field">
         <div class="label"><label for="pbTitle">שם המוצר</label></div>
         <input class="input" id="pbTitle" placeholder="לדוגמה: מטריה מתקפלת">
       </div>
@@ -486,6 +495,34 @@ $('generateBtn').addEventListener('click', async () => {
 });
 
 ['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails', 'pbSpecs', 'pbShipping'].forEach(id => $(id).addEventListener('input', schedulePreview));
+
+// מילוי אוטומטי מקישור לחנות: שם, מחיר, תיאור ותמונות, והקישור עצמו הופך לכפתור הקנייה
+$('pbImport').addEventListener('click', async () => {
+  const url = $('pbImportUrl').value.trim();
+  const status = $('pbImportStatus');
+  if (!url) { status.textContent = 'הדביקו קישור למוצר'; return; }
+  const btn = $('pbImport');
+  btn.disabled = true;
+  status.textContent = 'מייבא את פרטי המוצר...';
+  try {
+    const r = await fetch('/api/product-page/import', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'לא הצלחנו לייבא את המוצר');
+    if (d.product) { $('pbTitle').value = d.product; $('pbHeadline').value = d.product; }
+    if (d.price) $('pbPrice').value = d.price;
+    if (d.description) $('pbDesc').value = d.description;
+    $('pbCtaUrl').value = d.url || url;
+    if (d.images && d.images.length) { images = d.images.slice(0, LIMITS.images); renderImages(); }
+    status.textContent = 'הפרטים מולאו. אפשר לערוך אותם למטה.';
+    schedulePreview();
+  } catch (err) {
+    status.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
 $('pbReviews').addEventListener('change', schedulePreview);
 document.querySelectorAll('#pbToggles input').forEach(i => i.addEventListener('change', schedulePreview));
 renderThemeOptions();
