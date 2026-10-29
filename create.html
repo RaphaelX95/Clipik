@@ -382,6 +382,9 @@
         }
         status.appendChild(text);
         if (link.href) status.appendChild(link);
+        // ההודעה מופיעה מתחת לכפתור, ולכן מגללים אליה ומציגים גם הודעה קופצת
+        toast(e.status === 402 ? "אין מספיק טוקנים. צריך להטעין כדי ליצור סרטון" : (e.status === 401 ? "צריך להתחבר כדי ליצור סרטון" : (e.message || "אירעה שגיאה. נסו שוב.")));
+        status.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     };
 
