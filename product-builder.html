@@ -33,6 +33,7 @@
 .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .hint{font-size:13px;color:#8a8aa0;margin:12px 0 0}
 .opts{display:grid;gap:8px}
+.chip-check{display:inline-flex;align-items:center;gap:6px;border:1px solid #e6dfd2;border-radius:10px;padding:8px 10px;font-size:14px;cursor:pointer}
 .opts.tpl{grid-template-columns:repeat(3,1fr)}
 .opts.fonts{grid-template-columns:repeat(2,1fr)}
 .opts.colors{grid-template-columns:repeat(5,1fr)}
@@ -103,6 +104,20 @@
 
   <div class="workspace">
     <section class="panel editor">
+      <div class="field">
+        <div class="label">מה מופיע בדף (בטלו סימון כדי להסיר חלק)</div>
+        <div class="opts" id="pbToggles" style="display:flex;flex-wrap:wrap;gap:8px">
+          <label class="chip-check"><input type="checkbox" data-hide-key="description" checked> תיאור קצר</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="benefits" checked> יתרונות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="shipping" checked> משלוח והחזרות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="specs" checked> מפרט</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="details" checked> הסבר מלא</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="reviews" checked> ביקורות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="faq" checked> שאלות נפוצות</label>
+          <label class="chip-check"><input type="checkbox" data-hide-key="cta" checked> כפתור קנייה</label>
+        </div>
+      </div>
+
       <div class="field">
         <div class="label"><label for="pbTitle">שם המוצר</label></div>
         <input class="input" id="pbTitle" placeholder="לדוגמה: מטריה מתקפלת">
@@ -358,6 +373,7 @@ function collect() {
     details_title: $('pbDetailsTitle').value.trim(),
     details: $('pbDetails').value.trim(),
     specs: $('pbSpecs').value.trim(),
+    hidden: Array.from(document.querySelectorAll('#pbToggles input')).filter(i => !i.checked).map(i => i.dataset.hideKey),
     shipping: $('pbShipping').value.trim(),
     images, benefits, reviews, faq,
     theme: { ...theme }
@@ -467,6 +483,7 @@ $('generateBtn').addEventListener('click', async () => {
 
 ['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails', 'pbSpecs', 'pbShipping'].forEach(id => $(id).addEventListener('input', schedulePreview));
 $('pbReviews').addEventListener('change', schedulePreview);
+document.querySelectorAll('#pbToggles input').forEach(i => i.addEventListener('change', schedulePreview));
 renderThemeOptions();
 bindThemeOptions();
 
@@ -493,6 +510,8 @@ async function loadTemplate(slug) {
     $('pbDetailsTitle').value = page.details_title || '';
     $('pbDetails').value = page.details || '';
     $('pbSpecs').value = page.specs || '';
+    const hiddenKeys = page.hidden || [];
+    document.querySelectorAll('#pbToggles input').forEach(i => { i.checked = !hiddenKeys.includes(i.dataset.hideKey); });
     $('pbShipping').value = page.shipping || '';
     images = d.images || [];
     (page.benefits || []).forEach(b => addBenefit(b));
