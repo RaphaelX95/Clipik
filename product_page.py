@@ -9,7 +9,8 @@ import html
 import re
 
 MAX_IMAGES = 10
-_IMAGE_RE = re.compile(r"data:image/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]{1,1500000}")
+# SVG מותר רק כי התמונות ממקור הדוגמאות בלבד. העלאות של משתמשים עוברות המרה ל-JPEG בדפדפן.
+_IMAGE_RE = re.compile(r"data:image/(?:jpeg|png|webp|svg\+xml);base64,[A-Za-z0-9+/=]{1,1500000}")
 
 LAYOUTS = {
     "top": "עליונה",
@@ -387,6 +388,20 @@ EXAMPLES = [
               ("יש אחריות?", "שנה אחריות על התפרים והרוכסנים.")],
              "backpack", [(1, 0, 0), (1.8, 0, 30), (1.4, -50, -40), (1.1, 60, 0), (2.0, 0, -60)]),
 ]
+
+
+def template_data(slug: str):
+    """נתוני תבנית לעריכה: התוכן, התמונות והעיצוב של הדוגמה."""
+    for ex in EXAMPLES:
+        if ex["slug"] == slug:
+            return {
+                "slug": slug,
+                "name": ex["name"],
+                "layout": ex["page"]["theme"]["template"],
+                "page": ex["page"],
+                "images": ex["images"],
+            }
+    return None
 
 
 def example_page_html(slug: str):
