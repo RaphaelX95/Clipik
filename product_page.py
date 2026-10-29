@@ -25,7 +25,7 @@ LAYOUTS = {
     "minimal": "מינימלי",
 }
 # תבניות ישנות שנשמרו לפני שהתבניות הוחלפו
-_LEGACY_LAYOUTS = {"modern": "top", "minimal": "center", "bold": "overlay"}
+_LEGACY_LAYOUTS = {"modern": "top", "bold": "overlay"}
 
 FONTS = {
     "heebo": ("Heebo", "400;700;900"),
