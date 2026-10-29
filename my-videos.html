@@ -169,7 +169,16 @@ function deleteVideo(index) {
 
 async function loadVideos() {
   try {
-    const r = await fetch('/api/projects');
+    const r = await fetch('/api/projects', { credentials: 'same-origin' });
+    if (r.status === 401) {
+      document.getElementById('videosGrid').innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">👤</div>
+          <h3>צריך להתחבר</h3>
+          <p><a href="/login.html">התחברו</a> כדי לראות את הסרטונים שלכם</p>
+        </div>`;
+      return;
+    }
     if (!r.ok) throw new Error('Failed');
     const d = await r.json();
     videos = d.projects || [];
