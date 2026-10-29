@@ -706,7 +706,7 @@ EDITOR_BAR = """<div id="pe-bar" dir="rtl" role="region" aria-label="עריכת 
   <div class="pe-row"><a id="pe-back" href="/product-examples.html">→ חזרה לתבניות</a><strong>עריכה ישירה בדף</strong><button id="pe-toggle" type="button" aria-expanded="true">הסתרת העריכה</button></div>
   <div id="pe-body">
     <div class="pe-row"><span class="pe-hint">לחצו על טקסט כדי לשנות אותו. הסגנון, הצבעים והפונט נשארים כמו בתבנית.</span></div>
-    <div class="pe-row" id="pe-import-row"><span class="pe-hint">קישור למוצר בחנות שלכם:</span><input id="pe-link" type="url" dir="ltr" placeholder="https://your-shop.com/product" autocomplete="off"><button id="pe-import" type="button">מילוי אוטומטי מהקישור</button><span id="pe-import-status" role="status"></span></div>
+    <div class="pe-row" id="pe-import-row"><span class="pe-hint">העלו מוצר באמצעות קישור:</span><input id="pe-link" type="url" dir="ltr" placeholder="https://your-shop.com/product" autocomplete="off"><button id="pe-import" type="button">מילוי אוטומטי מהקישור</button><span id="pe-import-status" role="status"></span></div>
     <div class="pe-row" id="pe-sections"><span class="pe-hint">מה מוצג בדף:</span>__SECTIONS__</div>
     <div class="pe-row" id="pe-imgs"></div>
     <div class="pe-row"><button id="pe-save" type="button">שמירה ויצירת קישור לדף</button><span id="pe-status" role="status"></span></div>
