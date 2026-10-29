@@ -13,7 +13,7 @@ import requests
 
 MAX_PAGE_BYTES = 2_000_000
 MAX_IMAGE_BYTES = 1_000_000  # תואם למגבלת התמונות בדף המוצר
-MAX_IMAGES = 3
+MAX_IMAGES = 5
 TIMEOUT = (5, 10)
 USER_AGENT = "Mozilla/5.0 (compatible; ClipikProductImport/1.0)"
 _CURRENCY = {"ILS": "₪", "NIS": "₪", "USD": "$", "EUR": "€", "GBP": "£"}
