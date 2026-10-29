@@ -160,6 +160,15 @@
       </div>
 
       <div class="field">
+        <div class="label"><label for="pbSpecs">מפרט המוצר (לא חובה)</label></div>
+        <textarea class="textarea" id="pbSpecs" rows="4" placeholder="שורה לכל פרט, בפורמט: גובה: 7 ס״מ"></textarea>
+      </div>
+      <div class="field">
+        <div class="label"><label for="pbShipping">משלוח והחזרות (לא חובה)</label></div>
+        <input class="input" id="pbShipping" placeholder="לדוגמה: משלוח עד 3 ימי עסקים · החזרה עד 14 יום">
+      </div>
+
+      <div class="field">
         <div class="label">שאלות נפוצות (עד 20). ערכו את התשובות לפני היצירה.</div>
         <div id="pbFaq"></div>
         <button type="button" class="btn btn-secondary" id="pbAddFaq">+ הוספת שאלה</button>
@@ -291,9 +300,10 @@ function addBenefit(v = '') {
   if ($('pbBenefits').children.length >= LIMITS.benefits) return toast('אפשר עד 6 יתרונות');
   addRow($('pbBenefits'), `<input class="input" placeholder="לדוגמה: נכנס לכל תיק" value="${esc(v)}">`);
 }
-function addReview(name = '', text = '') {
+function addReview(name = '', text = '', rating = 5) {
   if ($('pbReviews').children.length >= LIMITS.reviews) return toast('אפשר עד 10 ביקורות');
-  addRow($('pbReviews'), `<div class="row-stack"><input class="input rv-name" placeholder="שם הלקוח, לדוגמה: דנה, תל אביב" value="${esc(name)}"><textarea class="textarea rv-text" rows="2" placeholder="מה הלקוח כתב, לדוגמה: הזמנתי, הגיע מהר וממש מרוצה">${esc(text)}</textarea></div>`);
+  const stars = [5, 4, 3, 2, 1].map(n => `<option value="${n}"${n === Number(rating) ? ' selected' : ''}>${'★'.repeat(n)}</option>`).join('');
+  addRow($('pbReviews'), `<div class="row-stack"><input class="input rv-name" placeholder="שם הלקוח, לדוגמה: דנה, תל אביב" value="${esc(name)}"><select class="input rv-rating" aria-label="דירוג">${stars}</select><textarea class="textarea rv-text" rows="2" placeholder="מה הלקוח כתב, לדוגמה: הזמנתי, הגיע מהר וממש מרוצה">${esc(text)}</textarea></div>`);
 }
 function addFaq(q = '', a = '') {
   if ($('pbFaq').children.length >= LIMITS.faq) return toast('אפשר עד 20 שאלות');
@@ -331,6 +341,7 @@ function collect() {
   const benefits = Array.from($('pbBenefits').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
   const reviews = Array.from($('pbReviews').querySelectorAll('.row')).map(r => ({
     name: r.querySelector('.rv-name').value.trim(),
+    rating: Number(r.querySelector('.rv-rating').value) || 5,
     text: r.querySelector('.rv-text').value.trim()
   })).filter(r => r.text);
   const faq = Array.from($('pbFaq').querySelectorAll('.row')).map(r => ({
@@ -346,6 +357,8 @@ function collect() {
     cta_url: $('pbCtaUrl').value.trim(),
     details_title: $('pbDetailsTitle').value.trim(),
     details: $('pbDetails').value.trim(),
+    specs: $('pbSpecs').value.trim(),
+    shipping: $('pbShipping').value.trim(),
     images, benefits, reviews, faq,
     theme: { ...theme }
   };
@@ -452,7 +465,8 @@ $('generateBtn').addEventListener('click', async () => {
   }
 });
 
-['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails'].forEach(id => $(id).addEventListener('input', schedulePreview));
+['pbTitle', 'pbHeadline', 'pbPrice', 'pbDesc', 'pbCtaText', 'pbCtaUrl', 'pbDetailsTitle', 'pbDetails', 'pbSpecs', 'pbShipping'].forEach(id => $(id).addEventListener('input', schedulePreview));
+$('pbReviews').addEventListener('change', schedulePreview);
 renderThemeOptions();
 bindThemeOptions();
 
@@ -478,10 +492,12 @@ async function loadTemplate(slug) {
     $('pbCtaUrl').value = page.cta_url || '';
     $('pbDetailsTitle').value = page.details_title || '';
     $('pbDetails').value = page.details || '';
+    $('pbSpecs').value = page.specs || '';
+    $('pbShipping').value = page.shipping || '';
     images = d.images || [];
     (page.benefits || []).forEach(b => addBenefit(b));
-    addReview();
-    addReview();
+    if ((page.reviews || []).length) (page.reviews || []).forEach(r => addReview(r.name, r.text, r.rating));
+    else { addReview(); addReview(); }
     (page.faq || []).forEach(f => addFaq(f.q, f.a));
     theme.template = page.theme.template;
     theme.font = page.theme.font;
