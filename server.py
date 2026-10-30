@@ -145,7 +145,7 @@ def _send_login_code(email: str, code: str) -> bool:
             json={
                 "from": sender,
                 "to": [email],
-                "subject": "קוד ההתחברות שלכם לקליפיק",
+                "subject": "קוד ההתחברות שלכם לקליפיק פרו",
                 "text": f"קוד ההתחברות שלכם: {code}\nהקוד תקף 10 דקות. אם לא ביקשתם אותו, אפשר להתעלם מההודעה.",
             },
             timeout=15,
@@ -984,7 +984,7 @@ class Handler(BaseHTTPRequestHandler):
                 legacy = _store.load("product_pages", [], DATA_DIR)
                 page = next((p for p in legacy if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(legacy, list) else None
         if not isinstance(page, dict):
-            body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק</a></p></body></html>".encode("utf-8")
+            body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק פרו</a></p></body></html>".encode("utf-8")
             self.send_response(404)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))

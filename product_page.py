@@ -488,7 +488,7 @@ def _render(page: dict, images: list, edit: bool = False) -> str:
 <style>{root_css}{BASE_CSS}{FEATURE_CSS}{LAYOUT_CSS[theme["template"]]}</style></head>
 <body class="l-{theme["template"]}">
 {body}
-<footer class="foot">נוצר באמצעות קליפיק</footer>
+<footer class="foot">נוצר באמצעות קליפיק פרו</footer>
 </body></html>"""
     if edit:
         doc = _with_editor(doc, {"product": product, "headline": headline, "price": price,
