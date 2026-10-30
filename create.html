@@ -108,7 +108,7 @@
               <strong id="avatarDialogTitle" style="font-size:18px">בחירת דמות</strong>
               <button type="button" class="btn btn-secondary" id="avatarClose">סגירה</button>
             </div>
-            <input class="input" id="avatarSearch" type="search" placeholder="חיפוש: למשל שיער בלונד, משקפיים, ג'ינס" aria-label="חיפוש דמות" style="margin-bottom:12px">
+            <input class="input" id="avatarSearch" type="search" placeholder="חיפוש: שם או מראה, למשל נועה או משקפיים" aria-label="חיפוש דמות" style="margin-bottom:12px">
             <div id="avatarAll" role="group" aria-label="כל הדמויות"></div>
           </dialog>
         </div>
@@ -235,7 +235,7 @@
     }
     function renderAllAvatars() {
       const q = $("#avatarSearch").value.trim().toLowerCase();
-      const list = AVATARS.filter(a => !q || a.label.toLowerCase().includes(q));
+      const list = AVATARS.filter(a => !q || a.label.toLowerCase().includes(q) || (a.desc || "").toLowerCase().includes(q));
       $("#avatarAll").innerHTML = list.length
         ? list.map(a => `<div>${avatarBtn(a)}<span class="av-cap">${escAttr(a.label)}</span></div>`).join("")
         : '<p style="color:var(--muted)">לא נמצאה דמות עם החיפוש הזה</p>';
