@@ -331,5 +331,15 @@
 })();
 </script>
 
+<!-- menu-close-outside -->
+<script>
+// סגירת התפריט הנייד בלחיצה על שאר המסך
+document.addEventListener('click', function (e) {
+  var sb = document.querySelector('.sidebar');
+  if (!sb || !sb.classList.contains('open')) return;
+  if (sb.contains(e.target) || (e.target.closest && e.target.closest('.sidebar-toggle'))) return;
+  sb.classList.remove('open');
+}, true);
+</script>
 </body>
 </html>
