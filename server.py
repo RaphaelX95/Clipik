@@ -778,6 +778,19 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        if path.startswith("/avatars/"):
+            name = path.rsplit("/", 1)[-1]
+            file_path = ROOT / "avatars" / name
+            if not re.fullmatch(r"avatar-(10|[1-9])\.jpg", name) or not file_path.is_file():
+                return self.send_error(404, "Not found")
+            data = file_path.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "public, max-age=86400")
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if path.startswith("/uploads/"):
             name = path.rsplit("/", 1)[-1]
             file_path = _UPLOAD_DIR / name
