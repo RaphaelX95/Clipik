@@ -20,23 +20,24 @@
   <meta name="twitter:image" content="https://clipik.pro/og-image.png">
 </head>
 <body>
-<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
+<header class="mobile-bar"><button class="sidebar-toggle" aria-label="פתיחת התפריט" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button><a class="mobile-brand" href="/">קליפיק פרו</a></header>
 <aside class="sidebar">
   <a class="sidebar-brand" href="/create.html">
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק פרו
   </a>
-  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
+  <a href="/login.html" class="sidebar-login-cta"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
-    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
-    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
-    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon">📦</span>יצירת דף מוצר</a>
-    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <a href="/create.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg></span>יצירת סרטון</a>
+    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>יצירת דף מוצר</a>
+    <a href="/templates.html" class="sidebar-link active"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>תבניות לסרטון</a>
+    <a href="/product-examples.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span>תבניות לדפי מוצר<span class="sidebar-badge">חדש</span></a>
+    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
-    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
-    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
-    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
+    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 0 0-6V6H3z"/><path d="M13 6v12"/></svg></span>מחירון</a>
+    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></span>טיפים</a>
+    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg></span>שאלות נפוצות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק פרו</div>
 </aside>
@@ -56,7 +57,7 @@
     <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
       <span class="chip" style="cursor:default" id="chipStyle"></span>
       <span class="chip" style="cursor:default" id="chipDuration"></span>
-      <span style="color:var(--muted);font-size:13px">התבנית קבועה. אפשר לשנות רק את מה שמופיע למטה.</span>
+      <span style="color:var(--muted);font-size:13px">התבנית קבועה. אפשר לבחור אורך, רזולוציה ותסריט, ולשנות את מה שמופיע למטה.</span>
     </div>
 
     <section class="card" style="margin-bottom:20px">
@@ -75,7 +76,12 @@
     </section>
 
     <section class="card" style="margin-bottom:20px">
-      <h2 style="font-size:18px;margin:0 0 12px">2. רזולוציה וקהל</h2>
+      <h2 style="font-size:18px;margin:0 0 12px">2. אורך הסרטון</h2>
+      <div id="durationOpts" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+    </section>
+
+    <section class="card" style="margin-bottom:20px">
+      <h2 style="font-size:18px;margin:0 0 12px">3. רזולוציה וקהל</h2>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-secondary res-opt" type="button" data-res="720p" aria-pressed="true"></button>
         <button class="btn btn-secondary res-opt" type="button" data-res="1080p" aria-pressed="false"></button>
@@ -87,7 +93,7 @@
     </section>
 
     <section class="card" style="margin-bottom:20px">
-      <h2 style="font-size:18px;margin:0 0 12px">3. התסריט</h2>
+      <h2 style="font-size:18px;margin:0 0 12px">4. התסריט</h2>
       <div id="scriptOptions" style="display:grid;gap:10px"></div>
       <div class="field" style="margin-top:16px">
         <label class="label" for="scriptText">אפשר לערוך את הנוסח</label>
@@ -117,63 +123,85 @@
 (function () {
   // כל התבניות: סגנון, אורך, טוקנים לפי רזולוציה, ושלושה תסריטים לכל אחת.
   var TEMPLATES = {
-    'UGC טבעי': { duration: 15, icon: '🎬', desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.', tokens: { '720p': 6, '1080p': 9 },
-      scripts: [
+    'UGC טבעי': { icon: '🎬', desc: 'מוצר בשימוש יומיומי, כמו המלצה של לקוח אמיתי. מתאים לטיקטוק ולרילס.', scripts: [
         { title: 'המלצה אישית', text: function (p) { return 'אני משתמש/ת ב-' + p + ' כבר כמה ימים, וזה שינה לי את השגרה.'; } },
         { title: 'לפני ואחרי', text: function (p) { return 'לפני ' + p + ' הכל היה לוקח יותר זמן. עכשיו זה נראה אחרת לגמרי.'; } },
         { title: 'שאלה מהלקוח', text: function (p) { return 'שאלו אותי אם ' + p + ' באמת שווה את זה. הנה מה שראיתי.'; } }
       ] },
-    'הדגמת מוצר': { duration: 15, icon: '🔍', desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.', tokens: { '720p': 6, '1080p': 9 },
-      scripts: [
+    'הדגמת מוצר': { icon: '🔍', desc: 'מראה מה המוצר עושה ואיך משתמשים בו, בלי להסתיר את הפונקציה שלו.', scripts: [
         { title: 'מתחילים בהדגמה', text: function (p) { return 'הנה ' + p + ' מקרוב. נראה את המראה שלו ואת אופן השימוש.'; } },
         { title: 'שלבים פשוטים', text: function (p) { return 'שלוש דקות עם ' + p + ': מוציאים, מפעילים, ומתחילים לעבוד.'; } },
         { title: 'הפונקציה בפעולה', text: function (p) { return 'זה ' + p + ' בפעולה. שימו לב מה קורה כשמפעילים אותו.'; } }
       ] },
-    'פתיחת חבילה': { duration: 15, icon: '📦', desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.', tokens: { '720p': 6, '1080p': 9 },
-      scripts: [
+    'פתיחת חבילה': { icon: '📦', desc: 'רגע הגילוי, מהחבילה אל המוצר. טוב לחשיפה ראשונה של מוצר חדש.', scripts: [
         { title: 'רגע הגילוי', text: function (p) { return 'פותחים את ' + p + '. הנה הרגע שבו הוא יוצא מהאריזה.'; } },
         { title: 'מהחבילה למוצר', text: function (p) { return 'זה מה שנמצא בתוך החבילה: ' + p + '. בואו נראה אותו מקרוב.'; } },
         { title: 'חשיפה ראשונה', text: function (p) { return p + ' הגיע. ככה הוא נראה ביום הראשון.'; } }
       ] },
-    'קריינות ותקריבים': { duration: 20, icon: '🎙️', desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.', tokens: { '720p': 8, '1080p': 12 },
-      scripts: [
+    'קריינות ותקריבים': { icon: '🎙️', desc: 'תצוגה מקצועית עם קריין וצילומי קרוב, בלי דמות על המסך.', scripts: [
         { title: 'הצגה מקצועית', text: function (p) { return 'הכירו את ' + p + ': פרטים קטנים, איכות גבוהה, ותוצאה שאפשר לראות.'; } },
         { title: 'יתרונות', text: function (p) { return p + ' מציע שלושה דברים שחשוב לדעת לפני שקונים.'; } },
         { title: 'סיום בקריאה לפעולה', text: function (p) { return p + ': עכשיו הזמן לנסות בעצמכם.'; } }
       ] },
-    'מדריך קצר': { duration: 30, icon: '📚', desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.', tokens: { '720p': 12, '1080p': 18 },
-      scripts: [
+    'מדריך קצר': { icon: '📚', desc: '3 עד 4 שלבים פשוטים, אחד אחרי השני. מתאים למוצרים שצריך להסביר.', scripts: [
         { title: 'שלבים פשוטים', text: function (p) { return 'איך משתמשים ב-' + p + ' בארבעה שלבים פשוטים. שלב ראשון: ההכנה.'; } },
         { title: 'לפני שמתחילים', text: function (p) { return 'לפני שמתחילים עם ' + p + ', הנה מה שצריך לדעת.'; } },
         { title: 'טיפים לתוצאה', text: function (p) { return 'שלושה טיפים שיעזרו לכם להוציא את המקסימום מ-' + p + '.'; } }
       ] }
   };
 
+  // בכל תבנית מוסיפים אפשרות "כתיבה חופשית" אחרי התסריטים המוכנים.
+  Object.keys(TEMPLATES).forEach(function (k) {
+    TEMPLATES[k].scripts.push({ title: 'כתיבה חופשית', free: true, text: function () { return ''; } });
+  });
+
   function $(id) { return document.getElementById(id); }
   function toast(msg) { var t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(function () { t.classList.remove('show'); }, 2600); }
 
   var params = new URLSearchParams(location.search);
   var style = params.get('style') || '';
-  var duration = +(params.get('duration') || 0);
   var cfg = TEMPLATES[style];
-  if (!cfg || cfg.duration !== duration) {
+  if (!cfg) {
     $('tplBody').style.display = 'none';
     $('tplError').style.display = 'block';
     return;
   }
 
+  // אורכים אפשריים, ומספר הטוקנים לכל אורך לפי 720p. ב-1080p הטוקנים כפול 1.5 (מעוגל למעלה), כמו בשרת.
+  var DURATIONS = [5, 10, 15, 20, 25, 30];
+  var BASE_TOKENS = { 5: 2, 10: 4, 15: 6, 20: 8, 25: 10, 30: 12 };
+  function tokensFor(d, r) {
+    var base = BASE_TOKENS[d];
+    return r === '1080p' ? Math.ceil(base * 1.5) : base;
+  }
+
+  var duration = +(params.get('duration') || 0);
+  if (DURATIONS.indexOf(duration) < 0) duration = 15;
+  var resolution = '720p';
+
   document.title = style + ' - קליפיק פרו';
   $('tplTitle').textContent = cfg.icon + ' ' + style;
   $('tplDesc').textContent = cfg.desc;
   $('chipStyle').textContent = 'סגנון: ' + style;
-  $('chipDuration').textContent = 'אורך: ' + duration + ' שניות';
-  document.querySelectorAll('.res-opt').forEach(function (b) {
-    var r = b.dataset.res;
-    b.textContent = r + ' · ' + cfg.tokens[r] + ' טוקנים';
-  });
+
+  function renderDurations() {
+    $('durationOpts').innerHTML = DURATIONS.map(function (d) {
+      var on = d === duration;
+      return '<button class="btn ' + (on ? 'btn-primary' : 'btn-secondary') + ' dur-opt" type="button" data-dur="' + d + '" aria-pressed="' + on + '">' +
+        d + ' שניות · ' + tokensFor(d, resolution) + ' טוקנים</button>';
+    }).join('');
+  }
+
+  function refreshLabels() {
+    $('chipDuration').textContent = 'אורך: ' + duration + ' שניות';
+    document.querySelectorAll('.res-opt').forEach(function (b) {
+      var r = b.dataset.res;
+      b.textContent = r + ' · ' + tokensFor(duration, r) + ' טוקנים';
+    });
+    renderDurations();
+  }
 
   var productImage = '';
-  var resolution = '720p';
   var selectedScript = 0;
 
   function productLabel() {
@@ -193,14 +221,20 @@
     $('scriptOptions').innerHTML = cfg.scripts.map(function (s, i) {
       return '<button type="button" class="btn ' + (i === selectedScript ? 'btn-primary' : 'btn-secondary') + '" data-idx="' + i + '" style="justify-content:flex-start;text-align:right">' + s.title + '</button>';
     }).join('');
-    $('scriptText').value = cfg.scripts[selectedScript].text(p);
+    var s = cfg.scripts[selectedScript];
+    var ta = $('scriptText');
+    ta.placeholder = s.free ? 'כתבו כאן את התסריט שלכם…' : '';
+    // בכתיבה חופשית לא דורסים את מה שהלקוח כתב.
+    if (!s.free) ta.value = s.text(p);
   }
 
   $('scriptOptions').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-idx]');
     if (!b) return;
     selectedScript = +b.dataset.idx;
+    if (cfg.scripts[selectedScript].free) $('scriptText').value = '';
     renderScripts();
+    if (cfg.scripts[selectedScript].free) $('scriptText').focus();
   });
   $('productName').addEventListener('input', renderScripts);
   $('productUrl').addEventListener('input', renderScripts);
@@ -213,8 +247,18 @@
         b.setAttribute('aria-pressed', String(on));
         b.className = 'btn ' + (on ? 'btn-primary' : 'btn-secondary') + ' res-opt';
       });
+      refreshLabels();
     });
   });
+
+  $('durationOpts').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-dur]');
+    if (!b) return;
+    duration = +b.dataset.dur;
+    refreshLabels();
+  });
+
+  refreshLabels();
 
   $('uploadBtn').onclick = function () { $('file').click(); };
   $('file').onchange = function (e) {
@@ -282,7 +326,7 @@
   cta.insertAdjacentElement('afterend', box);
   fetch('/api/users/me', { credentials: 'same-origin' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); })
+    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); if (d && d.user && d.user.email) cta.textContent = '👤 ' + d.user.email; })
     .catch(function () {});
 })();
 </script>

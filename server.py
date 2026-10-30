@@ -12,6 +12,7 @@ import time
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 import store as _store
+from product_page import render_product_page, clean_images, clean_theme, example_page_html, example_edit_html, template_data, EXAMPLES, HIDEABLE as HIDEABLE_SECTIONS
 from decimal import Decimal
 import os
 import threading
@@ -33,6 +34,7 @@ import fal_provider as _fal_provider
 import unifically_provider as _uni
 import token_packages as _token_packages
 import requests as _requests
+import product_import as _product_import
 
 ROOT = Path(__file__).resolve().parent
 # תיקיית הנתונים (קבצי JSON של משתמשים, פרויקטים ותשלומים). ברירת מחדל: תיקיית הקוד.
@@ -40,6 +42,8 @@ DATA_DIR = Path(os.environ.get("DATA_DIR") or ROOT)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DATA = DATA_DIR / "projects.json"
 MAX_BODY = 1_000_000
+# דף מוצר יכול לכלול עד 10 תמונות, לכן מגבילים אותו בנפרד
+MAX_PRODUCT_BODY = 8_000_000
 
 # Base URL for the application (used for iCount redirects and meta tags)
 _BASE_URL = os.environ.get("BASE_URL", f"http://127.0.0.1:{os.environ.get('PORT', '8765')}")
@@ -105,29 +109,23 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _OTP_TTL = 600          # קוד תקף 10 דקות
 _OTP_COOLDOWN = 60     # שליחה חוזרת לאותה כתובת אחרי דקה
 _OTP_MAX_TRIES = 5
-def _otp_load() -> dict:
-    data = _store.load("login_codes", {}, DATA_DIR)
-    return data if isinstance(data, dict) else {}
+_OTP_STORE: dict = {}  # email -> {"hash", "exp", "tries", "sent_at"} (בזיכרון, כמו בגרסה שעבדה)
+_OTP_LOCK = threading.Lock()
 
 
 def _otp_get(email: str):
-    return _otp_load().get(email)
+    return _OTP_STORE.get(email)
 
 
 def _otp_put(email: str, entry: dict) -> None:
-    data = _otp_load()
     now = time.time()
-    data = {k: v for k, v in data.items() if isinstance(v, dict) and v.get("exp", 0) > now - 3600}
-    data[email] = entry
-    _store.save("login_codes", data, DATA_DIR)
+    for k in [k for k, v in _OTP_STORE.items() if v.get("exp", 0) < now - 3600]:
+        _OTP_STORE.pop(k, None)
+    _OTP_STORE[email] = entry
 
 
 def _otp_del(email: str) -> None:
-    data = _otp_load()
-    if email in data:
-        data.pop(email, None)
-        _store.save("login_codes", data, DATA_DIR)
-_OTP_LOCK = threading.Lock()
+    _OTP_STORE.pop(email, None)
 
 
 def _otp_hash(email: str, code: str) -> str:
@@ -180,6 +178,14 @@ def _unsign(token: str) -> dict | None:
 
 
 def _ensure_user(user_id: str, email: str) -> None:
+    """יוצר משתמש אם חסר. שגיאת אחסון לא מפילה את ההתחברות: הסשן נחתם בנפרד."""
+    try:
+        _ensure_user_inner(user_id, email)
+    except Exception as exc:
+        print(f"[auth] could not save user record: {exc!r}", flush=True)
+
+
+def _ensure_user_inner(user_id: str, email: str) -> None:
     data = _load_users()
     users = data.setdefault("users", [])
     if any(u.get("id") == user_id for u in users):
@@ -243,8 +249,9 @@ def _icount_session() -> str:
             _ICOUNT_SID = data["sid"]
             _ICOUNT_SID_EXIRES = now + 900  # 15 minutes
             return _ICOUNT_SID
-    except Exception:
-        pass
+        print(f"[icount] login failed: status={r.status_code} error={str(data.get('error_description') or data.get('error') or data)[:200]}", flush=True)
+    except Exception as exc:
+        print(f"[icount] login exception: {exc!r}", flush=True)
     return ""
 
 
@@ -269,9 +276,11 @@ def _icount_create_payment_link(amount: float, order_id: str, description: str, 
         sale_url = data.get("sale_url", "")
         if sale_url:
             return {"ok": True, "sale_url": sale_url}
-        return {"error": data.get("error_description", "Failed")}
+        print(f"[icount] generate_sale failed: status={r.status_code} data={str(data)[:300]}", flush=True)
+        return {"error": f"iCount: {data.get('error_description') or data.get('error') or 'Failed'}"}
     except Exception as exc:
-        return {"error": str(exc)}
+        print(f"[icount] generate_sale exception: {exc!r}", flush=True)
+        return {"error": f"iCount exception: {exc}"}
 
 
 def _icount_verify_payment(confirmation_code: str, expected_amount: float) -> bool:
@@ -593,12 +602,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urlparse(self.path).path
-        if path in REDIRECTS:
+        if path in self.REDIRECTS:
             self.send_response(301)
-            self.send_header('Location', REDIRECTS[path])
+            self.send_header("Location", self.REDIRECTS[path])
             self.end_headers()
             return
-        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
+        if path not in ('/', '/index.html', '/home.html', '/create.html', '/templates.html', '/product-examples.html', '/my-videos.html', '/product-builder.html', '/pricing.html', '/examples.html', '/faq.html', '/login.html', '/payment_success.html', '/payment_failure.html', '/payment_cancel.html', '/template.html', '/sitemap.xml', '/robots.txt', '/google7cfae0c73b4d1768.html', '/logo.svg', '/logo-source.jpg', '/logo.html', '/styles.css', '/favicon.ico', '/favicon-48.png', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/og-image.png'):
             self.send_error(404, 'Not found')
             return
         body = b''
@@ -608,6 +617,8 @@ class Handler(BaseHTTPRequestHandler):
             body = (ROOT / 'create.html').read_bytes()
         elif path == '/templates.html':
             body = (ROOT / 'templates.html').read_bytes()
+        elif path == '/product-examples.html':
+            body = (ROOT / 'product-examples.html').read_bytes()
         elif path == '/my-videos.html':
             body = (ROOT / 'my-videos.html').read_bytes()
         elif path == '/product-builder.html':
@@ -658,6 +669,26 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"ok": True, "app": "clipic-mvp"})
         if path.startswith("/p/"):
             return self._serve_product_page(path[3:].strip("/"))
+        if path.startswith("/api/product-templates/"):
+            data = template_data(path[len("/api/product-templates/"):].strip("/"))
+            if data is None:
+                return self.send_json(404, {"error": "not found"})
+            return self.send_json(200, data)
+        if path.startswith("/product-examples/") or path.startswith("/product-edit/"):
+            if path.startswith("/product-edit/"):
+                body = example_edit_html(path[len("/product-edit/"):].strip("/"))
+            else:
+                body = example_page_html(path[len("/product-examples/"):].strip("/"))
+            if body is None:
+                return self.send_json(404, {"error": "not found"})
+            data = body.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if path == "/api/auth/logout":
             return self._redirect("/login.html", [f"{SESSION_COOKIE}=; Path=/; Max-Age=0"])
         if path == "/api/auth/me":
@@ -679,7 +710,17 @@ class Handler(BaseHTTPRequestHandler):
             user_id = self._require_session_user()
             if not user_id:
                 return
-            user = _get_user(user_id)
+            try:
+                user = _get_user(user_id)
+                if not user and user_id.startswith("email:"):
+                    # הסשן תקף אבל רשומת המשתמש לא נשמרה (למשל תקלת אחסון): יוצרים אותה מחדש
+                    _ensure_user(user_id, user_id[len("email:"):])
+                    user = _get_user(user_id)
+            except Exception as exc:
+                # האחסון לא זמין: מחזירים לפחות את פרטי ההתחברות מהסשן, כדי שהאתר יציג שאתם מחוברים
+                print(f"[auth] user store unavailable: {exc!r}", flush=True)
+                email = user_id[len("email:"):] if user_id.startswith("email:") else ""
+                return self.send_json(200, {"user": {"id": user_id, "email": email, "tokens": 0, "degraded": True}})
             if not user:
                 return self.send_json(404, {"error": "User not found"})
             return self.send_json(200, {"user": user})
@@ -737,6 +778,25 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        if path.startswith("/avatars/"):
+            name = path.rsplit("/", 1)[-1]
+            file_path = ROOT / "avatars" / name
+            if name == "index.json":
+                ctype = "application/json; charset=utf-8"
+            elif re.fullmatch(r"avatar-\d{1,3}\.(jpg|png|webp)", name):
+                ctype = {"jpg": "image/jpeg", "png": "image/png", "webp": "image/webp"}[name.rsplit(".", 1)[-1]]
+            else:
+                return self.send_error(404, "Not found")
+            if not file_path.is_file():
+                return self.send_error(404, "Not found")
+            data = file_path.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "public, max-age=86400")
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if path.startswith("/uploads/"):
             name = path.rsplit("/", 1)[-1]
             file_path = _UPLOAD_DIR / name
@@ -750,12 +810,14 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
+        if path not in ("/", "/index.html", "/home.html", "/create.html", "/templates.html", "/product-examples.html", "/my-videos.html", "/product-builder.html", "/pricing.html", "/examples.html", "/faq.html", "/login.html", "/payment_success.html", "/payment_failure.html", "/payment_cancel.html", "/template.html", "/sitemap.xml", "/robots.txt", "/google7cfae0c73b4d1768.html", "/logo.svg", "/logo-source.jpg", "/logo.html", "/logo.html", "/styles.css", "/favicon.ico", "/favicon-48.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/og-image.png"):
             self.send_error(404, "Not found")
             return
         body = b""
         if path == "/templates.html":
             body = (ROOT / "templates.html").read_bytes()
+        if path == "/product-examples.html":
+            body = (ROOT / "product-examples.html").read_bytes()
         if path == "/my-videos.html":
             body = (ROOT / "my-videos.html").read_bytes()
         if path == "/product-builder.html":
@@ -859,6 +921,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle_script_generate()
         if path == "/api/product-page":
             return self._handle_product_page()
+        if path == "/api/product-page/preview":
+            return self._handle_product_preview()
+        if path == "/api/product-page/import":
+            return self._handle_product_import()
         if path == "/api/analytics/summary":
             token = urlparse(self.path).query.split("token=")[-1].split("&")[0] if "token=" in self.path else ""
             if not _analytics_ok(token):
@@ -870,7 +936,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(403, {"error": "Forbidden"})
             return self._handle_analytics_event()
         if path == "/api/icount/create-payment":
-            return self._handle_icount_payment()
+            return self._safe_call(self._handle_icount_payment)
         if path == "/api/icount/ipn":
             return self._handle_icount_ipn()
         if path != "/api/projects":
@@ -910,9 +976,14 @@ class Handler(BaseHTTPRequestHandler):
         return self.send_json(201, {"project": project})
 
     def _serve_product_page(self, slug):
-        pages = _store.load("product_pages", [], DATA_DIR)
-        page = next((p for p in pages if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(pages, list) else None
-        if not page or not re.fullmatch(r"[a-f0-9]{8}", slug or ""):
+        page = None
+        if re.fullmatch(r"[a-f0-9]{8}", slug or ""):
+            page = _store.load(f"product_page_{slug}", None, DATA_DIR)
+            if not isinstance(page, dict):
+                # דפים ישנים נשמרו ברשימה אחת
+                legacy = _store.load("product_pages", [], DATA_DIR)
+                page = next((p for p in legacy if isinstance(p, dict) and p.get("slug") == slug), None) if isinstance(legacy, list) else None
+        if not isinstance(page, dict):
             body = "<!doctype html><html lang='he' dir='rtl'><meta charset='utf-8'><title>הדף לא נמצא</title><body style='font-family:sans-serif;padding:40px'><h1>הדף לא נמצא</h1><p><a href='/'>לאתר קליפיק פרו</a></p></body></html>".encode("utf-8")
             self.send_response(404)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -920,25 +991,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        e = lambda v: html.escape(str(v or ""), quote=True)
-        bullets = "".join(f"<li>{e(b)}</li>" for b in page.get("bullets", []))
-        cta_url = page.get("cta_url") or "/pricing.html"
-        if not (cta_url.startswith("/") or cta_url.startswith("https://") or cta_url.startswith("http://")):
-            cta_url = "/pricing.html"
-        video = f"<video src=\"{e(page.get('video_url'))}\" controls playsinline style='width:100%;border-radius:12px'></video>" if str(page.get("video_url", "")).startswith(("https://", "/")) else ""
-        body = f"""<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>{e(page.get('headline') or page.get('product'))} - קליפיק פרו</title>
-<style>body{{margin:0;font-family:Arial,sans-serif;background:#f6f6fb;color:#1d1d2b}}
-.wrap{{max-width:640px;margin:0 auto;padding:24px 16px}}h1{{font-size:28px;margin:12px 0}}
-p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:12px;background:#ff6b3d;color:#fff;text-decoration:none;font-weight:700}}
-</style></head><body><div class="wrap">
-<h1>{e(page.get('headline') or page.get('product'))}</h1>
-{video}
-<p>{e(page.get('description'))}</p>
-<ul>{bullets}</ul>
-<a class="cta" href="{e(cta_url)}">{e(page.get('cta_text') or 'קנו עכשיו')}</a>
-</div></body></html>""".encode("utf-8")
+        body = render_product_page(page).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -946,46 +999,99 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
         self.end_headers()
         self.wfile.write(body)
 
-    def _handle_product_page(self):
+    def _read_product_payload(self):
+        length = int(self.headers.get("Content-Length", "0") or 0)
+        if length <= 0 or length > MAX_PRODUCT_BODY:
+            return None, (413, {"error": "Request too large"})
         try:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0 or length > MAX_BODY:
-                return self.send_json(413, {"error": "Request too large"})
             payload = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):
-            return self.send_json(400, {"error": "Invalid JSON"})
+            return None, (400, {"error": "Invalid JSON"})
+        if not isinstance(payload, dict):
+            return None, (400, {"error": "Invalid JSON"})
+        return payload, None
 
-        product = self._sanitize(payload.get("product", "מוצר לדוגמה"), 120)
-        product_url = self._sanitize(payload.get("product_url", ""), 500)
-        headline = self._sanitize(payload.get("headline", product), 200)
-        description = self._sanitize(payload.get("description", ""), 500)
-        bullets = [self._sanitize(b, 120) for b in payload.get("bullets", [])][:8]
-        cta_text = self._sanitize(payload.get("cta_text", "קנו עכשיו"), 80)
-        cta_url = self._sanitize(payload.get("cta_url", product_url or "/pricing.html"), 200)
-        style = self._sanitize(payload.get("style", "UGC טבעי"), 80)
-        video_url = self._sanitize(payload.get("video_url", ""), 500)
-
-        page = {
-            "id": uuid.uuid4().hex[:10],
-            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "product": product,
-            "product_url": product_url,
-            "headline": headline,
-            "description": description,
-            "bullets": bullets,
-            "cta_text": cta_text,
+    @staticmethod
+    def _build_product_page(payload):
+        clean = Handler._sanitize
+        items_in = lambda key, limit, max_items: [
+            t for t in (clean(i, limit) for i in (payload.get(key) or [])[:max_items] if isinstance(i, str)) if t.strip()
+        ]
+        reviews = []
+        for r in (payload.get("reviews") or [])[:10]:
+            if isinstance(r, dict):
+                text = clean(r.get("text", ""), 400)
+                if text.strip():
+                    try:
+                        rating = max(1, min(5, int(r.get("rating", 5))))
+                    except (TypeError, ValueError):
+                        rating = 5
+                    reviews.append({"name": clean(r.get("name", ""), 60), "text": text, "rating": rating})
+        faq = []
+        for f in (payload.get("faq") or [])[:20]:
+            if isinstance(f, dict):
+                q = clean(f.get("q", ""), 200)
+                a = clean(f.get("a", ""), 600)
+                if q.strip() and a.strip():
+                    faq.append({"q": q, "a": a})
+        cta_url = clean(payload.get("cta_url", ""), 500).strip()
+        if not cta_url.lower().startswith(("http://", "https://")):
+            cta_url = ""
+        return {
+            "product": clean(payload.get("product", ""), 120),
+            "headline": clean(payload.get("headline", ""), 200),
+            "price": clean(payload.get("price", ""), 40),
+            "description": clean(payload.get("description", ""), 800),
+            "cta_text": clean(payload.get("cta_text", ""), 40),
             "cta_url": cta_url,
-            "style": style,
-            "video_url": video_url,
-            "slug": uuid.uuid4().hex[:8],
+            "details_title": clean(payload.get("details_title", ""), 80),
+            "details": clean(payload.get("details", ""), 2000),
+            "specs": clean(payload.get("specs", ""), 1500),
+            "hidden": [k for k in (payload.get("hidden") or []) if isinstance(k, str) and k in HIDEABLE_SECTIONS],
+            "shipping": clean(payload.get("shipping", ""), 200),
+            "images": clean_images(payload.get("images")),
+            "benefits": items_in("benefits", 160, 6),
+            "reviews": reviews,
+            "faq": faq,
+            "theme": clean_theme(payload.get("theme")),
         }
-        pages = _store.load("product_pages", [], DATA_DIR)
-        if not isinstance(pages, list):
-            pages = []
-        pages.insert(0, page)
-        _store.save("product_pages", pages[:100], DATA_DIR)
-        page_url = f"{_BASE_URL}/p/{page['slug']}"
-        return self.send_json(201, {"ok": True, "page": page, "page_url": page_url})
+
+    def _handle_product_page(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        page = self._build_product_page(payload)
+        if not page["product"].strip():
+            return self.send_json(400, {"error": "כתבו שם מוצר"})
+        slug = uuid.uuid4().hex[:8]
+        page.update({
+            "id": uuid.uuid4().hex[:10],
+            "slug": slug,
+            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        })
+        _store.save(f"product_page_{slug}", page, DATA_DIR)
+        page_url = f"{_BASE_URL}/p/{slug}"
+        return self.send_json(201, {"ok": True, "page": {"slug": slug}, "page_url": page_url})
+
+    def _handle_product_import(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        url = payload.get("url")
+        try:
+            data = _product_import.import_product(url if isinstance(url, str) else "")
+        except _product_import.ImportError_ as exc:
+            return self.send_json(400, {"error": str(exc)})
+        except Exception:
+            return self.send_json(502, {"error": "לא הצלחנו לייבא את המוצר מהקישור"})
+        return self.send_json(200, data)
+
+    def _handle_product_preview(self):
+        payload, error = self._read_product_payload()
+        if error:
+            return self.send_json(*error)
+        edit = "edit=1" in self.path
+        return self.send_json(200, {"html": render_product_page(self._build_product_page(payload), edit=edit)})
 
     def _handle_script_generate(self):
         try:
@@ -1179,7 +1285,7 @@ p,li{{font-size:17px;line-height:1.6}}.cta{{display:inline-block;margin-top:18px
 
     def _send_security_headers(self):
         self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('X-Frame-Options', 'DENY')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
         self.send_header('X-XSS-Protection', '1; mode=block')
         self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
         self.send_header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')

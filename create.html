@@ -19,23 +19,24 @@
   <meta name="twitter:image" content="https://clipik.pro/og-image.png">
 </head>
 <body>
-<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ תפריט</button>
+<header class="mobile-bar"><button class="sidebar-toggle" aria-label="פתיחת התפריט" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button><a class="mobile-brand" href="/">קליפיק פרו</a></header>
 <aside class="sidebar">
   <a class="sidebar-brand" href="/create.html">
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="url(#g)"/><path d="M11 8l12 7-12 7V8z" fill="#fff"/><defs><linearGradient id="g" x1="0" y1="0" x2="30" y2="30"><stop stop-color="#ff5a1f"/><stop offset="1" stop-color="#14161a"/></linearGradient></defs></svg>
     קליפיק פרו
   </a>
-  <a href="/login.html" class="sidebar-login-cta">👤 התחברות</a>
+  <a href="/login.html" class="sidebar-login-cta"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> התחברות</a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">עריכה</div>
-    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon">✨</span>יצירת סרטון</a>
-    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon">📋</span>תבניות</a>
-    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon">📦</span>יצירת דף מוצר</a>
-    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon">🎬</span>הסרטונים שלי</a>
+    <a href="/create.html" class="sidebar-link active"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg></span>יצירת סרטון</a>
+    <a href="/product-builder.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>יצירת דף מוצר</a>
+    <a href="/templates.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>תבניות לסרטון</a>
+    <a href="/product-examples.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span>תבניות לדפי מוצר<span class="sidebar-badge">חדש</span></a>
+    <a href="/my-videos.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></span>הסרטונים שלי</a>
     <div class="sidebar-section">ניווט</div>
-    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon">🎟️</span>מחירון</a>
-    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon">💡</span>טיפים</a>
-    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon">❓</span>שאלות נפוצות</a>
+    <a href="/pricing.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 0 0-6V6H3z"/><path d="M13 6v12"/></svg></span>מחירון</a>
+    <a href="/examples.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></span>טיפים</a>
+    <a href="/faq.html" class="sidebar-link"><span class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg></span>שאלות נפוצות</a>
   </nav>
   <div class="sidebar-footer">© 2026 קליפיק פרו</div>
 </aside>
@@ -48,6 +49,10 @@
       <span class="step" id="step2"><b>2</b></span>
       <div class="step-line"></div>
       <span class="step" id="step3"><b>3</b></span>
+    </div>
+    <div id="promoBanner" role="region" aria-label="דפי מוצר בחינם" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent);color:#fff;border-radius:16px;padding:14px 18px;margin:0 0 22px;box-shadow:0 6px 18px rgba(255,90,31,.25)">
+      <strong style="font-size:16px;line-height:1.4;flex:1 1 260px">רוצים להקפיץ את המכירות? יצירת דפי מוצר מדהימים בחינם לגמרי!</strong>
+      <a href="/product-examples.html" class="btn" style="background:#fff;color:var(--ink);box-shadow:none;white-space:nowrap">צפה בתבניות לדפי מוצר</a>
     </div>
     <h2 id="stageTitle" style="text-align:center;margin-bottom:4px">נתחיל מהמוצר</h2>
     <p id="stageCount" style="text-align:center;color:var(--muted);margin-bottom:24px">שלב 1 מתוך 3</p>
@@ -81,6 +86,31 @@
           <div class="label"><label for="audience">למי הסרטון מיועד?</label></div>
           <input class="input" id="audience" placeholder="למשל: הורים לילדים קטנים">
           <p style="color:var(--muted);font-size:13px;margin-top:4px">ספרו בקצרה למי אתם מוכרים את המוצר.</p>
+        </div>
+        <div class="field" id="avatarField">
+          <div class="label"><span>בחרו את הדמות שמציגה את המוצר</span></div>
+          <style>
+            #avatarRow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+            .av-btn{padding:0;border:2px solid transparent;border-radius:14px;overflow:hidden;background:var(--surface-2);cursor:pointer;aspect-ratio:3/4;display:block;width:100%}
+            .av-btn[aria-pressed="true"]{border-color:var(--accent)}
+            .av-btn img{width:100%;height:100%;object-fit:cover;display:block}
+            .av-more{aspect-ratio:auto;min-height:44px;font:inherit;font-weight:700;color:var(--ink);background:var(--surface-2)}
+            #avatarDialog{border:0;border-radius:18px;padding:20px;width:min(560px,calc(100vw - 32px));max-height:85vh;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-lg)}
+            #avatarDialog::backdrop{background:rgba(20,20,20,.45)}
+            #avatarAll{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;max-height:55vh;overflow-y:auto;padding:4px}
+            #avatarAll .av-btn{aspect-ratio:3/4}
+            .av-cap{display:block;font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+          </style>
+          <div id="avatarRow" role="group" aria-label="דמויות מומלצות"></div>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px" id="avatarName">לא נבחרה דמות: יוצר AI ברירת מחדל</p>
+          <dialog id="avatarDialog" aria-labelledby="avatarDialogTitle">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
+              <strong id="avatarDialogTitle" style="font-size:18px">בחירת דמות</strong>
+              <button type="button" class="btn btn-secondary" id="avatarClose">סגירה</button>
+            </div>
+            <input class="input" id="avatarSearch" type="search" placeholder="חיפוש: למשל שיער בלונד, משקפיים, ג'ינס" aria-label="חיפוש דמות" style="margin-bottom:12px">
+            <div id="avatarAll" role="group" aria-label="כל הדמויות"></div>
+          </dialog>
         </div>
         <div class="options-row">
           <div class="field">
@@ -184,6 +214,60 @@
 
   <script>
     const $ = s => document.querySelector(s);
+    // דמויות לבחירה: הרשימה נטענת מ-/avatars/index.json, שלושה מוצגות והשאר בחלון חיפוש
+    let AVATARS = [];
+    let selectedAvatar = null;
+    const escAttr = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function selectedCreator() {
+      const a = AVATARS.find(x => x.id === selectedAvatar);
+      return a ? a.label : "דמות AI";
+    }
+    function avatarBtn(a) {
+      return `<button type="button" class="av-btn" data-id="${a.id}" aria-pressed="${a.id === selectedAvatar}" aria-label="${escAttr(a.label)}" title="${escAttr(a.label)}"><img src="/avatars/${escAttr(a.file)}" alt="" loading="lazy"></button>`;
+    }
+    function renderAvatars() {
+      const sel = AVATARS.find(a => a.id === selectedAvatar);
+      const rest = AVATARS.filter(a => a.id !== selectedAvatar);
+      const shown = (sel ? [sel] : []).concat(rest).slice(0, 3);
+      $("#avatarRow").innerHTML = shown.map(avatarBtn).join("") +
+        `<button type="button" class="av-btn av-more" id="avatarMore">עוד דמויות (${AVATARS.length})</button>`;
+      $("#avatarName").textContent = sel ? "נבחרה: " + sel.label : "לא נבחרה דמות: יוצר AI ברירת מחדל";
+    }
+    function renderAllAvatars() {
+      const q = $("#avatarSearch").value.trim().toLowerCase();
+      const list = AVATARS.filter(a => !q || a.label.toLowerCase().includes(q));
+      $("#avatarAll").innerHTML = list.length
+        ? list.map(a => `<div>${avatarBtn(a)}<span class="av-cap">${escAttr(a.label)}</span></div>`).join("")
+        : '<p style="color:var(--muted)">לא נמצאה דמות עם החיפוש הזה</p>';
+    }
+    async function loadAvatars() {
+      try {
+        const r = await fetch("/avatars/index.json");
+        AVATARS = r.ok ? await r.json() : [];
+      } catch (e) { AVATARS = []; }
+      renderAvatars();
+    }
+    function chooseAvatar(id) {
+      selectedAvatar = Number(id);
+      renderAvatars();
+    }
+    $("#avatarRow").addEventListener("click", e => {
+      if (e.target.closest("#avatarMore")) {
+        $("#avatarSearch").value = "";
+        renderAllAvatars();
+        $("#avatarDialog").showModal();
+        return;
+      }
+      const b = e.target.closest("button[data-id]"); if (b) chooseAvatar(b.dataset.id);
+    });
+    $("#avatarAll").addEventListener("click", e => {
+      const b = e.target.closest("button[data-id]"); if (!b) return;
+      chooseAvatar(b.dataset.id);
+      $("#avatarDialog").close();
+    });
+    $("#avatarSearch").addEventListener("input", renderAllAvatars);
+    $("#avatarClose").addEventListener("click", () => $("#avatarDialog").close());
+    loadAvatars();
     let stage = 1, selected = -1, openScript = -1, style = "UGC טבעי", productImages = [], scriptData = [], scriptTexts = [], productName = "";
 
     function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2300); }
@@ -199,6 +283,8 @@
       });
       $("#stageTitle").textContent = ["נתחיל מהמוצר","בוחרים תסריט וסגנון","תצוגה וצירת סרטון"][n - 1];
       $("#stageCount").textContent = "שלב " + n + " מתוך 3";
+      const banner = $("#promoBanner");
+      if (banner) banner.hidden = n !== 1;
       window.scrollTo({top: 0, behavior: "smooth"});
     }
 
@@ -344,7 +430,7 @@
         resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
-        creator: "דמות AI"
+        creator: selectedCreator()
       };
       btn.disabled = true; btn.innerHTML = "✳ יוצר סרטון…";
       const status = $("#previewStatus"); status.style.display = "block"; status.textContent = "שולח בקשה…";
@@ -381,6 +467,9 @@
         }
         status.appendChild(text);
         if (link.href) status.appendChild(link);
+        // ההודעה מופיעה מתחת לכפתור, ולכן מגללים אליה ומציגים גם הודעה קופצת
+        toast(e.status === 402 ? "אין מספיק טוקנים. צריך להטעין כדי ליצור סרטון" : (e.status === 401 ? "צריך להתחבר כדי ליצור סרטון" : (e.message || "אירעה שגיאה. נסו שוב.")));
+        status.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     };
 
@@ -395,7 +484,7 @@
         resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
-        creator: "דמות AI"
+        creator: selectedCreator()
       };
       try {
         const r = await fetch("/api/projects", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload) });
@@ -451,7 +540,7 @@ document.querySelectorAll('.seg-wrap').forEach(function(group){
   cta.insertAdjacentElement('afterend', box);
   fetch('/api/users/me', { credentials: 'same-origin' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); })
+    .then(function (d) { if (d && d.user) box.textContent = 'טוקנים: ' + Number(d.user.tokens || 0); if (d && d.user && d.user.email) cta.textContent = '👤 ' + d.user.email; })
     .catch(function () {});
 })();
 </script>
