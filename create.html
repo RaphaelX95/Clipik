@@ -85,8 +85,28 @@
         </div>
         <div class="field" id="avatarField">
           <div class="label"><span>בחרו את הדמות שמציגה את המוצר</span></div>
-          <div id="avatarGrid" role="radiogroup" aria-label="בחירת דמות" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px"></div>
-          <p style="color:var(--muted);font-size:13px;margin-top:4px" id="avatarName">לא נבחרה דמות: יוצר AI ברירת מחדל</p>
+          <style>
+            #avatarRow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+            .av-btn{padding:0;border:2px solid transparent;border-radius:14px;overflow:hidden;background:var(--surface-2);cursor:pointer;aspect-ratio:3/4;display:block;width:100%}
+            .av-btn[aria-pressed="true"]{border-color:var(--accent)}
+            .av-btn img{width:100%;height:100%;object-fit:cover;display:block}
+            .av-more{aspect-ratio:auto;min-height:44px;font:inherit;font-weight:700;color:var(--ink);background:var(--surface-2)}
+            #avatarDialog{border:0;border-radius:18px;padding:20px;width:min(560px,calc(100vw - 32px));max-height:85vh;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-lg)}
+            #avatarDialog::backdrop{background:rgba(20,20,20,.45)}
+            #avatarAll{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;max-height:55vh;overflow-y:auto;padding:4px}
+            #avatarAll .av-btn{aspect-ratio:3/4}
+            .av-cap{display:block;font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+          </style>
+          <div id="avatarRow" role="group" aria-label="דמויות מומלצות"></div>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px" id="avatarName">לא נבחרה דמות: יוצר AI ברירת מחדל</p>
+          <dialog id="avatarDialog" aria-labelledby="avatarDialogTitle">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
+              <strong id="avatarDialogTitle" style="font-size:18px">בחירת דמות</strong>
+              <button type="button" class="btn btn-secondary" id="avatarClose">סגירה</button>
+            </div>
+            <input class="input" id="avatarSearch" type="search" placeholder="חיפוש: למשל שיער בלונד, משקפיים, ג'ינס" aria-label="חיפוש דמות" style="margin-bottom:12px">
+            <div id="avatarAll" role="group" aria-label="כל הדמויות"></div>
+          </dialog>
         </div>
         <div class="options-row">
           <div class="field">
@@ -190,39 +210,60 @@
 
   <script>
     const $ = s => document.querySelector(s);
-    // דמויות לבחירה: התמונה נשמרת ב-/avatars, והתיאור נכנס לבקשת הסרטון
-    const AVATARS = [
-      { id: 1, label: "אישה צעירה, שיער בלונד גלי, שמלה פרחונית" },
-      { id: 2, label: "אישה, שיער כהה ישר, בלייזר ירוק" },
-      { id: 3, label: "אישה, שיער כהה מתולתל, חולצה ירוקה" },
-      { id: 4, label: "אישה, שיער חום גלי, חולצה ירוקה" },
-      { id: 5, label: "אישה, קוקו כהה, בגד ספורט כחול" },
-      { id: 6, label: "אישה, שיער כהה קצר, ג'קט ג'ינס" },
-      { id: 7, label: "אישה, שיער כהה ארוך, שמלה צבעונית" },
-      { id: 8, label: "אישה, שיער חום מתולתל, סוודר כחול" },
-      { id: 9, label: "אישה, שיער מתולתל כהה, משקפיים" },
-      { id: 10, label: "אישה, שיער אדמוני מתולתל, חולצה לבנה" }
-    ];
+    // דמויות לבחירה: הרשימה נטענת מ-/avatars/index.json, שלושה מוצגות והשאר בחלון חיפוש
+    let AVATARS = [];
     let selectedAvatar = null;
+    const escAttr = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     function selectedCreator() {
       const a = AVATARS.find(x => x.id === selectedAvatar);
       return a ? a.label : "דמות AI";
     }
-    function renderAvatars() {
-      const grid = $("#avatarGrid");
-      grid.innerHTML = AVATARS.map(a => `
-        <button type="button" role="radio" aria-checked="${a.id === selectedAvatar}" data-id="${a.id}"
-          aria-label="דמות ${a.id}: ${a.label}"
-          style="padding:0;border:2px solid ${a.id === selectedAvatar ? "var(--accent)" : "transparent"};border-radius:14px;overflow:hidden;background:var(--surface-2);cursor:pointer;aspect-ratio:3/4">
-          <img src="/avatars/avatar-${a.id}.jpg" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
-        </button>`).join("");
-      $("#avatarName").textContent = selectedAvatar ? "נבחרה: " + selectedCreator() : "לא נבחרה דמות: יוצר AI ברירת מחדל";
+    function avatarBtn(a) {
+      return `<button type="button" class="av-btn" data-id="${a.id}" aria-pressed="${a.id === selectedAvatar}" aria-label="${escAttr(a.label)}" title="${escAttr(a.label)}"><img src="/avatars/${escAttr(a.file)}" alt="" loading="lazy"></button>`;
     }
-    $("#avatarGrid").addEventListener("click", e => {
-      const b = e.target.closest("button[data-id]"); if (!b) return;
-      selectedAvatar = Number(b.dataset.id); renderAvatars();
+    function renderAvatars() {
+      const sel = AVATARS.find(a => a.id === selectedAvatar);
+      const rest = AVATARS.filter(a => a.id !== selectedAvatar);
+      const shown = (sel ? [sel] : []).concat(rest).slice(0, 3);
+      $("#avatarRow").innerHTML = shown.map(avatarBtn).join("") +
+        `<button type="button" class="av-btn av-more" id="avatarMore">עוד דמויות (${AVATARS.length})</button>`;
+      $("#avatarName").textContent = sel ? "נבחרה: " + sel.label : "לא נבחרה דמות: יוצר AI ברירת מחדל";
+    }
+    function renderAllAvatars() {
+      const q = $("#avatarSearch").value.trim().toLowerCase();
+      const list = AVATARS.filter(a => !q || a.label.toLowerCase().includes(q));
+      $("#avatarAll").innerHTML = list.length
+        ? list.map(a => `<div>${avatarBtn(a)}<span class="av-cap">${escAttr(a.label)}</span></div>`).join("")
+        : '<p style="color:var(--muted)">לא נמצאה דמות עם החיפוש הזה</p>';
+    }
+    async function loadAvatars() {
+      try {
+        const r = await fetch("/avatars/index.json");
+        AVATARS = r.ok ? await r.json() : [];
+      } catch (e) { AVATARS = []; }
+      renderAvatars();
+    }
+    function chooseAvatar(id) {
+      selectedAvatar = Number(id);
+      renderAvatars();
+    }
+    $("#avatarRow").addEventListener("click", e => {
+      if (e.target.closest("#avatarMore")) {
+        $("#avatarSearch").value = "";
+        renderAllAvatars();
+        $("#avatarDialog").showModal();
+        return;
+      }
+      const b = e.target.closest("button[data-id]"); if (b) chooseAvatar(b.dataset.id);
     });
-    renderAvatars();
+    $("#avatarAll").addEventListener("click", e => {
+      const b = e.target.closest("button[data-id]"); if (!b) return;
+      chooseAvatar(b.dataset.id);
+      $("#avatarDialog").close();
+    });
+    $("#avatarSearch").addEventListener("input", renderAllAvatars);
+    $("#avatarClose").addEventListener("click", () => $("#avatarDialog").close());
+    loadAvatars();
     let stage = 1, selected = -1, openScript = -1, style = "UGC טבעי", productImages = [], scriptData = [], scriptTexts = [], productName = "";
 
     function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2300); }
