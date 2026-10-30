@@ -83,6 +83,11 @@
           <input class="input" id="audience" placeholder="למשל: הורים לילדים קטנים">
           <p style="color:var(--muted);font-size:13px;margin-top:4px">ספרו בקצרה למי אתם מוכרים את המוצר.</p>
         </div>
+        <div class="field" id="avatarField">
+          <div class="label"><span>בחרו את הדמות שמציגה את המוצר</span></div>
+          <div id="avatarGrid" role="radiogroup" aria-label="בחירת דמות" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px"></div>
+          <p style="color:var(--muted);font-size:13px;margin-top:4px" id="avatarName">לא נבחרה דמות: יוצר AI ברירת מחדל</p>
+        </div>
         <div class="options-row">
           <div class="field">
             <div class="label"><label for="language">שפת הסרטון</label></div>
@@ -185,6 +190,39 @@
 
   <script>
     const $ = s => document.querySelector(s);
+    // דמויות לבחירה: התמונה נשמרת ב-/avatars, והתיאור נכנס לבקשת הסרטון
+    const AVATARS = [
+      { id: 1, label: "אישה צעירה, שיער בלונד גלי, שמלה פרחונית" },
+      { id: 2, label: "אישה, שיער כהה ישר, בלייזר ירוק" },
+      { id: 3, label: "אישה, שיער כהה מתולתל, חולצה ירוקה" },
+      { id: 4, label: "אישה, שיער חום גלי, חולצה ירוקה" },
+      { id: 5, label: "אישה, קוקו כהה, בגד ספורט כחול" },
+      { id: 6, label: "אישה, שיער כהה קצר, ג'קט ג'ינס" },
+      { id: 7, label: "אישה, שיער כהה ארוך, שמלה צבעונית" },
+      { id: 8, label: "אישה, שיער חום מתולתל, סוודר כחול" },
+      { id: 9, label: "אישה, שיער מתולתל כהה, משקפיים" },
+      { id: 10, label: "אישה, שיער אדמוני מתולתל, חולצה לבנה" }
+    ];
+    let selectedAvatar = null;
+    function selectedCreator() {
+      const a = AVATARS.find(x => x.id === selectedAvatar);
+      return a ? a.label : "דמות AI";
+    }
+    function renderAvatars() {
+      const grid = $("#avatarGrid");
+      grid.innerHTML = AVATARS.map(a => `
+        <button type="button" role="radio" aria-checked="${a.id === selectedAvatar}" data-id="${a.id}"
+          aria-label="דמות ${a.id}: ${a.label}"
+          style="padding:0;border:2px solid ${a.id === selectedAvatar ? "var(--accent)" : "transparent"};border-radius:14px;overflow:hidden;background:var(--surface-2);cursor:pointer;aspect-ratio:3/4">
+          <img src="/avatars/avatar-${a.id}.jpg" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
+        </button>`).join("");
+      $("#avatarName").textContent = selectedAvatar ? "נבחרה: " + selectedCreator() : "לא נבחרה דמות: יוצר AI ברירת מחדל";
+    }
+    $("#avatarGrid").addEventListener("click", e => {
+      const b = e.target.closest("button[data-id]"); if (!b) return;
+      selectedAvatar = Number(b.dataset.id); renderAvatars();
+    });
+    renderAvatars();
     let stage = 1, selected = -1, openScript = -1, style = "UGC טבעי", productImages = [], scriptData = [], scriptTexts = [], productName = "";
 
     function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2300); }
@@ -345,7 +383,7 @@
         resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
-        creator: "דמות AI"
+        creator: selectedCreator()
       };
       btn.disabled = true; btn.innerHTML = "✳ יוצר סרטון…";
       const status = $("#previewStatus"); status.style.display = "block"; status.textContent = "שולח בקשה…";
@@ -399,7 +437,7 @@
         resolution: $("#resolution").value,
         script: currentScript().trim(),
         style: style,
-        creator: "דמות AI"
+        creator: selectedCreator()
       };
       try {
         const r = await fetch("/api/projects", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload) });
