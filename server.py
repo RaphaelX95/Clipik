@@ -348,7 +348,8 @@ class Handler(BaseHTTPRequestHandler):
     def _client_ip(self):
         fwd = self.headers.get("X-Forwarded-For", "") if hasattr(self, "headers") else ""
         if fwd:
-            return fwd.split(",")[0].strip()[:64]
+            # הפרוקסי מוסיף את ה-IP האמיתי בסוף הרשימה. הערך הראשון נשלח על ידי הלקוח ואפשר לזייף אותו.
+            return fwd.split(",")[-1].strip()[:64]
         return self.client_address[0] if hasattr(self, "client_address") else "unknown"
 
     def send_json(self, status, payload):
