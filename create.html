@@ -242,7 +242,7 @@
     }
     async function loadAvatars() {
       try {
-        const r = await fetch("/avatars/index.json");
+        const r = await fetch("/avatars/index.json?v=2", { cache: "no-store" });
         AVATARS = r.ok ? await r.json() : [];
       } catch (e) { AVATARS = []; }
       renderAvatars();
